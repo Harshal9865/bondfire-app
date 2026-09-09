@@ -1,0 +1,81 @@
+openapi: 3.1.0
+info:
+  title: Bondfire REST & WebSocket API
+  version: 1.0.0
+  description: Production API documentation for Bondfire Social Memory Play & Keepsakes.
+servers:
+  - url: https://api.bondfire.app/api
+    description: Production Edge Gateway
+  - url: http://localhost:4000/api
+    description: Local Development Environment
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: API is operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "healthy" }
+                  uptime: { type: number, example: 142.5 }
+
+  /pods:
+    post:
+      summary: Create a new Pod workspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, hostName]
+              properties:
+                name: { type: string, example: "The Goa Trip Crew 🏖️" }
+                type: { type: string, enum: [SOLO, COUPLE, SQUAD], default: SQUAD }
+                hostName: { type: string, example: "Maya" }
+      responses:
+        '201':
+          description: Pod created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pod: { type: object }
+                  hostUserId: { type: string }
+
+  /pods/{code}:
+    get:
+      summary: Retrieve room by 4-letter room code
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema: { type: string, example: "FIRE" }
+      responses:
+        '200':
+          description: Pod lobby state
+        '404':
+          description: Room not found or expired
+
+  /game/start:
+    post:
+      summary: Initialize game session and deck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [podId, hostUserId]
+              properties:
+                podId: { type: string }
+                hostUserId: { type: string }
+      responses:
+        '200':
+          description: Game session started

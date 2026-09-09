@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bondfire — Party games made from your own memories</title>
+  
+  <!-- SEO & Open Graph Meta -->
+  <meta name="description" content="No generic trivia. Drop in your group chats, real photos, and inside jokes. Bondfire auto-generates hilarious social party games and physical yearbooks for Couples, Squads, and Solo." />
+  <meta property="og:title" content="Bondfire — Social Memory Play & Keepsakes" />
+  <meta property="og:description" content="Party games made from your own memories. Zero gambling, 100% real inside jokes." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0B0E17" />
+
+  <!-- Google Fonts: Space Grotesk, Plus Jakarta Sans, Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Google Identity Services (GSI) SDK for Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- PWA Web App Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN & Design System Extension -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            'room-code': ['Space Grotesk', 'monospace'],
+            'label-md': ['Space Grotesk', 'sans-serif'],
+            'label-lg': ['Space Grotesk', 'sans-serif'],
+            'headline-md': ['Space Grotesk', 'sans-serif'],
+            'headline-sm': ['Space Grotesk', 'sans-serif'],
+            'headline-lg': ['Space Grotesk', 'sans-serif'],
+            'caption': ['Plus Jakarta Sans', 'sans-serif'],
+            'body-sm': ['Plus Jakarta Sans', 'sans-serif'],
+            'body-md': ['Plus Jakarta Sans', 'sans-serif'],
+            'body-lg': ['Plus Jakarta Sans', 'sans-serif']
+          },
+          colors: {
+            canvas: '#0B0E17',
+            surface: '#10131c',
+            'surface-bright': '#202538',
+            'surface-dark': '#0F121E',
+            'surface-card': '#1A1D2B',
+            'surface-raised': '#25293C',
+            'surface-container-lowest': '#0b0e17',
+            'surface-container-low': '#181b25',
+            'surface-container': '#1c1f29',
+            'surface-container-high': '#272a34',
+            'surface-container-highest': '#32343f',
+            'on-surface': '#e0e2ef',
+            'on-surface-variant': '#e2bebc',
+            border: '#262B40',
+            'border-light': '#363D5A',
+            amber: { gold: '#FFB703' },
+            sunset: { coral: '#FF5A5F' },
+            duo: { rose: '#F72585' },
+            mint: { green: '#4ADE80' },
+            primary: '#ffb3b0',
+            'primary-container': '#ff5a5f',
+            'on-primary': '#680010',
+            'on-primary-container': '#61000e',
+            secondary: '#ffd795',
+            'secondary-container': '#fbb400',
+            'on-secondary': '#422c00',
+            'on-secondary-container': '#694900',
+            'secondary-fixed': '#ffdea9',
+            'secondary-fixed-dim': '#ffba27',
+            tertiary: '#4de082',
+            'tertiary-container': '#00aa57',
+            'on-tertiary': '#003919',
+            'tertiary-fixed': '#6dfe9c',
+            'tertiary-fixed-dim': '#4de082',
+            outline: '#a98988',
+            'outline-variant': '#5a403f'
+          },
+          boxShadow: {
+            'glow-coral': '0 0 35px -5px rgba(255, 90, 95, 0.35)',
+            'glow-amber': '0 0 35px -5px rgba(255, 183, 3, 0.35)',
+            'glow-rose': '0 0 35px -5px rgba(247, 37, 133, 0.35)',
+            'glow-mint': '0 0 30px -5px rgba(74, 222, 128, 0.3)'
+          },
+          spacing: {
+            'card-padding': '1.25rem',
+            'margin-mobile': '1.25rem',
+            'gutter-mobile': '1rem'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Application Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/modes.css" />
+  <link rel="stylesheet" href="css/canvas-shader.css" />
+  <link rel="stylesheet" href="css/book-3d.css" />
+  <style>
+    .mesh-gradient {
+      background: radial-gradient(circle at 20% 15%, rgba(255, 90, 95, 0.12) 0%, transparent 45%),
+                  radial-gradient(circle at 80% 25%, rgba(255, 183, 3, 0.10) 0%, transparent 40%),
+                  radial-gradient(circle at 50% 70%, rgba(247, 37, 133, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 15% 85%, rgba(74, 222, 128, 0.07) 0%, transparent 40%);
+    }
+    .cyber-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(38, 43, 64, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(38, 43, 64, 0.35) 1px, transparent 1px);
+    }
+    .book-spine-3d {
+      transform: perspective(1400px) rotateY(-18deg) rotateX(10deg);
+      box-shadow: -25px 25px 50px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 183, 3, 0.15);
+    }
+    .glass-pill {
+      background: rgba(22, 25, 38, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(38, 43, 64, 0.8);
+    }
+  </style>
+</head>
+<body data-mode="PODS">
+
+  <!-- OpenAI / Gemini Fluid Ambient Particle Canvas -->
+  <div id="bg-canvas-container">
+    <canvas id="bg-canvas"></canvas>
+    <div class="hero-glow-orb"></div>
+    <div class="mesh-overlay"></div>
+  </div>
+
+  <!-- Celebration Confetti Layer -->
+  <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999;"></canvas>
+
+  <!-- Global Navigation Header Mount -->
+  <div id="header-mount"></div>
+
+  <!-- Main View Dynamic Mount -->
+  <main id="app-mount"></main>
+
+  <!-- Global Footer Mount -->
+  <div id="footer-mount"></div>
+
+  <!-- Global Toast Mount -->
+  <div id="toast-mount" class="toast-container"></div>
+
+  <!-- Global Modal Mount for Auth & Checkout Simulator -->
+  <div id="modal-mount"></div>
+
+  <!-- Master Application Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

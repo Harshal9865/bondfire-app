@@ -1,0 +1,33 @@
+/* ==============================================================================
+   DYNAMIC MODE THEMES (Solo, Us, Pods)
+   ============================================================================== */
+
+/* MODE A: SOLO (Time Capsule & Self Reflection) */
+body[data-mode="SOLO"] {
+  --mode-accent: var(--accent-amber);
+  --mode-glow: var(--accent-amber-glow);
+}
+
+body[data-mode="SOLO"] .hero-glow-orb {
+  background: radial-gradient(circle, rgba(255, 183, 3, 0.18) 0%, transparent 70%);
+}
+
+/* MODE B: US (Couples & Romantic Nostalgia) */
+body[data-mode="US"] {
+  --mode-accent: var(--accent-rose);
+  --mode-glow: var(--accent-rose-glow);
+}
+
+body[data-mode="US"] .hero-glow-orb {
+  background: radial-gradient(circle, rgba(247, 37, 133, 0.18) 0%, transparent 70%);
+}
+
+/* MODE C: PODS (Squads, Families & Roasts) */
+body[data-mode="PODS"] {
+  --mode-accent: var(--accent-coral);
+  --mode-glow: var(--accent-coral-glow);
+}
+
+body[data-mode="PODS"] .hero-glow-orb {
+  background: radial-gradient(circle, rgba(255, 90, 95, 0.2) 0%, transparent 70%);
+}
