@@ -217,7 +217,8 @@ export function bindHeaderEvents() {
   const createRoomBtn = document.getElementById('btn-header-create-room');
   if (createRoomBtn) {
     createRoomBtn.addEventListener('click', () => {
-      audio.playClick();
+      audio.playChime();
+      store.createNewRoom();
       store.setView('LOBBY');
     });
   }

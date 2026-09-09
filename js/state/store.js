@@ -3,7 +3,7 @@
 // Guarantees zero lost game state on page refresh or tab re-opening
 // ==============================================================================
 
-import { CONFIG } from '../config.js';
+import { CONFIG, generateRoomCode } from '../config.js';
 
 class ReactiveStore {
   constructor() {
@@ -52,13 +52,14 @@ class ReactiveStore {
   }
 
   getDefaultFriendsList() {
+    const liveCode = generateRoomCode();
     return [
       {
         id: 'fr_1',
         name: 'Liam Vance',
         username: 'liam_v',
         status: 'IN_GAME', // 'IN_GAME' | 'ONLINE' | 'OFFLINE'
-        currentRoom: 'FIRE',
+        currentRoom: liveCode,
         avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam',
         sparks: 620,
         mutualGames: 14,
@@ -113,7 +114,7 @@ class ReactiveStore {
         membersCount: 5,
         members: ['fr_1', 'fr_2', 'fr_3', 'fr_4'],
         deckName: 'Inside Joke Mystery Deck',
-        activeRoomCode: 'FIRE',
+        activeRoomCode: generateRoomCode(),
         unreadMemories: 2,
         isPinned: true,
       },
@@ -182,16 +183,24 @@ class ReactiveStore {
           if (parsed.currentUser && (parsed.currentUser.email === 'maya@bondfire.app' || parsed.currentUser.displayName === 'Maya Lin')) {
             parsed.currentUser = this.getDefaultGuestUser();
           }
-          if (parsed.activeRoom && Array.isArray(parsed.activeRoom.players)) {
-            parsed.activeRoom.players = parsed.activeRoom.players.map((p) => {
-              if (p.name === 'Maya') {
-                return { ...p, name: 'Host (You)', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost' };
-              }
-              if (p.avatar && p.avatar.includes('unsplash.com')) {
-                return { ...p, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(p.name)}` };
-              }
-              return p;
-            });
+          if (parsed.activeRoom) {
+            if (parsed.activeRoom.roomCode === 'FIRE' || !parsed.activeRoom.roomCode) {
+              parsed.activeRoom.roomCode = generateRoomCode();
+            }
+            if (!parsed.activeRoom.selectedGameMode) {
+              parsed.activeRoom.selectedGameMode = 'RED_FLAG_COURT';
+            }
+            if (Array.isArray(parsed.activeRoom.players)) {
+              parsed.activeRoom.players = parsed.activeRoom.players.map((p) => {
+                if (p.name === 'Maya') {
+                  return { ...p, name: 'Host (You)', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost' };
+                }
+                if (p.avatar && p.avatar.includes('unsplash.com')) {
+                  return { ...p, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(p.name)}` };
+                }
+                return p;
+              });
+            }
           }
           if (!parsed.friendsList) parsed.friendsList = this.getDefaultFriendsList();
           if (!parsed.squadsList) parsed.squadsList = this.getDefaultSquadsList();
@@ -215,9 +224,10 @@ class ReactiveStore {
       squadsList: this.getDefaultSquadsList(),
       friendRequests: this.getDefaultFriendRequests(),
       activeRoom: {
-        roomCode: 'FIRE',
+        roomCode: generateRoomCode(),
         podName: 'The Goa Trip Crew 🏖️',
         isHost: true,
+        selectedGameMode: 'RED_FLAG_COURT',
         players: [
           { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost' },
           { id: 'usr_2', name: 'Liam', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam' },
@@ -295,6 +305,32 @@ class ReactiveStore {
 
   setRoomCode(roomCode) {
     const activeRoom = { ...this.state.activeRoom, roomCode };
+    this.setState({ activeRoom });
+  }
+
+  createNewRoom(podName) {
+    const roomCode = generateRoomCode();
+    const user = this.state.currentUser;
+    const hostName = (user && user.isLoggedIn && user.displayName) ? `${user.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+    const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost';
+    const activeRoom = {
+      roomCode,
+      podName: podName || 'Campfire Squad Pod 🔥',
+      isHost: true,
+      selectedGameMode: this.state.activeRoom?.selectedGameMode || 'RED_FLAG_COURT',
+      players: [
+        { id: 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
+        { id: 'usr_2', name: 'Liam', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam' },
+        { id: 'usr_3', name: 'Sarah', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Sarah' },
+        { id: 'usr_4', name: 'Alex', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex' },
+      ],
+    };
+    this.setState({ activeRoom });
+    return activeRoom;
+  }
+
+  setGameMode(gameMode) {
+    const activeRoom = { ...this.state.activeRoom, selectedGameMode: gameMode };
     this.setState({ activeRoom });
   }
 

@@ -13,6 +13,8 @@ class WebSocketService {
     this.maxReconnectDelay = 10000;
     this.heartbeatInterval = null;
     this.isConnected = false;
+    this.hasLoggedError = false;
+    this.hasLoggedMeshMode = false;
   }
 
   connect() {
@@ -53,14 +55,25 @@ class WebSocketService {
       this.socket.onclose = () => {
         this.isConnected = false;
         this.stopHeartbeat();
-        this.scheduleReconnect();
+        if (this.reconnectAttempts < 2) {
+          this.scheduleReconnect();
+        } else if (!this.hasLoggedMeshMode) {
+          this.hasLoggedMeshMode = true;
+          console.log('⚡ Bondfire operating in resilient local mesh mode.');
+        }
       };
 
-      this.socket.onerror = (err) => {
-        console.warn('WebSocket warning (server may be offline, operating in resilient local mode):', err);
+      this.socket.onerror = () => {
+        if (!this.hasLoggedError) {
+          this.hasLoggedError = true;
+          console.info('ℹ️ WebSocket server offline; seamless local mesh fallback engaged.');
+        }
       };
     } catch (e) {
-      console.warn('Unable to establish WebSocket, running in resilient client mode:', e);
+      if (!this.hasLoggedError) {
+        this.hasLoggedError = true;
+        console.info('ℹ️ Running in resilient client-first mode.');
+      }
     }
   }
 

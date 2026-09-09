@@ -6,6 +6,7 @@
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+import { generateRoomCode } from '../config.js';
 
 let activeFilter = 'ALL'; // 'ALL' | 'ONLINE' | 'IN_GAME'
 let activeTab = 'CAMPERS'; // 'CAMPERS' | 'SQUADS' | 'DISCOVER'
@@ -195,7 +196,7 @@ function renderCampersRoster(friends) {
                   ${isLive ? 'videogame_asset' : isOnline ? 'schedule' : 'history'}
                 </span>
                 <span class="text-gray-300 font-medium truncate">
-                  ${isLive ? `Playing in Pod #${friend.currentRoom || 'FIRE'}` : friend.lastActive}
+                  ${isLive ? `Playing in Pod #${friend.currentRoom || store.getState().activeRoom.roomCode}` : friend.lastActive}
                 </span>
               </div>
 
@@ -209,9 +210,9 @@ function renderCampersRoster(friends) {
             <!-- Card Bottom Quick Action Suite -->
             <div class="flex items-center gap-2 pt-1 border-t border-border/40">
               ${isLive ? `
-                <button class="btn-join-friend-room flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5" data-room="${friend.currentRoom || 'FIRE'}" type="button">
+                <button class="btn-join-friend-room flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5" data-room="${friend.currentRoom || store.getState().activeRoom.roomCode}" type="button">
                   <span class="material-symbols-outlined text-[16px]">meeting_room</span>
-                  <span>Join Room #${friend.currentRoom || 'FIRE'}</span>
+                  <span>Join Room #${friend.currentRoom || store.getState().activeRoom.roomCode}</span>
                 </button>
               ` : `
                 <button class="btn-invite-friend-room flex-1 py-2 px-3 rounded-xl bg-surface-bright hover:bg-sunset-coral hover:text-white text-gray-200 font-bold text-xs border border-border/80 transition-all active:scale-95 flex items-center justify-center gap-1.5" data-id="${friend.id}" data-name="${friend.name}" type="button">
@@ -288,7 +289,7 @@ function renderSquadsList(squads) {
             </div>
 
             <!-- Squad Ignition Button -->
-            <button class="btn-ignite-squad w-full py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-xs shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2" data-squad="${sq.name}" data-code="${sq.activeRoomCode || 'FIRE'}" type="button">
+            <button class="btn-ignite-squad w-full py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-xs shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2" data-squad="${sq.name}" data-code="${sq.activeRoomCode || generateRoomCode()}" type="button">
               <span class="material-symbols-outlined text-[16px]">local_fire_department</span>
               <span>Ignite Squad Pod</span>
             </button>
@@ -486,7 +487,7 @@ export function bindFriendsEvents() {
   const joinBtns = document.querySelectorAll('.btn-join-friend-room');
   joinBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const roomCode = btn.dataset.room || 'FIRE';
+      const roomCode = btn.dataset.room || store.getState().activeRoom?.roomCode || generateRoomCode();
       audio.playChime();
       store.setRoomCode(roomCode);
       store.setView('LOBBY');
@@ -499,7 +500,7 @@ export function bindFriendsEvents() {
     btn.addEventListener('click', () => {
       audio.playChime();
       const friendName = btn.dataset.name;
-      const currentCode = store.getState().activeRoom?.roomCode || 'FIRE';
+      const currentCode = store.getState().activeRoom?.roomCode || generateRoomCode();
       const toastMount = document.getElementById('toast-mount');
       if (toastMount) {
         toastMount.innerHTML = `<div class="toast toast-amber show"><span>🎟️ Room #${currentCode} invite dispatched to ${friendName}!</span></div>`;
@@ -539,7 +540,7 @@ export function bindFriendsEvents() {
     btn.addEventListener('click', () => {
       audio.playChime();
       const squadName = btn.dataset.squad;
-      const code = btn.dataset.code || 'FIRE';
+      const code = btn.dataset.code || generateRoomCode();
       const currentRoom = store.getState().activeRoom;
       store.setState({
         activeRoom: {

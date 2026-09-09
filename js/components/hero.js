@@ -45,7 +45,7 @@ export function renderHero() {
             <div class="flex items-center p-1.5 rounded-full bg-surface border border-border focus-within:border-sunset-coral/80 transition-colors shadow-lg">
               <div class="pl-4 pr-2 py-1 text-xs font-mono text-gray-400 flex items-center gap-1.5">
                 <span>ROOM:</span>
-                <input id="hero-room-input" class="bg-transparent border-none text-white font-bold tracking-widest text-sm focus:outline-none w-28 uppercase placeholder:text-gray-600 font-room-code" placeholder="CAMP-9428" type="text" value="FIRE" maxlength="8" />
+                <input id="hero-room-input" class="bg-transparent border-none text-white font-bold tracking-widest text-sm focus:outline-none w-28 uppercase placeholder:text-gray-500 font-room-code" placeholder="ROOM CODE" type="text" maxlength="8" autocomplete="off" />
               </div>
               <button id="btn-hero-join-room" class="px-5 py-2.5 rounded-full bg-sunset-coral hover:bg-sunset-coral/90 text-white font-bold text-sm shadow-glow-coral transition-all active:scale-95">
                 Join Room →
@@ -528,7 +528,7 @@ export function renderHero() {
           <div class="max-w-md mx-auto p-2 rounded-full bg-surface border-2 border-sunset-coral/50 shadow-glow-coral flex items-center justify-between">
             <div class="pl-4 flex items-center gap-2 text-gray-400 font-mono text-xs">
               <span class="text-sunset-coral font-bold">#</span>
-              <input id="footer-room-code-input" class="bg-transparent border-none text-white font-mono font-bold tracking-widest text-sm focus:outline-none w-44 uppercase placeholder:text-gray-600 font-room-code" placeholder="ENTER 4-LETTER CODE" type="text" value="FIRE" maxlength="4" />
+              <input id="footer-room-code-input" class="bg-transparent border-none text-white font-mono font-bold tracking-widest text-sm focus:outline-none w-44 uppercase placeholder:text-gray-500 font-room-code" placeholder="ENTER 4-LETTER CODE" type="text" maxlength="8" autocomplete="off" />
             </div>
             <button id="btn-footer-join-room" class="px-7 py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:from-sunset-coral/90 hover:to-amber-gold/90 text-canvas font-bold text-sm tracking-wide shadow-md transition-all active:scale-95">
               Join Room →
@@ -561,11 +561,12 @@ export function bindHeroEvents() {
     confettiInstance = new ConfettiEngine('confetti-canvas');
   }
 
-  // Create Pod Button -> Go to Lobby
+  // Create Pod Button -> Generate dynamic room & enter Lobby
   const createPodBtn = document.getElementById('btn-hero-create-pod');
   if (createPodBtn) {
     createPodBtn.addEventListener('click', () => {
-      audio.playClick();
+      audio.playChime();
+      store.createNewRoom();
       store.setView('LOBBY');
     });
   }
@@ -574,11 +575,26 @@ export function bindHeroEvents() {
   const joinHeroBtn = document.getElementById('btn-hero-join-room');
   const heroInput = document.getElementById('hero-room-input');
   if (joinHeroBtn && heroInput) {
-    joinHeroBtn.addEventListener('click', () => {
-      const code = heroInput.value.trim().toUpperCase() || 'FIRE';
-      audio.playChime();
-      store.setRoomCode(code);
-      store.setView('LOBBY');
+    const handleHeroJoin = () => {
+      const code = heroInput.value.trim().toUpperCase();
+      if (code.length >= 3) {
+        audio.playChime();
+        store.setRoomCode(code);
+        store.setView('LOBBY');
+      } else {
+        audio.playClick();
+        heroInput.focus();
+        heroInput.placeholder = 'ENTER CODE!';
+        heroInput.classList.add('animate-pulse');
+        setTimeout(() => {
+          heroInput.placeholder = 'ROOM CODE';
+          heroInput.classList.remove('animate-pulse');
+        }, 1500);
+      }
+    };
+    joinHeroBtn.addEventListener('click', handleHeroJoin);
+    heroInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleHeroJoin();
     });
   }
 
@@ -586,11 +602,26 @@ export function bindHeroEvents() {
   const footerJoinBtn = document.getElementById('btn-footer-join-room');
   const footerInput = document.getElementById('footer-room-code-input');
   if (footerJoinBtn && footerInput) {
-    footerJoinBtn.addEventListener('click', () => {
-      const code = footerInput.value.trim().toUpperCase() || 'FIRE';
-      audio.playChime();
-      store.setRoomCode(code);
-      store.setView('LOBBY');
+    const handleFooterJoin = () => {
+      const code = footerInput.value.trim().toUpperCase();
+      if (code.length >= 3) {
+        audio.playChime();
+        store.setRoomCode(code);
+        store.setView('LOBBY');
+      } else {
+        audio.playClick();
+        footerInput.focus();
+        footerInput.placeholder = 'ENTER 4-LETTER CODE!';
+        footerInput.classList.add('animate-pulse');
+        setTimeout(() => {
+          footerInput.placeholder = 'ENTER 4-LETTER CODE';
+          footerInput.classList.remove('animate-pulse');
+        }, 1500);
+      }
+    };
+    footerJoinBtn.addEventListener('click', handleFooterJoin);
+    footerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleFooterJoin();
     });
   }
 

@@ -5,6 +5,7 @@
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+import { GAME_MODES } from '../data/partyGameDecks.js';
 
 export function renderLobby() {
   const state = store.getState();
@@ -60,16 +61,20 @@ export function renderLobby() {
               ${room.podName} 🏖️
             </h2>
 
-            <div class="flex items-center justify-between bg-surface-container-lowest/80 rounded-xl p-2.5 mt-1 border border-border/60">
-              <div class="flex items-center gap-2 min-w-0">
-                <span class="material-symbols-outlined text-primary-container text-[20px] flex-shrink-0" style="font-variation-settings: 'FILL' 1;">videogame_asset</span>
+            <div class="flex items-center justify-between bg-surface-container-lowest/80 rounded-xl p-2.5 mt-1 border border-border/60 hover:border-sunset-coral/50 transition-colors cursor-pointer" id="btn-active-deck-trigger">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-xl flex-shrink-0">${(GAME_MODES.find((m) => m.id === (room.selectedGameMode || 'RED_FLAG_COURT')) || GAME_MODES[0]).emoji}</span>
                 <div class="truncate">
-                  <span class="font-caption text-caption text-on-surface-variant block uppercase font-bold">Active Deck</span>
-                  <span class="font-label-md text-label-md text-on-surface truncate block font-bold">Inside Joke Mystery Deck</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-caption text-caption text-on-surface-variant uppercase font-bold">Active Game Mode</span>
+                    <span class="px-1.5 py-0.2 rounded bg-sunset-coral/20 text-sunset-coral text-[9px] font-bold font-mono uppercase">${(GAME_MODES.find((m) => m.id === (room.selectedGameMode || 'RED_FLAG_COURT')) || GAME_MODES[0]).badgeText}</span>
+                  </div>
+                  <span class="font-label-md text-label-md text-on-surface truncate block font-bold">${(GAME_MODES.find((m) => m.id === (room.selectedGameMode || 'RED_FLAG_COURT')) || GAME_MODES[0]).name}</span>
                 </div>
               </div>
-              <button class="flex-shrink-0 w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface hover:text-primary transition-colors" title="Customize Deck" id="btn-tune-deck">
-                <span class="material-symbols-outlined text-[16px]">tune</span>
+              <button class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-surface-bright flex items-center gap-1 text-xs text-on-surface font-semibold hover:text-amber-gold transition-colors" title="Customize Game Mode" id="btn-tune-deck">
+                <span class="material-symbols-outlined text-[15px]">tune</span>
+                <span>Change</span>
               </button>
             </div>
           </div>
@@ -239,6 +244,44 @@ export function renderLobby() {
           </div>
         </div>
       </div>
+
+      <!-- Game Mode & Deck Selector Modal -->
+      <div id="deck-modal" class="fixed inset-0 bg-canvas/85 backdrop-blur-2xl z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="max-w-lg w-full rounded-2xl bg-surface-container p-5 sm:p-6 border border-border shadow-2xl">
+          <div class="flex justify-between items-center pb-3 mb-4 border-b border-border/80">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🎮</span>
+              <div>
+                <h3 class="font-headline-sm text-base sm:text-lg text-white font-bold">Select Squad Party Game</h3>
+                <p class="text-xs text-on-surface-variant">Choose the vibe for tonight's pod session</p>
+              </div>
+            </div>
+            <button class="w-8 h-8 rounded-full bg-surface-bright hover:bg-surface-container-high flex items-center justify-center text-white" id="btn-close-deck-modal">✕</button>
+          </div>
+
+          <div class="flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
+            ${GAME_MODES.map((mode) => {
+              const isSelected = mode.id === (room.selectedGameMode || 'RED_FLAG_COURT');
+              return `
+                <button class="btn-select-deck text-left p-3.5 rounded-xl border ${isSelected ? 'bg-primary-container/15 border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest/80 border-border/70 hover:border-border hover:bg-surface-container-high'} transition-all active:scale-[0.99] flex items-start gap-3 group cursor-pointer" data-mode="${mode.id}">
+                  <span class="text-2xl shrink-0 mt-0.5">${mode.emoji}</span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center justify-between gap-2 mb-0.5">
+                      <span class="font-headline-sm text-sm font-bold text-white group-hover:text-sunset-coral transition-colors">${mode.name}</span>
+                      <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${isSelected ? 'bg-sunset-coral text-canvas' : 'bg-surface-container-high text-gray-400'}">${mode.badgeText}</span>
+                    </div>
+                    <p class="text-xs text-amber-gold/90 font-medium mb-1">${mode.tagline}</p>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">${mode.description}</p>
+                  </div>
+                  <div class="shrink-0 mt-1">
+                    <span class="material-symbols-outlined text-[18px] ${isSelected ? 'text-sunset-coral' : 'text-gray-600'}">${isSelected ? 'radio_button_checked' : 'radio_button_unchecked'}</span>
+                  </div>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -372,4 +415,39 @@ export function bindLobbyEvents() {
       window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
     });
   }
+
+  // Deck & Game Mode Selection Logic
+  const deckModal = document.getElementById('deck-modal');
+  const tuneDeckBtn = document.getElementById('btn-tune-deck');
+  const deckTrigger = document.getElementById('btn-active-deck-trigger');
+  const closeDeckBtn = document.getElementById('btn-close-deck-modal');
+
+  const openDeckModal = () => {
+    audio.playClick();
+    if (deckModal) deckModal.style.display = 'flex';
+  };
+
+  if (tuneDeckBtn) tuneDeckBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openDeckModal();
+  });
+  if (deckTrigger) deckTrigger.addEventListener('click', openDeckModal);
+
+  if (closeDeckBtn && deckModal) {
+    closeDeckBtn.addEventListener('click', () => {
+      audio.playClick();
+      deckModal.style.display = 'none';
+    });
+  }
+
+  const deckBtns = document.querySelectorAll('.btn-select-deck');
+  deckBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      audio.playChime();
+      const mode = btn.dataset.mode;
+      store.setGameMode(mode);
+      if (deckModal) deckModal.style.display = 'none';
+      store.setView('LOBBY');
+    });
+  });
 }
