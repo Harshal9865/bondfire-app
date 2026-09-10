@@ -153,6 +153,17 @@ p, h1, h2, h3, h4, span, div {
   }
 }
 
+/* Clear mobile bottom docking bar */
+#app-mount {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 1024px) {
+  #app-mount {
+    padding-bottom: 2rem;
+  }
+}
+
 /* ==============================================================================
    PRINT-READY HARDCOVER YEARBOOK & PDF EXPORT STYLESHEET
    High-contrast, CMYK/RGB calibrated, clean page-break formatting

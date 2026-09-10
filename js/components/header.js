@@ -16,28 +16,28 @@ export function renderHeader() {
 
   return `
     <header class="sticky top-0 w-full z-50 bg-[#0B0E17]/85 backdrop-blur-2xl border-b border-[#262B40]/70 select-none transition-all duration-300">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between gap-4">
+      <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-10 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Left: Brand Identity -->
-        <div class="flex items-center gap-3 cursor-pointer group" id="nav-brand-logo">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sunset-coral via-amber-gold to-duo-rose p-[1.5px] shadow-glow-coral flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
+        <div class="flex items-center gap-2 sm:gap-3 cursor-pointer group shrink-0" id="nav-brand-logo">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-sunset-coral via-amber-gold to-duo-rose p-[1.5px] shadow-glow-coral flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
             <div class="w-full h-full bg-canvas rounded-[10px] flex items-center justify-center">
-              <svg class="w-5 h-5 text-amber-gold" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-gold" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C12 2 13.8 6.2 16 8.5C18.2 10.8 21 12 21 12C21 12 18.2 13.2 16 15.5C13.8 17.8 12 22 12 22C12 22 10.2 17.8 8 15.5C5.8 13.2 3 12 3 12C3 12 5.8 10.8 8 8.5C10.2 6.2 12 2 12 2Z"></path>
                 <circle class="text-sunset-coral" cx="12" cy="12" fill="currentColor" r="2.5"></circle>
               </svg>
             </div>
           </div>
           <div class="flex flex-col">
-            <span class="font-display font-bold text-2xl tracking-tight text-white flex items-center gap-2 leading-none">
+            <span class="font-display font-bold text-lg sm:text-2xl tracking-tight text-white flex items-center gap-1.5 sm:gap-2 leading-none">
               Bondfire
-              <span class="text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30">Beta</span>
+              <span class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest px-1.5 sm:px-2 py-0.5 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30">Beta</span>
             </span>
-            <span class="text-[11px] text-gray-400 mt-1 font-medium tracking-wide">formerly Huddle</span>
+            <span class="hidden sm:block text-[11px] text-gray-400 mt-1 font-medium tracking-wide">formerly Huddle</span>
           </div>
         </div>
 
-        <!-- Center: Curated Single-Deck Navigation Capsule -->
+        <!-- Center: Curated Single-Deck Navigation Capsule (Desktop & Tablets >= 1024px) -->
         <nav class="hidden lg:flex items-center p-1 rounded-full glass-pill border border-border/80 shadow-lg shadow-black/40">
           <!-- Mode Switcher Segment -->
           <div class="flex items-center gap-1 p-0.5 bg-surface-dark/60 rounded-full border border-border/60" id="header-mode-switcher">
@@ -85,14 +85,14 @@ export function renderHeader() {
         </nav>
 
         <!-- Right: Action Suite -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <!-- Audio Synthesizer Toggle -->
-          <button class="w-9 h-9 rounded-full bg-surface border border-border/80 text-gray-400 hover:text-white hover:border-amber-gold/50 flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95" id="btn-sound-toggle" title="Toggle Procedural Audio">
-            <span class="material-symbols-outlined text-[18px]">${state.soundEnabled ? 'volume_up' : 'volume_off'}</span>
+          <button class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface border border-border/80 text-gray-400 hover:text-white hover:border-amber-gold/50 flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 shrink-0" id="btn-sound-toggle" title="Toggle Procedural Audio">
+            <span class="material-symbols-outlined text-[16px] sm:text-[18px]">${state.soundEnabled ? 'volume_up' : 'volume_off'}</span>
           </button>
 
-          <!-- Room Code Quick Pill -->
-          <div class="hidden sm:flex items-center p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/70 transition-colors shadow-inner">
+          <!-- Room Code Quick Pill (Tablet & Desktop) -->
+          <div class="hidden md:flex items-center p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/70 transition-colors shadow-inner">
             <div class="pl-3 pr-1 text-xs font-mono text-sunset-coral font-bold flex items-center gap-1">
               <span>#</span>
               <input type="text" id="quick-join-input" placeholder="CODE" maxlength="4" class="w-14 bg-transparent text-xs font-room-code font-bold uppercase text-white placeholder:text-gray-600 focus:outline-none tracking-wider" />
@@ -103,18 +103,19 @@ export function renderHeader() {
           </div>
 
           <!-- Primary CTA Button -->
-          <button class="relative group overflow-hidden px-5 py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2" id="btn-header-create-room">
-            <span class="relative z-10 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px]">add</span>
-              <span>Create Room</span>
+          <button class="relative group overflow-hidden px-3 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-1 sm:gap-2 shrink-0" id="btn-header-create-room">
+            <span class="relative z-10 flex items-center gap-1 sm:gap-1.5">
+              <span class="material-symbols-outlined text-[15px] sm:text-[16px]">add</span>
+              <span class="hidden xs:inline sm:inline">Create Room</span>
+              <span class="xs:hidden sm:hidden inline">Room</span>
             </span>
             <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           </button>
 
           <!-- User Profile / Auth Trigger -->
           ${user.isLoggedIn && user.email ? `
-            <div class="relative group cursor-pointer" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
-              <div class="w-9 h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white">
+            <div class="relative group cursor-pointer shrink-0" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white">
                 ${user.avatarUrl ? `
                   <img src="${user.avatarUrl}" alt="${user.displayName || 'User'}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                   <span style="display:none;" class="w-full h-full items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
@@ -122,10 +123,10 @@ export function renderHeader() {
                   <span class="w-full h-full flex items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
                 `}
               </div>
-              <span class="w-2.5 h-2.5 rounded-full bg-mint-green border-2 border-canvas absolute -bottom-0.5 -right-0.5" title="Verified Online"></span>
+              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-mint-green border-2 border-canvas absolute -bottom-0.5 -right-0.5" title="Verified Online"></span>
             </div>
           ` : `
-            <button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border/80 hover:border-sunset-coral/70 text-xs font-bold text-gray-200 hover:text-white transition-all active:scale-95 shadow-sm" id="header-user-profile" title="Sign In with Google">
+            <button class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-surface border border-border/80 hover:border-sunset-coral/70 text-xs font-bold text-gray-200 hover:text-white transition-all active:scale-95 shadow-sm shrink-0" id="header-user-profile" title="Sign In with Google">
               <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -136,15 +137,15 @@ export function renderHeader() {
             </button>
           `}
 
-          <!-- Mobile Menu Drawer Toggle -->
-          <button class="lg:hidden w-9 h-9 rounded-full bg-surface border border-border flex items-center justify-center text-gray-300 hover:text-white transition-colors" id="btn-mobile-menu" title="Menu">
-            <span class="material-symbols-outlined text-[20px]">menu</span>
+          <!-- Mobile Menu Drawer Toggle (For game modes & options) -->
+          <button class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface border border-border flex items-center justify-center text-gray-300 hover:text-white transition-colors shrink-0" id="btn-mobile-menu" title="Menu">
+            <span class="material-symbols-outlined text-[18px] sm:text-[20px]">menu</span>
           </button>
         </div>
       </div>
 
-      <!-- Mobile Dropdown Drawer (Sleek modal on small screens, hidden by default) -->
-      <div id="mobile-drawer" class="lg:hidden fixed inset-x-0 top-20 bg-canvas/95 backdrop-blur-2xl border-b border-border/80 p-5 shadow-2xl transition-all duration-300 z-50 max-h-[calc(100vh-80px)] overflow-y-auto" style="display: none;">
+      <!-- Mobile Dropdown Drawer (Modes & Extra Settings) -->
+      <div id="mobile-drawer" class="lg:hidden fixed inset-x-0 top-16 sm:top-20 bg-canvas/95 backdrop-blur-2xl border-b border-border/80 p-4 sm:p-5 shadow-2xl transition-all duration-300 z-50 max-h-[calc(100vh-80px)] overflow-y-auto" style="display: none;">
         <div class="flex flex-col gap-3">
           <!-- Mobile Quick Join Pill -->
           <div class="p-2 rounded-xl bg-surface border border-border focus-within:border-sunset-coral/80 flex items-center justify-between gap-2 shadow-sm">
@@ -157,7 +158,7 @@ export function renderHeader() {
             </button>
           </div>
 
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-1">Modes</div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-1">Play Modes</div>
           <div class="grid grid-cols-3 gap-2">
             <button class="mobile-nav-btn p-2.5 rounded-xl bg-surface border border-border text-center text-xs font-semibold text-gray-200 flex flex-col items-center gap-1" data-mode="SOLO" data-view="SOLO">
               <span class="material-symbols-outlined text-amber-gold text-[18px]">person</span>
@@ -173,44 +174,76 @@ export function renderHeader() {
             </button>
           </div>
 
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-2 mb-1">Experiences</div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-2 mb-1">More Features</div>
           <div class="grid grid-cols-2 gap-2">
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="FRIENDS">
-              <span class="material-symbols-outlined text-sunset-coral text-[20px]">diversity_3</span>
-              <span>Friends Lounge</span>
-            </button>
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="VAULT">
-              <span class="material-symbols-outlined text-tertiary text-[20px]">folder</span>
-              <span>Memory Vault</span>
-            </button>
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="YEARBOOK">
-              <span class="material-symbols-outlined text-amber-gold text-[20px]">auto_stories</span>
-              <span>3D Yearbook</span>
-            </button>
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="GLADE">
-              <span class="material-symbols-outlined text-mint-green text-[20px]">stadia_controller</span>
-              <span>Pixel Glade</span>
-            </button>
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white col-span-2" data-view="STORE">
+            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="STORE">
               <span class="material-symbols-outlined text-secondary text-[20px]">shopping_bag</span>
               <span>Emporium & Sparks</span>
-            </button>
-          </div>
-
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-2 mb-1">Account & Plans</div>
-          <div class="grid grid-cols-2 gap-2">
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="PROFILE">
-              <span class="material-symbols-outlined text-amber-gold text-[20px]">badge</span>
-              <span>My Profile</span>
             </button>
             <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="PRICING">
               <span class="material-symbols-outlined text-sunset-coral text-[20px]">stars</span>
               <span>Pricing & Plans</span>
             </button>
+            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white col-span-2" data-view="PROFILE">
+              <span class="material-symbols-outlined text-amber-gold text-[20px]">badge</span>
+              <span>My Passport & Stats</span>
+            </button>
           </div>
         </div>
       </div>
     </header>
+
+    <!-- Mobile Bottom Navigation Bar (Fixed thumb-friendly docking bar for mobile screens) -->
+    <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/90 backdrop-blur-2xl border-t border-[#262B40]/80 shadow-[0_-8px_30px_rgba(0,0,0,0.65)] select-none transition-transform duration-300 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-1 px-2">
+      <div class="max-w-md mx-auto grid grid-cols-5 items-center justify-around gap-0.5">
+        
+        <!-- Tab 1: Play / Campfire -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="HERO">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px] ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">local_fire_department</span>
+            ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? '<span class="w-1 h-1 rounded-full bg-sunset-coral absolute -bottom-1"></span>' : ''}
+          </div>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Play</span>
+        </button>
+
+        <!-- Tab 2: Vault (Memories & Chat Import) -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'VAULT' ? 'text-tertiary font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="VAULT">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px] ${currentView === 'VAULT' ? 'text-tertiary scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">inventory_2</span>
+            ${currentView === 'VAULT' ? '<span class="w-1 h-1 rounded-full bg-tertiary absolute -bottom-1"></span>' : ''}
+          </div>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Vault</span>
+        </button>
+
+        <!-- Tab 3: Photobook (Yearbook & Keepsake) -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'YEARBOOK' ? 'text-amber-gold font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="YEARBOOK">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px] ${currentView === 'YEARBOOK' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">auto_stories</span>
+            ${currentView === 'YEARBOOK' ? '<span class="w-1 h-1 rounded-full bg-amber-gold absolute -bottom-1"></span>' : ''}
+          </div>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Book</span>
+        </button>
+
+        <!-- Tab 4: Friends & Squads -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'FRIENDS' ? 'text-sunset-coral font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="FRIENDS">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px] ${currentView === 'FRIENDS' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">diversity_3</span>
+            ${currentView === 'FRIENDS' ? '<span class="w-1 h-1 rounded-full bg-sunset-coral absolute -bottom-1"></span>' : ''}
+          </div>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Friends</span>
+        </button>
+
+        <!-- Tab 5: Arcade (Pixel Glade & S'mores) -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'GLADE' ? 'text-mint-green font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="GLADE">
+          <div class="relative flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px] ${currentView === 'GLADE' ? 'text-mint-green scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">stadia_controller</span>
+            ${currentView === 'GLADE' ? '<span class="w-1 h-1 rounded-full bg-mint-green absolute -bottom-1"></span>' : ''}
+          </div>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Arcade</span>
+        </button>
+
+      </div>
+    </nav>
   `;
 }
 
@@ -360,4 +393,16 @@ export function bindHeaderEvents() {
       }
     });
   }
+
+  // Mobile Bottom Navigation Tabs Click
+  const bottomTabs = document.querySelectorAll('.mobile-bottom-tab');
+  bottomTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      audio.playClick();
+      const view = tab.dataset.view;
+      if (view) {
+        store.setView(view);
+      }
+    });
+  });
 }
