@@ -48,7 +48,10 @@ class BondfireApp {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
-        .then((reg) => console.log('⚡ Bondfire PWA Service Worker registered:', reg.scope))
+        .then((reg) => {
+          console.log('⚡ Bondfire PWA Service Worker registered:', reg.scope);
+          reg.update();
+        })
         .catch((err) => console.warn('PWA Service Worker registration warning:', err));
     }
 

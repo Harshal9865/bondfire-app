@@ -102,12 +102,11 @@ export function renderHeader() {
             </button>
           </div>
 
-          <!-- Primary CTA Button -->
-          <button class="relative group overflow-hidden px-3 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-1 sm:gap-2 shrink-0" id="btn-header-create-room">
-            <span class="relative z-10 flex items-center gap-1 sm:gap-1.5">
-              <span class="material-symbols-outlined text-[15px] sm:text-[16px]">add</span>
-              <span class="hidden xs:inline sm:inline">Create Room</span>
-              <span class="xs:hidden sm:hidden inline">Room</span>
+          <!-- Primary CTA Button (Desktop & Tablet) -->
+          <button class="hidden sm:flex relative group overflow-hidden px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0" id="btn-header-create-room">
+            <span class="relative z-10 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">add</span>
+              <span>Create Room</span>
             </span>
             <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           </button>
@@ -126,124 +125,194 @@ export function renderHeader() {
               <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-mint-green border-2 border-canvas absolute -bottom-0.5 -right-0.5" title="Verified Online"></span>
             </div>
           ` : `
-            <button class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-surface border border-border/80 hover:border-sunset-coral/70 text-xs font-bold text-gray-200 hover:text-white transition-all active:scale-95 shadow-sm shrink-0" id="header-user-profile" title="Sign In with Google">
+            <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-border/80 hover:border-sunset-coral/70 text-xs font-bold text-gray-200 hover:text-white transition-all active:scale-95 shadow-sm shrink-0" id="header-user-profile" title="Sign In with Google">
               <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
-              <span class="hidden sm:inline">Sign In</span>
+              <span>Sign In</span>
             </button>
           `}
-
-          <!-- Mobile Menu Drawer Toggle (For game modes & options) -->
-          <button class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface border border-border flex items-center justify-center text-gray-300 hover:text-white transition-colors shrink-0" id="btn-mobile-menu" title="Menu">
-            <span class="material-symbols-outlined text-[18px] sm:text-[20px]">menu</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Mobile Dropdown Drawer (Modes & Extra Settings) -->
-      <div id="mobile-drawer" class="lg:hidden fixed inset-x-0 top-16 sm:top-20 bg-canvas/95 backdrop-blur-2xl border-b border-border/80 p-4 sm:p-5 shadow-2xl transition-all duration-300 z-50 max-h-[calc(100vh-80px)] overflow-y-auto" style="display: none;">
-        <div class="flex flex-col gap-3">
-          <!-- Mobile Quick Join Pill -->
-          <div class="p-2 rounded-xl bg-surface border border-border focus-within:border-sunset-coral/80 flex items-center justify-between gap-2 shadow-sm">
-            <div class="flex items-center gap-1.5 pl-2 text-xs font-mono text-gray-400 flex-1 min-w-0">
-              <span class="text-sunset-coral font-bold font-mono">#</span>
-              <input type="text" id="drawer-quick-join-input" placeholder="ROOM CODE" maxlength="8" class="bg-transparent border-none text-white font-bold tracking-widest text-xs focus:outline-none w-full uppercase placeholder:text-gray-500 font-room-code" />
-            </div>
-            <button id="btn-drawer-quick-join" class="px-3.5 py-1.5 rounded-lg bg-sunset-coral text-white font-bold text-xs shadow-glow-coral active:scale-95 shrink-0">
-              Join
-            </button>
-          </div>
-
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-1">Play Modes</div>
-          <div class="grid grid-cols-3 gap-2">
-            <button class="mobile-nav-btn p-2.5 rounded-xl bg-surface border border-border text-center text-xs font-semibold text-gray-200 flex flex-col items-center gap-1" data-mode="SOLO" data-view="SOLO">
-              <span class="material-symbols-outlined text-amber-gold text-[18px]">person</span>
-              <span>Solo</span>
-            </button>
-            <button class="mobile-nav-btn p-2.5 rounded-xl bg-surface border border-border text-center text-xs font-semibold text-gray-200 flex flex-col items-center gap-1" data-mode="US" data-view="COUPLE">
-              <span class="material-symbols-outlined text-duo-rose text-[18px]">favorite</span>
-              <span>Us Mode</span>
-            </button>
-            <button class="mobile-nav-btn p-2.5 rounded-xl bg-surface border border-border text-center text-xs font-semibold text-gray-200 flex flex-col items-center gap-1" data-mode="PODS" data-view="LOBBY">
-              <span class="material-symbols-outlined text-sunset-coral text-[18px]">groups</span>
-              <span>Pods</span>
-            </button>
-          </div>
-
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-2 mb-1">More Features</div>
-          <div class="grid grid-cols-2 gap-2">
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="STORE">
-              <span class="material-symbols-outlined text-secondary text-[20px]">shopping_bag</span>
-              <span>Emporium & Sparks</span>
-            </button>
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white" data-view="PRICING">
-              <span class="material-symbols-outlined text-sunset-coral text-[20px]">stars</span>
-              <span>Pricing & Plans</span>
-            </button>
-            <button class="mobile-nav-btn p-3 rounded-xl bg-surface-container border border-border text-left flex items-center gap-2.5 text-xs font-bold text-white col-span-2" data-view="PROFILE">
-              <span class="material-symbols-outlined text-amber-gold text-[20px]">badge</span>
-              <span>My Passport & Stats</span>
-            </button>
-          </div>
         </div>
       </div>
     </header>
 
-    <!-- Mobile Bottom Navigation Bar (Fixed thumb-friendly docking bar for mobile screens) -->
-    <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/90 backdrop-blur-2xl border-t border-[#262B40]/80 shadow-[0_-8px_30px_rgba(0,0,0,0.65)] select-none transition-transform duration-300 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-1 px-2">
-      <div class="max-w-md mx-auto grid grid-cols-5 items-center justify-around gap-0.5">
+    <!-- Mobile Bottom Command Dock (Fixed thumb-friendly docking bar with elevated center flame button) -->
+    <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/92 backdrop-blur-2xl border-t border-[#262B40]/80 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] select-none transition-transform duration-300 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-1 px-3">
+      <div class="max-w-md mx-auto grid grid-cols-5 items-end justify-around gap-1">
         
-        <!-- Tab 1: Play / Campfire -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="HERO">
-          <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[22px] ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">local_fire_department</span>
-            ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? '<span class="w-1 h-1 rounded-full bg-sunset-coral absolute -bottom-1"></span>' : ''}
-          </div>
-          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Play</span>
-        </button>
-
-        <!-- Tab 2: Vault (Memories & Chat Import) -->
+        <!-- Tab 1: Vault (Memories & Chat Imports) -->
         <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'VAULT' ? 'text-tertiary font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="VAULT">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[22px] ${currentView === 'VAULT' ? 'text-tertiary scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">inventory_2</span>
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'VAULT' ? 'text-tertiary scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">inventory_2</span>
             ${currentView === 'VAULT' ? '<span class="w-1 h-1 rounded-full bg-tertiary absolute -bottom-1"></span>' : ''}
           </div>
-          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Vault</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Vault</span>
         </button>
 
-        <!-- Tab 3: Photobook (Yearbook & Keepsake) -->
+        <!-- Tab 2: Photobook (Yearbook & Keepsake) -->
         <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'YEARBOOK' ? 'text-amber-gold font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="YEARBOOK">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[22px] ${currentView === 'YEARBOOK' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">auto_stories</span>
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'YEARBOOK' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">auto_stories</span>
             ${currentView === 'YEARBOOK' ? '<span class="w-1 h-1 rounded-full bg-amber-gold absolute -bottom-1"></span>' : ''}
           </div>
-          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Book</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Book</span>
         </button>
+
+        <!-- Tab 3: CENTER HERO FLAME (Home / Play / Campfire Room) -->
+        <div class="flex flex-col items-center justify-center -mt-5">
+          <button id="btn-bottom-center-home" class="bottom-nav-center-btn w-13 h-13 rounded-full bg-gradient-to-tr from-sunset-coral via-[#FF7064] to-amber-gold p-[2px] flex items-center justify-center shadow-lg transition-transform duration-200 group active:scale-90" title="Campfire Play Hub">
+            <div class="w-full h-full rounded-full bg-canvas/40 backdrop-blur-sm flex items-center justify-center text-white">
+              <span class="material-symbols-outlined text-[26px] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">local_fire_department</span>
+            </div>
+          </button>
+          <span class="text-[10px] tracking-tight -mt-2 font-bold ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral' : 'text-gray-300'}">Play</span>
+        </div>
 
         <!-- Tab 4: Friends & Squads -->
         <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'FRIENDS' ? 'text-sunset-coral font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="FRIENDS">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[22px] ${currentView === 'FRIENDS' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">diversity_3</span>
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'FRIENDS' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">diversity_3</span>
             ${currentView === 'FRIENDS' ? '<span class="w-1 h-1 rounded-full bg-sunset-coral absolute -bottom-1"></span>' : ''}
           </div>
-          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Friends</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Friends</span>
         </button>
 
-        <!-- Tab 5: Arcade (Pixel Glade & S'mores) -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'GLADE' ? 'text-mint-green font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="GLADE">
+        <!-- Tab 5: Command Hub Sheet Trigger -->
+        <button id="btn-bottom-open-sheet" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'GLADE' || currentView === 'STORE' || currentView === 'PROFILE' || currentView === 'PRICING' ? 'text-duo-rose font-bold' : 'text-gray-400 hover:text-gray-200'}">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[22px] ${currentView === 'GLADE' ? 'text-mint-green scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">stadia_controller</span>
-            ${currentView === 'GLADE' ? '<span class="w-1 h-1 rounded-full bg-mint-green absolute -bottom-1"></span>' : ''}
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'GLADE' || currentView === 'STORE' || currentView === 'PROFILE' ? 'text-duo-rose scale-110 drop-shadow-[0_0_8px_rgba(247,37,133,0.6)]' : ''}">widgets</span>
+            ${currentView === 'GLADE' || currentView === 'STORE' || currentView === 'PROFILE' ? '<span class="w-1 h-1 rounded-full bg-duo-rose absolute -bottom-1"></span>' : ''}
           </div>
-          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Arcade</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Explore</span>
         </button>
 
       </div>
     </nav>
+
+    <!-- Mobile Slide-up Command Hub Sheet (Bottom Drawer with Modes, Arcade, TV Mode, Soundboard & Profile) -->
+    <div id="mobile-explore-sheet-backdrop" class="bottom-sheet-backdrop fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end lg:hidden select-none">
+      <div id="mobile-explore-sheet" class="bottom-sheet-panel relative w-full bg-[#0E121E] border-t border-border/80 rounded-t-[32px] p-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] shadow-2xl max-h-[85vh] overflow-y-auto text-on-surface">
+        
+        <!-- Grab Handle -->
+        <div class="w-12 h-1.5 bg-gray-600/80 rounded-full mx-auto mb-4 cursor-pointer" id="sheet-grab-handle"></div>
+
+        <!-- Sheet Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-border/70 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-sunset-coral text-[20px]">campfire</span>
+            <h3 class="font-bold text-white text-base tracking-tight">Bondfire Command Hub</h3>
+          </div>
+          <button id="btn-close-explore-sheet" class="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+
+        <!-- Section 1: Play Modes Switcher -->
+        <div class="mb-4">
+          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Game Flavor & Mode</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="sheet-mode-btn p-2.5 rounded-2xl bg-surface border ${currentMode === 'SOLO' ? 'border-amber-gold text-white bg-surface-bright' : 'border-border text-gray-300'} flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-mode="SOLO">
+              <span class="material-symbols-outlined text-amber-gold text-[20px]">person</span>
+              <span class="text-xs font-bold">Solo</span>
+              <span class="text-[9px] text-gray-400">1 Player</span>
+            </button>
+            <button class="sheet-mode-btn p-2.5 rounded-2xl bg-surface border ${currentMode === 'US' ? 'border-duo-rose text-white bg-surface-bright' : 'border-border text-gray-300'} flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-mode="US">
+              <span class="material-symbols-outlined text-duo-rose text-[20px]">favorite</span>
+              <span class="text-xs font-bold">Us Mode</span>
+              <span class="text-[9px] text-gray-400">Couples</span>
+            </button>
+            <button class="sheet-mode-btn p-2.5 rounded-2xl bg-surface border ${currentMode === 'PODS' ? 'border-sunset-coral text-white bg-surface-bright' : 'border-border text-gray-300'} flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-mode="PODS">
+              <span class="material-symbols-outlined text-sunset-coral text-[20px]">groups</span>
+              <span class="text-xs font-bold">Pods</span>
+              <span class="text-[9px] text-gray-400">Squads</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 2: Experiences & Creative Features Grid -->
+        <div class="mb-4">
+          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Experiences & Mini-Games</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="sheet-nav-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-mint-green/60 text-left flex items-center gap-3 transition-all active:scale-95" data-view="GLADE">
+              <div class="w-9 h-9 rounded-xl bg-mint-green/10 border border-mint-green/30 flex items-center justify-center text-mint-green shrink-0">
+                <span class="material-symbols-outlined text-[20px]">stadia_controller</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-white truncate">Pixel Glade</div>
+                <div class="text-[10px] text-gray-400 truncate">Graffiti & S'mores</div>
+              </div>
+            </button>
+
+            <button class="sheet-nav-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-sunset-coral/60 text-left flex items-center gap-3 transition-all active:scale-95" data-view="TV_MODE">
+              <div class="w-9 h-9 rounded-xl bg-sunset-coral/10 border border-sunset-coral/30 flex items-center justify-center text-sunset-coral shrink-0">
+                <span class="material-symbols-outlined text-[20px]">tv</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-white truncate">TV Host View</div>
+                <div class="text-[10px] text-gray-400 truncate">Living Room Cast</div>
+              </div>
+            </button>
+
+            <button class="sheet-nav-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-secondary/60 text-left flex items-center gap-3 transition-all active:scale-95" data-view="STORE">
+              <div class="w-9 h-9 rounded-xl bg-secondary/10 border border-secondary/30 flex items-center justify-center text-secondary shrink-0">
+                <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-white truncate">Emporium</div>
+                <div class="text-[10px] text-gray-400 truncate">Sparks & Albums</div>
+              </div>
+            </button>
+
+            <button class="sheet-nav-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-amber-gold/60 text-left flex items-center gap-3 transition-all active:scale-95" data-view="PROFILE">
+              <div class="w-9 h-9 rounded-xl bg-amber-gold/10 border border-amber-gold/30 flex items-center justify-center text-amber-gold shrink-0">
+                <span class="material-symbols-outlined text-[20px]">badge</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-white truncate">Passport</div>
+                <div class="text-[10px] text-gray-400 truncate">Stats & Account</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: Host Comedy Soundboard Mini-Rack -->
+        <div class="p-3 rounded-2xl bg-surface-container-lowest border border-border/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] uppercase font-mono text-amber-gold font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[14px]">volume_up</span>
+              <span>Party FX Soundboard</span>
+            </span>
+            <span class="text-[9px] text-gray-500 font-mono">Synthesized Web Audio</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5">
+            <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="buzzer" title="Wrong Buzzer">
+              <span class="text-base">🚨</span>
+              <span class="text-[9px] text-gray-300 font-bold">Buzzer</span>
+            </button>
+            <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="airhorn" title="Airhorn">
+              <span class="text-base">🎺</span>
+              <span class="text-[9px] text-gray-300 font-bold">Airhorn</span>
+            </button>
+            <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="rimshot" title="Rimshot">
+              <span class="text-base">🥁</span>
+              <span class="text-[9px] text-gray-300 font-bold">Rimshot</span>
+            </button>
+            <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="cheer" title="Crowd Cheer">
+              <span class="text-base">👏</span>
+              <span class="text-[9px] text-gray-300 font-bold">Cheer</span>
+            </button>
+            <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="crickets" title="Awkward Silence">
+              <span class="text-base">🦗</span>
+              <span class="text-[9px] text-gray-300 font-bold">Silence</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   `;
 }
 
@@ -373,27 +442,6 @@ export function bindHeaderEvents() {
     });
   }
 
-  // Mobile Drawer Toggle
-  const mobileMenuBtn = document.getElementById('btn-mobile-menu');
-  const mobileDrawer = document.getElementById('mobile-drawer');
-  if (mobileMenuBtn && mobileDrawer) {
-    mobileMenuBtn.addEventListener('click', () => {
-      audio.playClick();
-      const isHidden = mobileDrawer.style.display === 'none';
-      mobileDrawer.style.display = isHidden ? 'block' : 'none';
-    });
-
-    mobileDrawer.addEventListener('click', (e) => {
-      const btn = e.target.closest('.mobile-nav-btn');
-      if (btn) {
-        audio.playClick();
-        if (btn.dataset.mode) store.setMode(btn.dataset.mode);
-        if (btn.dataset.view) store.setView(btn.dataset.view);
-        mobileDrawer.style.display = 'none';
-      }
-    });
-  }
-
   // Mobile Bottom Navigation Tabs Click
   const bottomTabs = document.querySelectorAll('.mobile-bottom-tab');
   bottomTabs.forEach((tab) => {
@@ -403,6 +451,91 @@ export function bindHeaderEvents() {
       if (view) {
         store.setView(view);
       }
+    });
+  });
+
+  // Mobile Center Elevated Home / Play Button
+  const centerHomeBtn = document.getElementById('btn-bottom-center-home');
+  if (centerHomeBtn) {
+    centerHomeBtn.addEventListener('click', () => {
+      audio.playChime();
+      const currentRoom = store.getState().activeRoom;
+      if (currentRoom && currentRoom.roomCode) {
+        store.setView('LOBBY');
+      } else {
+        store.setView('HERO');
+      }
+    });
+  }
+
+  // Mobile Explore Command Sheet Controls
+  const sheetBackdrop = document.getElementById('mobile-explore-sheet-backdrop');
+  const openSheetBtn = document.getElementById('btn-bottom-open-sheet');
+  const closeSheetBtn = document.getElementById('btn-close-explore-sheet');
+  const grabHandle = document.getElementById('sheet-grab-handle');
+
+  const openSheet = () => {
+    if (sheetBackdrop) {
+      audio.playClick();
+      sheetBackdrop.classList.add('active');
+    }
+  };
+
+  const closeSheet = () => {
+    if (sheetBackdrop) {
+      audio.playClick();
+      sheetBackdrop.classList.remove('active');
+    }
+  };
+
+  if (openSheetBtn) openSheetBtn.addEventListener('click', openSheet);
+  if (closeSheetBtn) closeSheetBtn.addEventListener('click', closeSheet);
+  if (grabHandle) grabHandle.addEventListener('click', closeSheet);
+  if (sheetBackdrop) {
+    sheetBackdrop.addEventListener('click', (e) => {
+      if (e.target === sheetBackdrop) closeSheet();
+    });
+  }
+
+  // Sheet Mode Buttons
+  const sheetModeBtns = document.querySelectorAll('.sheet-mode-btn');
+  sheetModeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      audio.playClick();
+      const mode = btn.dataset.mode;
+      if (mode) {
+        store.setMode(mode);
+        if (mode === 'SOLO') store.setView('SOLO');
+        else if (mode === 'US') store.setView('COUPLE');
+        else store.setView('HERO');
+      }
+      closeSheet();
+    });
+  });
+
+  // Sheet Navigation Buttons
+  const sheetNavBtns = document.querySelectorAll('.sheet-nav-btn');
+  sheetNavBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      audio.playClick();
+      const view = btn.dataset.view;
+      if (view) {
+        store.setView(view);
+      }
+      closeSheet();
+    });
+  });
+
+  // Sheet Party Comedy Soundboard Buttons
+  const sheetFxBtns = document.querySelectorAll('.btn-sheet-fx');
+  sheetFxBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sound = btn.dataset.sound;
+      if (sound === 'buzzer') audio.playWrongBuzzer();
+      else if (sound === 'airhorn') audio.playAirhorn();
+      else if (sound === 'rimshot') audio.playRimshot();
+      else if (sound === 'cheer') audio.playCrowdCheer();
+      else if (sound === 'crickets') audio.playCrickets();
     });
   });
 }

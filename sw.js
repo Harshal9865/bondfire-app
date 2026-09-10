@@ -3,10 +3,16 @@
 // Caches core application assets for instant load and offline resilience
 // ==============================================================================
 
-const CACHE_NAME = 'bondfire-v2';
+// ==============================================================================
+// BONDFIRE SERVICE WORKER
+// Caches core application assets for instant load and offline resilience
+// ==============================================================================
+
+const CACHE_NAME = 'bondfire-v3';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
+  '/css/output.css',
   '/css/tokens.css',
   '/css/base.css',
   '/css/components.css',
@@ -19,12 +25,13 @@ const PRECACHE_ASSETS = [
   '/js/visuals/fluidCanvas.js',
   '/js/visuals/audioSynth.js',
   '/js/visuals/confetti.js',
+  '/js/services/webrtcService.js',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('⚡ Pre-caching Bondfire offline assets');
+      console.log('⚡ Pre-caching Bondfire v3 offline assets');
       return cache.addAll(PRECACHE_ASSETS);
     })
   );
@@ -37,7 +44,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('Cleaning obsolete cache:', key);
+            console.log('⚡ Evicting stale cache:', key);
             return caches.delete(key);
           }
         })
@@ -53,10 +60,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first strategy for HTML pages / navigation requests to prevent stale cached HTML
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Stale-while-revalidate for static assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cached asset and update in background (Stale-While-Revalidate)
         fetch(event.request)
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
