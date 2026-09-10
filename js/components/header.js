@@ -144,9 +144,20 @@ export function renderHeader() {
       </div>
 
       <!-- Mobile Dropdown Drawer (Sleek modal on small screens, hidden by default) -->
-      <div id="mobile-drawer" class="lg:hidden fixed inset-x-0 top-20 bg-canvas/95 backdrop-blur-2xl border-b border-border/80 p-5 shadow-2xl transition-all duration-300" style="display: none;">
+      <div id="mobile-drawer" class="lg:hidden fixed inset-x-0 top-20 bg-canvas/95 backdrop-blur-2xl border-b border-border/80 p-5 shadow-2xl transition-all duration-300 z-50 max-h-[calc(100vh-80px)] overflow-y-auto" style="display: none;">
         <div class="flex flex-col gap-3">
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Modes</div>
+          <!-- Mobile Quick Join Pill -->
+          <div class="p-2 rounded-xl bg-surface border border-border focus-within:border-sunset-coral/80 flex items-center justify-between gap-2 shadow-sm">
+            <div class="flex items-center gap-1.5 pl-2 text-xs font-mono text-gray-400 flex-1 min-w-0">
+              <span class="text-sunset-coral font-bold font-mono">#</span>
+              <input type="text" id="drawer-quick-join-input" placeholder="ROOM CODE" maxlength="8" class="bg-transparent border-none text-white font-bold tracking-widest text-xs focus:outline-none w-full uppercase placeholder:text-gray-500 font-room-code" />
+            </div>
+            <button id="btn-drawer-quick-join" class="px-3.5 py-1.5 rounded-lg bg-sunset-coral text-white font-bold text-xs shadow-glow-coral active:scale-95 shrink-0">
+              Join
+            </button>
+          </div>
+
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-1">Modes</div>
           <div class="grid grid-cols-3 gap-2">
             <button class="mobile-nav-btn p-2.5 rounded-xl bg-surface border border-border text-center text-xs font-semibold text-gray-200 flex flex-col items-center gap-1" data-mode="SOLO" data-view="SOLO">
               <span class="material-symbols-outlined text-amber-gold text-[18px]">person</span>
@@ -286,6 +297,32 @@ export function bindHeaderEvents() {
     joinBtn.addEventListener('click', handleJoin);
     joinInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') handleJoin();
+    });
+  }
+
+  // Mobile Drawer Quick Join Button
+  const drawerJoinBtn = document.getElementById('btn-drawer-quick-join');
+  const drawerJoinInput = document.getElementById('drawer-quick-join-input');
+  if (drawerJoinBtn && drawerJoinInput) {
+    const handleDrawerJoin = () => {
+      const code = drawerJoinInput.value.trim().toUpperCase();
+      if (code.length >= 3) {
+        audio.playChime();
+        const currentPod = store.getState().activeRoom;
+        store.setState({
+          activeRoom: { ...currentPod, roomCode: code, isHost: false },
+        });
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        if (mobileDrawer) mobileDrawer.style.display = 'none';
+        store.setView('LOBBY');
+      } else {
+        audio.playClick();
+        drawerJoinInput.placeholder = 'ENTER CODE';
+      }
+    };
+    drawerJoinBtn.addEventListener('click', handleDrawerJoin);
+    drawerJoinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleDrawerJoin();
     });
   }
 

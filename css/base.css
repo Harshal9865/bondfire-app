@@ -140,3 +140,69 @@ button, a, input, select, textarea, [role="button"], .cursor-pointer {
   user-select: none;
 }
 
+/* Mobile Word Break & Text Overlap Safeguards */
+p, h1, h2, h3, h4, span, div {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Safe area inset for modern mobile notches and home indicators */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ==============================================================================
+   PRINT-READY HARDCOVER YEARBOOK & PDF EXPORT STYLESHEET
+   High-contrast, CMYK/RGB calibrated, clean page-break formatting
+   ============================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide interactive browser chrome, headers, and buttons */
+  #header-mount,
+  #footer-mount,
+  #toast-mount,
+  #modal-mount,
+  button,
+  .no-print,
+  #bg-canvas,
+  #mobile-drawer {
+    display: none !important;
+  }
+
+  /* Force yearbook spread to full printable page with bleeds */
+  .yearbook-print-container,
+  #spread-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .yearbook-print-container * {
+    color: #111111 !important;
+    text-shadow: none !important;
+  }
+
+  .polaroid-print-frame {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    border: 1px solid #dddddd !important;
+    background: #ffffff !important;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+}

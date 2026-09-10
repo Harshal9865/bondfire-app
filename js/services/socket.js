@@ -5,6 +5,7 @@
 
 import { CONFIG } from '../config.js';
 import { store } from '../state/store.js';
+import { p2pMesh } from './webrtcService.js';
 
 class WebSocketService {
   constructor() {
@@ -18,6 +19,15 @@ class WebSocketService {
   }
 
   connect() {
+    if (!CONFIG.WS_BASE_URL) {
+      if (!this.hasLoggedMeshMode) {
+        this.hasLoggedMeshMode = true;
+        console.log('⚡ Bondfire operating in resilient local mesh mode with WebRTC P2P fallback.');
+        p2pMesh.initPeer(store.getState().activeRoom?.isHost ?? false);
+      }
+      return;
+    }
+
     if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
       return;
     }
@@ -66,13 +76,15 @@ class WebSocketService {
       this.socket.onerror = () => {
         if (!this.hasLoggedError) {
           this.hasLoggedError = true;
-          console.info('ℹ️ WebSocket server offline; seamless local mesh fallback engaged.');
+          console.info('ℹ️ WebSocket server offline; engaging peer-to-peer WebRTC mesh fallback.');
+          p2pMesh.initPeer(store.getState().activeRoom?.isHost ?? false);
         }
       };
     } catch (e) {
       if (!this.hasLoggedError) {
         this.hasLoggedError = true;
-        console.info('ℹ️ Running in resilient client-first mode.');
+        console.info('ℹ️ Running in resilient client-first mode with WebRTC P2P fallback.');
+        p2pMesh.initPeer(store.getState().activeRoom?.isHost ?? false);
       }
     }
   }
@@ -81,8 +93,11 @@ class WebSocketService {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ type, payload, timestamp: Date.now() }));
     } else {
-      // In offline mode, simulate server response locally
-      console.log(`[Offline Mode] Dispatched ${type}:`, payload);
+      // In offline mode, forward through P2P WebRTC data channel if active
+      if (p2pMesh.isConnected) {
+        p2pMesh.send({ type, payload, timestamp: Date.now() });
+      }
+      console.log(`[Mesh Mode] Dispatched ${type}:`, payload);
     }
   }
 

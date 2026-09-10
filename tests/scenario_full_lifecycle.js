@@ -175,7 +175,41 @@ async function runTests() {
   assert.strictEqual(unapplied[0].version, '002_add_pixel_art_and_audit');
   console.log('✅ Suite 11 Passed: SQL Migration Discovery & Planning Logic');
 
-  console.log('\n🎉 ALL 11 ENTERPRISE VERIFICATION SUITES (28 ASSERTIONS) PASSED FLAWLESSLY!');
+  // ------------------------------------------------------------------------------
+  // TEST SUITE 12: REAL CHAT EXPORT PARSER & TRIVIA GENERATOR
+  // ------------------------------------------------------------------------------
+  const sampleWhatsApp = `
+14/10/2021, 2:41 AM - Liam: If anyone orders another Hawaiian pizza tonight I am literally revoking Netflix for all 5 of you.
+14/10/2021, 2:43 AM - Sarah: Challenge accepted. Payment sent to 4111 2222 3333 4444.
+14/10/2021, 2:45 AM - Alex: Call me at (555) 234-5678 if you need garlic sauce.
+  `;
+  const parsedWa = MediaProcessor.parseWhatsAppChatExport(sampleWhatsApp);
+  assert.strictEqual(parsedWa.length, 3, 'Parsed 3 dialogue messages from WhatsApp export');
+  assert.strictEqual(parsedWa[0].author, 'Liam', 'First speaker is Liam');
+  assert.strictEqual(parsedWa[1].quote.includes('4111'), false, 'Credit card PII must be redacted');
+  assert.strictEqual(parsedWa[1].quote.includes('[REDACTED CARD]'), true, 'Scrubbed to redacted badge');
+  assert.strictEqual(parsedWa[2].quote.includes('(555) 234-5678'), false, 'Phone PII must be redacted');
+
+  const cards = MediaProcessor.convertChatMemoriesToCards(parsedWa, ['Liam', 'Sarah', 'Alex', 'Rohan']);
+  assert.strictEqual(cards.length, 3, 'Generated 3 playable cards');
+  assert.strictEqual(cards[0].correctAnswer, 'Liam', 'Card correct answer matches author');
+  assert.strictEqual(cards[0].options.includes('Liam'), true, 'Author is present in choices');
+  console.log('✅ Suite 12 Passed: WhatsApp & Discord Real Chat Importer & PII Guard');
+
+  // ------------------------------------------------------------------------------
+  // TEST SUITE 13: WEBRTC FREE STUN FALLBACK & TV MODE REGISTRATION
+  // ------------------------------------------------------------------------------
+  const { FREE_STUN_SERVERS } = await import('../js/services/webrtcService.js');
+  assert.ok(FREE_STUN_SERVERS.length >= 2, 'Has free Google & Twilio STUN servers configured');
+  assert.ok(FREE_STUN_SERVERS[0].urls.includes('stun.l.google.com'), 'Uses Google public STUN');
+
+  const { renderTvModeScreen } = await import('../js/components/tvModeScreen.js');
+  const tvHtml = renderTvModeScreen();
+  assert.ok(tvHtml.includes('TV STAGE'), 'TV Mode stage banner rendered');
+  assert.ok(tvHtml.includes('tv-timer'), 'TV Mode shot clock countdown mounted');
+  console.log('✅ Suite 13 Passed: WebRTC Free STUN Fallback & TV Host Presentation Mode');
+
+  console.log('\n🎉 ALL 13 ENTERPRISE VERIFICATION SUITES (36 ASSERTIONS) PASSED FLAWLESSLY!');
 }
 
 runTests().catch((err) => {

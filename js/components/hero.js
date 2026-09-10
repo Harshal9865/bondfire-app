@@ -41,18 +41,18 @@ export function renderHero() {
           </p>
 
           <!-- CTAs & Room Code Join -->
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-            <div class="flex items-center p-1.5 rounded-full bg-surface border border-border focus-within:border-sunset-coral/80 transition-colors shadow-lg">
-              <div class="pl-4 pr-2 py-1 text-xs font-mono text-gray-400 flex items-center gap-1.5">
-                <span>ROOM:</span>
-                <input id="hero-room-input" class="bg-transparent border-none text-white font-bold tracking-widest text-sm focus:outline-none w-28 uppercase placeholder:text-gray-500 font-room-code" placeholder="ROOM CODE" type="text" maxlength="8" autocomplete="off" />
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2 w-full max-w-lg">
+            <div class="flex items-center justify-between p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/80 transition-colors shadow-lg w-full sm:w-auto">
+              <div class="pl-3.5 pr-1 py-1 text-xs font-mono text-gray-400 flex items-center gap-1.5 flex-1 min-w-0">
+                <span class="text-sunset-coral font-bold shrink-0">#</span>
+                <input id="hero-room-input" class="bg-transparent border-none text-white font-bold tracking-widest text-sm focus:outline-none w-full sm:w-28 uppercase placeholder:text-gray-500 font-room-code" placeholder="ROOM CODE" type="text" maxlength="8" autocomplete="off" />
               </div>
-              <button id="btn-hero-join-room" class="px-5 py-2.5 rounded-full bg-sunset-coral hover:bg-sunset-coral/90 text-white font-bold text-sm shadow-glow-coral transition-all active:scale-95">
+              <button id="btn-hero-join-room" class="px-4 sm:px-5 py-2.5 rounded-full bg-sunset-coral hover:bg-sunset-coral/90 text-white font-bold text-xs sm:text-sm shadow-glow-coral transition-all active:scale-95 shrink-0">
                 Join Room →
               </button>
             </div>
 
-            <button id="btn-hero-create-pod" class="px-6 py-3.5 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-sm shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2">
+            <button id="btn-hero-create-pod" class="px-6 py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-sm shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0">
               <span class="material-symbols-outlined text-[18px]">add_circle</span>
               <span>Create a Room</span>
             </button>
@@ -190,11 +190,11 @@ export function renderHero() {
             </div>
 
             <!-- Floating Interactive Badge -->
-            <div class="absolute -bottom-5 -right-3 sm:-right-6 bg-gradient-to-r from-surface to-surface-bright border border-amber-gold/50 rounded-2xl px-4 py-2.5 shadow-glow-amber flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-105 transition-transform" id="hero-yearbook-badge">
-              <span class="text-xl">📖</span>
-              <div class="flex flex-col text-left">
-                <span class="text-xs font-bold text-white tracking-tight">Saved to Pod 2026 Yearbook</span>
-                <span class="text-[10px] text-amber-gold font-medium">Auto-compiled into Hardcover Print</span>
+            <div class="mt-4 sm:mt-0 sm:absolute sm:-bottom-5 sm:-right-4 bg-gradient-to-r from-surface to-surface-bright border border-amber-gold/50 rounded-2xl px-4 py-2.5 shadow-glow-amber flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-105 transition-transform" id="hero-yearbook-badge">
+              <span class="text-xl shrink-0">📖</span>
+              <div class="flex flex-col text-left min-w-0">
+                <span class="text-xs font-bold text-white tracking-tight truncate">Saved to Pod 2026 Yearbook</span>
+                <span class="text-[10px] text-amber-gold font-medium truncate">Auto-compiled into Hardcover Print</span>
               </div>
             </div>
           </div>
@@ -525,12 +525,12 @@ export function renderHero() {
           </div>
 
           <!-- Room Code Input Pill with Join Room Button -->
-          <div class="max-w-md mx-auto p-2 rounded-full bg-surface border-2 border-sunset-coral/50 shadow-glow-coral flex items-center justify-between">
-            <div class="pl-4 flex items-center gap-2 text-gray-400 font-mono text-xs">
-              <span class="text-sunset-coral font-bold">#</span>
-              <input id="footer-room-code-input" class="bg-transparent border-none text-white font-mono font-bold tracking-widest text-sm focus:outline-none w-44 uppercase placeholder:text-gray-500 font-room-code" placeholder="ENTER 4-LETTER CODE" type="text" maxlength="8" autocomplete="off" />
+          <div class="max-w-md mx-auto p-1.5 sm:p-2 rounded-2xl sm:rounded-full bg-surface border-2 border-sunset-coral/50 shadow-glow-coral flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-0">
+            <div class="pl-3 sm:pl-4 py-1.5 flex items-center gap-2 text-gray-400 font-mono text-xs flex-1 min-w-0">
+              <span class="text-sunset-coral font-bold shrink-0">#</span>
+              <input id="footer-room-code-input" class="bg-transparent border-none text-white font-mono font-bold tracking-widest text-sm focus:outline-none w-full uppercase placeholder:text-gray-500 font-room-code" placeholder="ENTER 4-LETTER CODE" type="text" maxlength="8" autocomplete="off" />
             </div>
-            <button id="btn-footer-join-room" class="px-7 py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:from-sunset-coral/90 hover:to-amber-gold/90 text-canvas font-bold text-sm tracking-wide shadow-md transition-all active:scale-95">
+            <button id="btn-footer-join-room" class="px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl sm:rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:from-sunset-coral/90 hover:to-amber-gold/90 text-canvas font-bold text-sm tracking-wide shadow-md transition-all active:scale-95 shrink-0">
               Join Room →
             </button>
           </div>

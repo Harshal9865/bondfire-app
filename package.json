@@ -5,10 +5,11 @@
   "description": "Party games made from your own memories. Zero gambling, 100% human connection.",
   "main": "index.html",
   "scripts": {
-    "dev": "serve -s . -p 5173",
+    "dev": "npm run build && serve -s . -p 5173",
     "start": "serve -s . -p 5173",
+    "build": "tailwindcss -i ./css/input.css -o ./css/output.css",
     "test": "node tests/scenario_full_lifecycle.js && node tests/verify_services.js",
-    "deploy": "npx vercel"
+    "deploy": "npm run build && npx vercel"
   },
   "keywords": [
     "party-games",
@@ -18,5 +19,9 @@
     "trivia"
   ],
   "author": "Bondfire Team",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
 }

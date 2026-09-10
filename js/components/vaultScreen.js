@@ -5,6 +5,7 @@
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+import { MediaProcessor } from '../services/mediaProcessor.js';
 
 export function renderVaultScreen() {
   const state = store.getState();
@@ -66,17 +67,17 @@ export function renderVaultScreen() {
               <span class="material-symbols-outlined text-primary text-[22px] group-hover/btn:scale-110 transition-transform">add_photo_alternate</span>
               <span class="font-label-md text-label-md text-on-surface font-semibold">Photos & Memes</span>
             </button>
+            <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-chat-import">
+              <span class="material-symbols-outlined text-mint-green text-[22px] group-hover/btn:scale-110 transition-transform">chat</span>
+              <span class="font-label-md text-label-md text-on-surface font-semibold">Import Chat (.txt/.json)</span>
+            </button>
             <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-ocr">
               <span class="material-symbols-outlined text-secondary text-[22px] group-hover/btn:scale-110 transition-transform">document_scanner</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold">Chat Screenshots</span>
-            </button>
-            <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-record-voice">
-              <span class="material-symbols-outlined text-tertiary text-[22px] group-hover/btn:scale-110 transition-transform" id="voice-record-icon">mic</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold" id="voice-record-text">Voice Notes</span>
+              <span class="font-label-md text-label-md text-on-surface font-semibold">Screenshots</span>
             </button>
             <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-quote">
               <span class="material-symbols-outlined text-primary-fixed text-[22px] group-hover/btn:scale-110 transition-transform">format_quote</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold">Inside Joke Quote</span>
+              <span class="font-label-md text-label-md text-on-surface font-semibold">Inside Joke</span>
             </button>
           </div>
 
@@ -305,6 +306,43 @@ export function renderVaultScreen() {
               <span>Deposit to Vault & Trivia Deck</span>
             </button>
           </form>
+      <!-- Real WhatsApp / Discord Chat Importer Modal -->
+      <div id="chat-importer-modal" class="fixed inset-0 bg-canvas/85 backdrop-blur-2xl z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="max-w-lg w-full rounded-2xl bg-surface-container p-6 border border-border shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between mb-3 pb-3 border-b border-border/80">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-mint-green text-[26px]">chat</span>
+              <div>
+                <h3 class="font-headline-sm text-base sm:text-lg text-white font-bold">Import Real Group Chat</h3>
+                <p class="text-[11px] text-on-surface-variant">WhatsApp (.txt) or Discord (.json) Export</p>
+              </div>
+            </div>
+            <button type="button" class="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-variant flex items-center justify-center text-white" id="btn-close-chat-modal">✕</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-surface-container-low border border-border/60 text-xs text-on-surface-variant mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-mint-green text-[18px] shrink-0">shield</span>
+            <span>100% Client-Side Privacy: Your chat export is parsed purely in-browser. Financial PII is automatically redacted.</span>
+          </div>
+
+          <!-- Drag and Drop File Target -->
+          <div id="chat-file-drop-target" class="border-2 border-dashed border-border hover:border-mint-green/80 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-surface-container-lowest/60 mb-4">
+            <input type="file" id="chat-file-input" accept=".txt,.json" class="hidden" />
+            <span class="material-symbols-outlined text-4xl text-mint-green mb-2">upload_file</span>
+            <p class="font-headline-sm text-sm text-white font-bold">Choose or Drop WhatsApp / Discord File</p>
+            <p class="text-xs text-gray-400 mt-1">Accepts "_chat.txt", "export.txt", or Discord "messages.json"</p>
+          </div>
+
+          <!-- Quick Paste Text Fallback -->
+          <div class="flex flex-col gap-1.5 mb-4">
+            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Or Paste Sample Chat Log Directly</label>
+            <textarea id="chat-paste-area" rows="4" placeholder="14/10/2021, 2:41 AM - Liam: If anyone orders another Hawaiian pizza tonight I am literally revoking Netflix for all 5 of you.&#10;14/10/2021, 2:43 AM - Sarah: Challenge accepted." class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest border border-border text-xs text-white placeholder:text-gray-500 font-mono focus:outline-none focus:border-mint-green"></textarea>
+          </div>
+
+          <button id="btn-parse-chat-text" class="w-full py-3 rounded-full bg-gradient-to-r from-mint-green to-emerald-400 text-canvas font-bold text-sm shadow-glow-mint hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+            <span>Auto-Generate Trivia Roast Cards</span>
+          </button>
         </div>
       </div>
     </div>
@@ -348,6 +386,112 @@ export function bindVaultEvents() {
   if (browseBtn) {
     browseBtn.addEventListener('click', () => {
       addSimulatedMemory('PHOTO', 'Anjuna Beach Sunset Party', 'The evening we watched the sun dip into the Arabian Sea.');
+    });
+  }
+
+  // Real Chat Log Importer (WhatsApp / Discord)
+  const chatImportBtn = document.getElementById('btn-vault-chat-import');
+  const chatModal = document.getElementById('chat-importer-modal');
+  const closeChatModalBtn = document.getElementById('btn-close-chat-modal');
+  const chatDropTarget = document.getElementById('chat-file-drop-target');
+  const chatFileInput = document.getElementById('chat-file-input');
+  const chatPasteArea = document.getElementById('chat-paste-area');
+  const parseChatBtn = document.getElementById('btn-parse-chat-text');
+
+  if (chatImportBtn && chatModal) {
+    chatImportBtn.addEventListener('click', () => {
+      audio.playClick();
+      chatModal.style.display = 'flex';
+    });
+  }
+
+  if (closeChatModalBtn && chatModal) {
+    closeChatModalBtn.addEventListener('click', () => {
+      audio.playClick();
+      chatModal.style.display = 'none';
+    });
+  }
+
+  const processChatText = (text, filename = 'Chat Export') => {
+    let parsed = [];
+    if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
+      parsed = MediaProcessor.parseDiscordChatExport(text);
+    } else {
+      parsed = MediaProcessor.parseWhatsAppChatExport(text);
+    }
+
+    if (parsed.length === 0) {
+      // Fallback: tokenize general text lines
+      parsed = MediaProcessor.extractChatMemoriesFromOcr(text);
+    }
+
+    const cards = MediaProcessor.convertChatMemoriesToCards(parsed);
+
+    // Ingest into vault memories and custom game deck
+    parsed.slice(0, 10).forEach((item) => {
+      store.addCustomMemory({
+        type: 'CHAT_SCREENSHOT',
+        title: `Export: ${item.author || 'Squad Quote'}`,
+        quote: item.quote,
+        author: item.author || 'Camp Camper',
+      });
+    });
+
+    audio.playFanfare();
+    if (chatModal) chatModal.style.display = 'none';
+
+    const dropzone = document.getElementById('vault-dropzone');
+    if (dropzone) {
+      dropzone.innerHTML = `
+        <div class="p-6 text-center text-mint-green flex flex-col items-center gap-2">
+          <span class="material-symbols-outlined text-5xl animate-bounce">verified</span>
+          <div class="font-headline-sm font-bold">${parsed.length} Real Chat Memories Ingested!</div>
+          <p class="text-xs text-on-surface-variant font-medium">Auto-generated ${cards.length} new Who-Said-It trivia roast cards into tonight's deck.</p>
+        </div>
+      `;
+      setTimeout(() => store.setView('VAULT'), 1800);
+    }
+  };
+
+  if (chatDropTarget && chatFileInput) {
+    chatDropTarget.addEventListener('click', () => chatFileInput.click());
+    chatFileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => processChatText(evt.target.result, file.name);
+        reader.readAsText(file);
+      }
+    });
+
+    chatDropTarget.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      chatDropTarget.classList.add('border-mint-green', 'bg-mint-green/10');
+    });
+    chatDropTarget.addEventListener('dragleave', () => {
+      chatDropTarget.classList.remove('border-mint-green', 'bg-mint-green/10');
+    });
+    chatDropTarget.addEventListener('drop', (e) => {
+      e.preventDefault();
+      chatDropTarget.classList.remove('border-mint-green', 'bg-mint-green/10');
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => processChatText(evt.target.result, file.name);
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  if (parseChatBtn && chatPasteArea) {
+    parseChatBtn.addEventListener('click', () => {
+      const text = chatPasteArea.value.trim();
+      if (text.length > 10) {
+        processChatText(text, 'Pasted Chat Transcript');
+      } else {
+        audio.playWrongBuzzer();
+        chatPasteArea.placeholder = 'PLEASE PASTE A CHAT LOG FIRST!';
+      }
     });
   }
 

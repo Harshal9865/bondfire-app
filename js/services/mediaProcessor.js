@@ -67,8 +67,6 @@ export class MediaProcessor {
       .filter((l) => l.length > 0);
 
     const candidates = [];
-    const timestampRegex = /(\d{1,2}:\d{2}\s*(?:AM|PM)?|\d{1,2}\/\d{1,2}\/\d{2,4})/i;
-
     lines.forEach((line) => {
       // Find lines that look like dialogue (greater than 20 chars, not just a timestamp)
       if (line.length > 20 && !line.match(/^\[?\d{1,2}:\d{2}/)) {
@@ -91,5 +89,100 @@ export class MediaProcessor {
             confidence: 0.88,
           },
         ];
+  }
+
+  // 3. Parse real WhatsApp exported text files (.txt)
+  // Supports formats:
+  // "14/10/2021, 2:41 AM - Liam: If anyone orders another Hawaiian pizza..."
+  // "[14/10/21, 02:41:05] Sarah: I am legally changing my name..."
+  static parseWhatsAppChatExport(rawText) {
+    const lines = rawText.split('\n');
+    const parsedMessages = [];
+    const waRegex1 = /^\[?(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]m)?)\]?\s*(?:-\s*)?([^:]+?):\s*(.+)$/i;
+
+    const piiCardPattern = /\b(?:\d[ -]*?){13,16}\b/g;
+    const piiPhonePattern = /\b(?:\+\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}\b/g;
+
+    lines.forEach((line) => {
+      const match = line.trim().match(waRegex1);
+      if (match) {
+        const [, date, time, rawAuthor, rawContent] = match;
+        const author = rawAuthor.trim();
+        let content = rawContent.trim();
+
+        // Filter out system and media messages
+        if (
+          content.includes('<Media omitted>') ||
+          content.includes('Messages and calls are end-to-end encrypted') ||
+          content.includes('omitted') ||
+          content.length < 15
+        ) {
+          return;
+        }
+
+        // Scrub PII credit cards & phone numbers
+        content = content.replace(piiCardPattern, '[REDACTED CARD]').replace(piiPhonePattern, '[REDACTED PHONE]');
+
+        parsedMessages.push({
+          id: `wa_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          date,
+          time,
+          author,
+          quote: content,
+          source: 'WHATSAPP_EXPORT',
+        });
+      }
+    });
+
+    return parsedMessages;
+  }
+
+  // 4. Parse real Discord chat export (.json)
+  static parseDiscordChatExport(jsonContent) {
+    try {
+      const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+      const messages = Array.isArray(data) ? data : (data.messages || []);
+      const parsed = [];
+
+      messages.forEach((msg) => {
+        const author = msg.author ? (msg.author.name || msg.author.username || msg.author) : 'Camp Camper';
+        const content = (msg.content || '').trim();
+
+        if (content && content.length >= 15 && !content.startsWith('http') && !content.startsWith('!')) {
+          parsed.push({
+            id: `disc_${msg.id || Math.random().toString(36).substring(2, 7)}`,
+            author: String(author),
+            quote: content,
+            timestamp: msg.timestamp || 'Discord Archive',
+            source: 'DISCORD_EXPORT',
+          });
+        }
+      });
+
+      return parsed;
+    } catch (e) {
+      console.warn('Failed parsing Discord JSON:', e);
+      return [];
+    }
+  }
+
+  // 5. Convert parsed messages into ready-to-play Game Question Cards
+  static convertChatMemoriesToCards(memories, squadRoster = ['Liam', 'Sarah', 'Alex', 'Rohan', 'You']) {
+    return memories.map((mem, idx) => {
+      const author = mem.author || 'Someone';
+      const wrongOptions = squadRoster.filter((name) => name.toLowerCase() !== author.toLowerCase()).slice(0, 3);
+      const allChoices = [...wrongOptions, author].sort(() => Math.random() - 0.5);
+
+      return {
+        id: `chat_card_${idx + 1}`,
+        type: 'WHO_SAID_IT',
+        quote: mem.quote,
+        author: author,
+        correctAnswer: author,
+        options: allChoices,
+        context: `${mem.source || 'Chat Export'} • ${mem.date || mem.timestamp || 'Real Archive'}`,
+        reactions: { '😂': 18, '💀': 24, '🚩': 4, '🍿': 12 },
+      };
+    });
   }
 }

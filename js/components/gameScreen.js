@@ -119,15 +119,60 @@ export function renderGameScreen() {
         </div>
       </div>
 
-      <!-- Category & Game Mode Switcher Pill -->
-      <div class="flex items-center justify-center my-1.5">
-        <button id="btn-game-switch-mode" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-low border border-sunset-coral/40 shadow-[0_0_12px_rgba(255,90,95,0.18)] hover:brightness-110 active:scale-95 transition-all cursor-pointer">
+      <!-- Category & Game Mode Switcher Pill & Host Soundboard Suite -->
+      <div class="flex flex-wrap items-center justify-center gap-2 my-1.5">
+        <button id="btn-game-switch-mode" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-low border border-sunset-coral/40 shadow-[0_0_12px_rgba(255,90,95,0.18)] hover:brightness-110 active:scale-95 transition-all cursor-pointer">
           <span class="text-base">${modeMeta.emoji}</span>
           <span class="font-label-md text-label-md tracking-wider text-primary-container uppercase font-bold">${modeMeta.name}</span>
           <span class="text-surface-variant text-[10px]">•</span>
           <span class="font-label-md text-caption uppercase tracking-wider text-amber-gold font-bold">Switch Mode</span>
           <span class="material-symbols-outlined text-[14px] text-amber-gold">tune</span>
         </button>
+
+        <!-- TV Presentation Mode Cast Button -->
+        <button id="btn-cast-tv-mode" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-border hover:border-mint-green/60 text-mint-green text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm" title="Launch TV Living Room Display Mode">
+          <span class="material-symbols-outlined text-[15px]">tv</span>
+          <span>TV Mode</span>
+        </button>
+
+        <!-- Host Soundboard Toggle -->
+        <button id="btn-toggle-soundboard" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-border hover:border-amber-gold/60 text-amber-gold text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm" title="Host Comedy Soundboard">
+          <span class="material-symbols-outlined text-[15px]">volume_up</span>
+          <span>FX Soundboard</span>
+        </button>
+      </div>
+
+      <!-- Host Soundboard Drawer (Collapsible) -->
+      <div id="host-soundboard-drawer" class="w-full bg-surface-container-high/95 border border-amber-gold/40 rounded-2xl p-3 my-2 shadow-xl flex flex-col gap-2" style="display: none;">
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-amber-gold text-[16px]">spatial_audio_off</span>
+            <span class="text-xs font-bold text-amber-gold uppercase tracking-wider">Host Soundboard (Live FX)</span>
+          </div>
+          <span class="text-[10px] text-gray-400 font-mono">Zero-Latency Web Audio</span>
+        </div>
+        <div class="grid grid-cols-5 gap-1.5 text-center">
+          <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-red-400 flex flex-col items-center gap-0.5 border border-red-500/20" data-sfx="wrong">
+            <span class="text-base">🚨</span>
+            <span class="text-[10px] truncate">Buzzer</span>
+          </button>
+          <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-amber-gold flex flex-col items-center gap-0.5 border border-amber-gold/20" data-sfx="airhorn">
+            <span class="text-base">📯</span>
+            <span class="text-[10px] truncate">Airhorn</span>
+          </button>
+          <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-mint-green flex flex-col items-center gap-0.5 border border-mint-green/20" data-sfx="rimshot">
+            <span class="text-base">🥁</span>
+            <span class="text-[10px] truncate">Rimshot</span>
+          </button>
+          <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-secondary flex flex-col items-center gap-0.5 border border-secondary/20" data-sfx="cheer">
+            <span class="text-base">👏</span>
+            <span class="text-[10px] truncate">Cheer</span>
+          </button>
+          <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-gray-400 flex flex-col items-center gap-0.5 border border-border" data-sfx="crickets">
+            <span class="text-base">🦗</span>
+            <span class="text-[10px] truncate">Silence</span>
+          </button>
+        </div>
       </div>
 
       <!-- DYNAMIC GAME MODE VIEWPORTS -->
@@ -839,6 +884,38 @@ export function bindGameEvents() {
     closeLightboxBtn.addEventListener('click', () => {
       audio.playClick();
       lightboxModal.style.display = 'none';
+    });
+  }
+
+  // Host Soundboard Drawer Toggle & SFX triggers
+  const toggleSoundboardBtn = document.getElementById('btn-toggle-soundboard');
+  const soundboardDrawer = document.getElementById('host-soundboard-drawer');
+  if (toggleSoundboardBtn && soundboardDrawer) {
+    toggleSoundboardBtn.addEventListener('click', () => {
+      audio.playClick();
+      const isHidden = soundboardDrawer.style.display === 'none';
+      soundboardDrawer.style.display = isHidden ? 'flex' : 'none';
+    });
+  }
+
+  const sfxBtns = document.querySelectorAll('.btn-sfx');
+  sfxBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sfx = btn.dataset.sfx;
+      if (sfx === 'wrong') audio.playWrongBuzzer();
+      else if (sfx === 'airhorn') audio.playAirhorn();
+      else if (sfx === 'rimshot') audio.playRimshot();
+      else if (sfx === 'cheer') audio.playCrowdCheer();
+      else if (sfx === 'crickets') audio.playCrickets();
+    });
+  });
+
+  // Cast to TV Presentation Mode
+  const castTvBtn = document.getElementById('btn-cast-tv-mode');
+  if (castTvBtn) {
+    castTvBtn.addEventListener('click', () => {
+      audio.playChime();
+      store.setView('TV_MODE');
     });
   }
 }

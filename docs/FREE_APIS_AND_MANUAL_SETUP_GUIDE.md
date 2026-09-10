@@ -1,174 +1,109 @@
-# Bondfire Production De-Hardcoding: Free Cloud APIs & Manual Setup Guide
+# Free APIs, Infrastructure & Manual Setup Guide
 
-This comprehensive guide details every mocked or simulated feature in Bondfire, the exact **100% Free Production APIs** that replace them, and the step-by-step manual actions you need to perform to go live.
-
----
-
-## Summary of Hardcoded Elements vs. 100% Free APIs
-
-| Feature Area | Current State (Local/Mock) | Free Production Replacement | Free Tier Allowance | Credit Card Needed? |
-| :--- | :--- | :--- | :--- | :--- |
-| **Authentication** | Simulated `currentUser` & GSI JWT Decoder | **Google Identity Services (OAuth 2.0)** | Unlimited Free Forever | ❌ **No** |
-| **Media & Photos** | Unsplash static URLs in Vault & Book | **Cloudflare R2 Object Storage** | 10 GB Free Storage + 0 Egress Bandwidth Fees | ❌ **No** |
-| **AI Roast & Trivia** | Hardcoded question array in `gameScreen.js` | **Google Gemini 1.5 Flash API** | 15 RPM, 1,500 Requests/Day Free via AI Studio | ❌ **No** |
-| **Database & Sync** | Browser `localStorage` + Memory Store | **Supabase Cloud PostgreSQL** | 500 MB DB, 50,000 Monthly Active Users | ❌ **No** |
-| **Payments & Pro** | Simulated Stripe Cyber Checkout Modal | **Stripe Developer Test Mode** | Unlimited Sandbox Charges & Real Webhooks | ❌ **No** |
-| **Live WebSockets** | Localhost ws port 4000 or broadcast | **PartyKit / Cloudflare Workers** | 100k daily requests Free | ❌ **No** |
+This document outlines all free public APIs, STUN infrastructure, and manual deployment steps implemented in Bondfire.
 
 ---
 
-## 1. Google OAuth 2.0 (Real Google 1-Tap & Sign-In)
+## 1. Free STUN Servers for Peer-to-Peer WebRTC Multiplayer
 
-### What it Replaces
-Replaces the simulated user object with real verified user names, emails, and profile pictures from Google.
+To allow browsers and mobile phones to establish direct peer-to-peer data channels without purchasing expensive TURN servers or hosted socket servers, Bondfire connects directly to Google and Twilio's public free STUN gateways.
 
-### Step-by-Step Manual Setup (5 Minutes)
-1. Open the [Google Cloud Console](https://console.cloud.google.com/).
-2. Click **Create Project** ➔ Name it `Bondfire-App`.
-3. In the left navigation, open **APIs & Services** ➔ **OAuth consent screen**:
-   - User Type: Select **External** and click **Create**.
-   - App Information: Set App Name to `Bondfire`, User support email to your personal email.
-   - Developer contact email: Enter your email.
-   - Click **Save and Continue** through the Scopes step (default `email`, `profile`, `openid` are automatically selected).
-   - Test Users: Add your personal Gmail address to test sign-ins.
-4. Go to **APIs & Services** ➔ **Credentials**:
-   - Click **+ CREATE CREDENTIALS** ➔ Select **OAuth client ID**.
-   - Application type: Select **Web application**.
-   - Name: `Bondfire Web Client`.
-   - **Authorized JavaScript origins**:
-     - `http://localhost:5173`
-     - `http://localhost:3000`
-     - `https://your-domain.vercel.app` (when deployed)
-   - Click **Create**.
-5. Copy the generated **Client ID** (looks like `XXXXXXXXX-XXXXX.apps.googleusercontent.com`).
-6. Open `js/config.js` in your project and update:
-   ```javascript
-   GOOGLE_CLIENT_ID: 'YOUR_COPIED_CLIENT_ID.apps.googleusercontent.com'
-   ```
+### Active Endpoints:
+- `stun:stun.l.google.com:19302` (Google Public STUN — 100% Free, Global Anycast)
+- `stun:stun1.l.google.com:19302` (Google Secondary STUN)
+- `stun:global.stun.twilio.com:3478?transport=udp` (Twilio Public STUN)
+
+### How to Get / Configure:
+1. **Zero Registration**: These endpoints are open-source and free public internet infrastructure.
+2. **Implementation**: Configured in [`js/services/webrtcService.js`](file:///c:/Users/Harshal/Desktop/gpt6/js/services/webrtcService.js).
+3. **Behavior**: When two devices are on Wi-Fi or cellular, the STUN server discovers their public IP and NAT mapping, allowing them to exchange messages directly via `RTCPeerConnection`.
 
 ---
 
-## 2. Cloudflare R2 (Real Group Photo & Voice Note Storage)
+## 2. Real Chat Export Importers (WhatsApp & Discord)
 
-### What it Replaces
-Replaces static Unsplash placeholder photos with real group photos, screenshots, and audio recordings uploaded by squad members.
+### WhatsApp Chat Export:
+1. Open any group chat on WhatsApp (iOS or Android).
+2. Tap the group title > **Export Chat**.
+3. Choose **Without Media** (creates a lightweight `_chat.txt`).
+4. In Bondfire: Go to **Memory Vault** -> Tap **Import Chat (.txt/.json)** -> Drag & drop the `.txt` file or paste lines directly.
+5. **PII Filtering**: Credit card numbers (`4111-XXXX-XXXX-XXXX`) and phone numbers are automatically redacted in-browser before cards are minted.
 
-### Step-by-Step Manual Setup (5 Minutes)
-1. Sign up for a free account at [Cloudflare.com](https://dash.cloudflare.com/).
-2. In the left sidebar, click **R2 Object Storage**.
-3. Click **Create Bucket** ➔ Bucket Name: `bondfire-vault-prod`.
-   - Location: Choose **Automatic** (closest to users).
-   - Click **Create Bucket**.
-4. In the bucket **Settings** tab:
-   - Under **Public Access**, click **Connect Domain** (or enable the free `r2.dev` public subdomain for testing).
-   - Under **CORS Policy**, click **Add CORS policy** and paste:
-     ```json
-     [
-       {
-         "AllowedOrigins": ["http://localhost:5173", "https://*.vercel.app"],
-         "AllowedMethods": ["GET", "PUT", "POST"],
-         "AllowedHeaders": ["*"],
-         "MaxAgeSeconds": 3600
-       }
-     ]
-     ```
-5. In the top-right of the R2 page, click **Manage R2 API Tokens** ➔ **Create API Token**:
-   - Permissions: Select **Object Read & Write**.
-   - Click **Create API Token**.
-6. Copy the:
-   - **Access Key ID**
-   - **Secret Access Key**
-   - **Jurisdiction-Specific S3 Endpoint** (`https://<account_id>.r2.cloudflarestorage.com`)
-7. Paste these credentials into `.env`:
-   ```env
-   R2_ACCOUNT_ID=your_account_id
-   R2_ACCESS_KEY_ID=your_access_key
-   R2_SECRET_ACCESS_KEY=your_secret_key
-   R2_BUCKET_NAME=bondfire-vault-prod
-   R2_PUBLIC_URL=https://pub-xxxxxx.r2.dev
-   ```
+### Discord Chat Export:
+1. Use any standard Discord channel export tool or bot (e.g. DiscordChatExporter) to download a `.json` transcript.
+2. In Bondfire: Drop the `.json` file. Bondfire filters out bot commands (`!`, `/`), links, and system notifications, keeping dialogue for trivia cards.
 
 ---
 
-## 3. Google Gemini 1.5 Flash API (Real AI Trivia & Chat OCR Roasts)
+## 3. Host Live TV Presentation Mode
 
-### What it Replaces
-Replaces the static 5-question mock array in `gameScreen.js` with live, hilarious AI roast questions generated directly from text OCR extracted from your group chat screenshots.
-
-### Step-by-Step Manual Setup (2 Minutes)
-1. Visit [Google AI Studio](https://aistudio.google.com/).
-2. Sign in with your Google account.
-3. Click **Get API Key** ➔ Click **Create API key in new project**.
-4. Copy the API key (starts with `AIzaSy...`).
-5. In `.env`, add:
-   ```env
-   GEMINI_API_KEY=AIzaSy...
-   ```
-6. The client / backend calls Gemini Flash:
-   ```javascript
-   const prompt = `You are the roast master for a squad called "${podName}". 
-   Here is a real quote from their chat: "${quote}". 
-   Generate 4 multiple-choice options for "Who said this in 2019?", where one is correct and 3 are believable squad members. 
-   Return pure JSON.`;
-   ```
+1. From the live game screen ([`gameScreen.js`](file:///c:/Users/Harshal/Desktop/gpt6/js/components/gameScreen.js)), tap **"TV Mode"** in the top action bar.
+2. Tap **"Fullscreen"** (`F11` or full screen toggle).
+3. Connect your laptop or phone via AirPlay, Chromecast, or HDMI to your living room TV.
+4. Players scan the corner QR code or enter the 4-letter room code on their phones to buzz in, while the TV displays high-impact questions and timer rings.
 
 ---
 
-## 4. Supabase (Free Production PostgreSQL Database)
+## 4. Print-Ready Keepsake Hardcover PDF Exporter
 
-### What it Replaces
-Replaces client `localStorage` with a persistent multi-user PostgreSQL database so scores, squad memberships, and unlocked memories persist across all devices.
-
-### Step-by-Step Manual Setup (3 Minutes)
-1. Go to [Supabase.com](https://supabase.com/) and click **Start your project** (free).
-2. Project Name: `Bondfire-DB` ➔ Set a strong Database Password.
-3. Region: Select the region closest to your users.
-4. When created, go to **SQL Editor** in the Supabase sidebar.
-5. Open `database/migrations/001_initial_schema.sql` from this repository, copy all contents, paste into the Supabase SQL editor, and click **RUN**.
-6. Go to **Project Settings** ➔ **API**:
-   - Copy **Project URL**
-   - Copy **anon / public key**
-7. Paste into `.env`:
-   ```env
-   SUPABASE_URL=https://xxxxxx.supabase.co
-   SUPABASE_ANON_KEY=eyJhbGci...
-   ```
+1. Navigate to **3D Photobook** (`/yearbook`).
+2. Review your squad's auto-compiled yearbook spread.
+3. Click **"Download PDF"** (`window.print`).
+4. The print stylesheet automatically hides UI bars, switches to high-contrast printable white backgrounds, and formats the pages with proper landscape spreads ready to save as PDF or send to a local print shop.
 
 ---
 
-## 5. Stripe Developer Test Mode (Real Sandbox Payments & Webhooks)
+## 5. Host Procedural Comedy Soundboard
 
-### What it Replaces
-Transitions the interactive demo checkout modal into real Stripe Elements with test cards, simulated 3D Secure verification, and webhook fulfillment.
-
-### Step-by-Step Manual Setup (3 Minutes)
-1. Create a free developer account at [Stripe.com](https://stripe.com/).
-2. In the top-right header, ensure **Test Mode** toggle is switched ON (Orange banner).
-3. Go to **Developers** ➔ **API Keys**:
-   - Copy **Publishable key** (`your_stripe_publishable_key`)
-   - Copy **Secret key** (`your_stripe_secret_key`)
-4. Add to `.env`:
-   ```env
-   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   ```
-5. You can test transactions immediately with the official Stripe test cards:
-   - **Visa Success**: `4242 4242 4242 4242`
-   - **Mastercard Success**: `5555 5555 5555 4444`
-   - **Any future date** (e.g. `12/28`) and any 3-digit CVC (`123`).
+1. In any game round or TV Mode, tap **"FX Soundboard"**.
+2. Trigger:
+   - **Buzzer** (Sawtooth dissonant buzz)
+   - **Airhorn** (Tri-blast stadium fanfare)
+   - **Rimshot** (Ba-dum-tss procedural snare and high-pass cymbal noise)
+   - **Applause** (Bandpass white noise crowd cheer)
+   - **Silence** (Procedural cricket chirps)
+3. Synthesized completely using the browser's native **Web Audio API** (`AudioContext`) — zero MP3 downloads or copyright licensing fees.
 
 ---
 
-## 6. Verification & Health Checklist
+## 6. How to Make Google Login Work for Multiple Real Accounts (100% Free)
 
-To verify your configuration at any time, run:
-```bash
-# Verify all enterprise scenario assertions
-node tests/scenario_full_lifecycle.js
+If you see an error saying **"Access blocked: This app is in testing and you are not a test user"** or can only log in with one email, here is exactly why and how to unlock it freely:
 
-# Verify core logic & screen renderers
-node tests/verify_services.js
+### Why Google Restricts Accounts Initially:
+When you create a Google Cloud Project for OAuth 2.0, Google automatically starts the project in **"Testing" Publishing Status**. In "Testing" mode, Google **blocks all Google accounts** except the exact email addresses you manually add to the "Test Users" whitelist.
 
-# Check local frontend server
-http://localhost:5173
-```
+### Option A: Make it Work for ANY Google Account in the World (Recommended, 100% Free)
+Because Bondfire only requests basic non-sensitive scopes (`openid`, `email`, `profile`), **Google DOES NOT require an app verification audit, payment, or paperwork!**
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Select your Bondfire project.
+3. In the left navigation menu, go to **APIs & Services** > **OAuth consent screen**.
+4. Look at **Publishing status**. It currently says **"Testing"**.
+5. Click the **"PUBLISH APP"** button.
+6. A confirmation modal will appear: *"Push to production? Your app will be available to any user with a Google Account."* Click **Confirm**.
+7. **Done!** Now **ANY** Google account can immediately sign in.
+
+### Option B: Keep in Testing Mode but Add Friends/Multiple Accounts
+If you prefer not to publish to production yet:
+1. In Google Cloud Console > **APIs & Services** > **OAuth consent screen**.
+2. Scroll down to the **Test users** section.
+3. Click **"+ ADD USERS"**.
+4. Type in the email addresses of your friends, family, or other test accounts (up to 100 emails).
+5. Click **Save**. All those accounts can now log in.
+
+### Crucial Step: Authorized JavaScript Origins
+To prevent `origin_mismatch` errors on your live site or locally:
+1. Go to **APIs & Services** > **Credentials**.
+2. Click your OAuth 2.0 Client ID (under Web application).
+3. Under **Authorized JavaScript origins**, ensure you have added:
+   - `https://bondfire-chi.vercel.app` (your Vercel production URL)
+   - `http://localhost:5173` (Vite dev server)
+   - `http://localhost:3000` (Local preview)
+4. Under **Authorized redirect URIs**, add the same URLs if using redirect mode.
+5. Click **Save**.
+
+### Testing Multiple Accounts Locally / On 1 Device:
+1. **Google Account Picker**: In Bondfire's Sign In modal, click **"Switch / Choose Another Google Account"** or use the official Google button to choose a different Google account.
+2. **Incognito / Private Window**: Open an Incognito window to log in as a second player with a separate Google account without logging out of your main account.
+3. **1-Click Test Accounts**: In the Bondfire Auth Modal, click any of the 4 instant test camper buttons (**Harshal [Host]**, **Liam**, **Sarah**, **Alex**) to test multiplayer flows in 1 click without needing multiple passwords.

@@ -22,6 +22,7 @@ import { renderPixelGladeScreen, bindPixelGladeEvents } from './components/pixel
 import { renderProfileScreen, bindProfileEvents } from './components/profileScreen.js';
 import { renderPricingScreen, bindPricingEvents } from './components/pricingScreen.js';
 import { renderFriendsScreen, bindFriendsEvents } from './components/friendsScreen.js';
+import { renderTvModeScreen, bindTvModeEvents } from './components/tvModeScreen.js';
 import { renderFooter, bindFooterEvents } from './components/footer.js';
 
 class BondfireApp {
@@ -67,7 +68,7 @@ class BondfireApp {
 
   handleHashChange() {
     const hash = window.location.hash.replace('#/', '').toUpperCase();
-    const validViews = ['HERO', 'LOBBY', 'GAME', 'COUPLE', 'SOLO', 'VAULT', 'YEARBOOK', 'STORE', 'GLADE', 'PROFILE', 'PRICING', 'FRIENDS'];
+    const validViews = ['HERO', 'LOBBY', 'GAME', 'COUPLE', 'SOLO', 'VAULT', 'YEARBOOK', 'STORE', 'GLADE', 'PROFILE', 'PRICING', 'FRIENDS', 'TV_MODE'];
     const targetView = validViews.includes(hash) ? hash : 'HERO';
 
     if (store.getState().currentView !== targetView) {
@@ -142,6 +143,13 @@ class BondfireApp {
         this.appMount.innerHTML = renderFriendsScreen();
         bindFriendsEvents();
         break;
+
+      case 'TV_MODE':
+        this.appMount.innerHTML = renderTvModeScreen();
+        bindTvModeEvents();
+        if (this.headerMount) this.headerMount.innerHTML = '';
+        if (this.footerMount) this.footerMount.innerHTML = '';
+        return; // TV Mode manages its own full-viewport layout
 
       case 'HERO':
       default:

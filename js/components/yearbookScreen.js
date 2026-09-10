@@ -174,7 +174,7 @@ export function renderYearbookScreen() {
             </div>
 
             <!-- Open Book Canvas Simulation -->
-            <div id="yearbook-spread-container" class="relative w-full rounded-2xl overflow-hidden shadow-2xl bg-[#0e111a] p-2 md:p-5 touch-manipulation select-none">
+            <div id="yearbook-spread-container" class="yearbook-print-container relative w-full rounded-2xl overflow-hidden shadow-2xl bg-[#0e111a] p-2 md:p-5 touch-manipulation select-none">
               <div class="relative w-full rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row bg-[#FDFBF7] text-[#1E2330] transition-all duration-300 min-h-[460px]">
                 
                 <!-- Left Page: The Unhinged Quotes -->
