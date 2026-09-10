@@ -211,9 +211,7 @@ p, h1, h2, h3, h4, span, div {
   button,
   .no-print,
   #bg-canvas,
-  #mobile-bottom-nav,
-  #mobile-fab-action,
-  #mobile-explore-sheet-backdrop {
+  #mobile-drawer {
     display: none !important;
   }
 

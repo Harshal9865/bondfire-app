@@ -64,9 +64,16 @@
     }
   </style>
 
-  <!-- PWA cache eviction is handled by the Service Worker lifecycle (sw.js
-       activate event). No inline cache purge here: deleting caches from the
-       page races with SW install/serve and causes offline flakiness. -->
+  <!-- Automatic PWA Cache Invalidation for New Releases -->
+  <script>
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        keys.forEach(function(key) {
+          if (key !== 'bondfire-v3') caches.delete(key);
+        });
+      });
+    }
+  </script>
 </head>
 <body data-mode="PODS">
 

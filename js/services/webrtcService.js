@@ -23,13 +23,6 @@ export class P2PWebRTCService {
 
   // Initialize P2P connection
   initPeer(isInitiator = false) {
-    // Reuse the existing mesh peer — socket fallback paths (error, close,
-    // retries-exhausted) can each trigger init, and duplicate peer
-    // connections leak ICE agents and spam the console.
-    if (this.peerConnection) {
-      return this.peerConnection;
-    }
-
     if (typeof window === 'undefined' || !window.RTCPeerConnection) {
       console.warn('WebRTC not supported in this browser environment');
       return null;

@@ -16,49 +16,15 @@ class WebSocketService {
     this.isConnected = false;
     this.hasLoggedError = false;
     this.hasLoggedMeshMode = false;
-    this.probeInFlight = false;
-    // Opt-in verbose mesh logging only (prevents console spam in production mesh mode)
-    this.debug = false;
-    try {
-      this.debug =
-        (typeof localStorage !== 'undefined' && localStorage.getItem('BONDFIRE_DEBUG') === '1') ||
-        (typeof window !== 'undefined' && window.location.search.includes('debug=1'));
-    } catch (e) {
-      this.debug = false;
-    }
   }
 
-  // Verify the backend is actually reachable before opening a socket.
-  // `new WebSocket()` failures print native browser console errors that JS
-  // cannot suppress, so a `/api/health` preflight keeps the console clean
-  // when the app runs in static-only hosting (Vercel) or backend is down.
-  async checkBackendHealth() {
-    try {
-      if (typeof fetch === 'undefined') return false;
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(`${CONFIG.API_BASE_URL}/health`, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (!res.ok) return false;
-      const data = await res.json();
-      return data && (data.status === 'healthy' || data.service === 'bondfire-api');
-    } catch (e) {
-      return false;
-    }
-  }
-
-  enterMeshMode(reason) {
-    if (!this.hasLoggedMeshMode) {
-      this.hasLoggedMeshMode = true;
-      console.log('⚡ Bondfire operating in resilient local mesh mode with WebRTC P2P fallback.');
-      p2pMesh.initPeer(store.getState().activeRoom?.isHost ?? false);
-    }
-    if (this.debug && reason) console.debug(`[Mesh Mode] reason: ${reason}`);
-  }
-
-  async connect() {
+  connect() {
     if (!CONFIG.WS_BASE_URL) {
-      this.enterMeshMode('no WS_BASE_URL configured');
+      if (!this.hasLoggedMeshMode) {
+        this.hasLoggedMeshMode = true;
+        console.log('⚡ Bondfire operating in resilient local mesh mode with WebRTC P2P fallback.');
+        p2pMesh.initPeer(store.getState().activeRoom?.isHost ?? false);
+      }
       return;
     }
 
@@ -66,23 +32,6 @@ class WebSocketService {
       return;
     }
 
-    // Avoid stacking parallel health probes on re-renders / hash changes
-    if (this.probeInFlight) return;
-    this.probeInFlight = true;
-
-    try {
-      const backendAlive = await this.checkBackendHealth();
-      if (!backendAlive) {
-        this.enterMeshMode('backend health check failed');
-        return;
-      }
-      this.openSocket();
-    } finally {
-      this.probeInFlight = false;
-    }
-  }
-
-  openSocket() {
     try {
       this.socket = new WebSocket(CONFIG.WS_BASE_URL);
 
@@ -118,8 +67,9 @@ class WebSocketService {
         this.stopHeartbeat();
         if (this.reconnectAttempts < 2) {
           this.scheduleReconnect();
-        } else {
-          this.enterMeshMode('websocket retries exhausted');
+        } else if (!this.hasLoggedMeshMode) {
+          this.hasLoggedMeshMode = true;
+          console.log('⚡ Bondfire operating in resilient local mesh mode.');
         }
       };
 
@@ -147,8 +97,7 @@ class WebSocketService {
       if (p2pMesh.isConnected) {
         p2pMesh.send({ type, payload, timestamp: Date.now() });
       }
-      // Verbose mesh dispatch logging is opt-in only (BONDFIRE_DEBUG=1 / ?debug=1)
-      if (this.debug) console.debug(`[Mesh Mode] Dispatched ${type}:`, payload);
+      console.log(`[Mesh Mode] Dispatched ${type}:`, payload);
     }
   }
 
