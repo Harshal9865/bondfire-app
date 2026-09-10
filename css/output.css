@@ -380,6 +380,9 @@
 .overflow-y-auto {
   overflow-y: auto;
 }
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
 .rounded-\[7px\] {
   border-radius: 7px;
 }
@@ -456,6 +459,9 @@
 .border-\[\#202C33\] {
   border-color: #202C33;
 }
+.border-\[\#262B40\]\/60 {
+  border-color: color-mix(in oklab, #262B40 60%, transparent);
+}
 .border-\[\#262B40\]\/70 {
   border-color: color-mix(in oklab, #262B40 70%, transparent);
 }
@@ -500,6 +506,9 @@
 }
 .bg-\[\#0E121E\] {
   background-color: #0E121E;
+}
+.bg-\[\#0E121E\]\/75 {
+  background-color: color-mix(in oklab, #0E121E 75%, transparent);
 }
 .bg-\[\#0e111a\] {
   background-color: #0e111a;

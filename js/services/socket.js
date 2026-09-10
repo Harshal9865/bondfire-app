@@ -159,6 +159,7 @@ class WebSocketService {
   }
 
   scheduleReconnect() {
+    if (!CONFIG.WS_BASE_URL) return;
     const delay = Math.min(1000 * Math.pow(1.5, this.reconnectAttempts), this.maxReconnectDelay);
     this.reconnectAttempts++;
     setTimeout(() => {

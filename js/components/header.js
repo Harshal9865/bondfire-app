@@ -137,7 +137,46 @@ export function renderHeader() {
           `}
         </div>
       </div>
+
+      <!-- Horizontal Scrolling Category & Mode Tabs (Mobile & Tablet < 1024px) -->
+      <div class="lg:hidden w-full overflow-x-auto no-scrollbar border-t border-[#262B40]/60 px-3 py-2 bg-[#0E121E]/75 backdrop-blur-md flex items-center gap-2 scroll-smooth">
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentMode === 'SOLO' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-mode="SOLO" data-view="SOLO">
+          <span class="material-symbols-outlined text-[14px] text-amber-gold">person</span>
+          <span>Solo</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentMode === 'US' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-mode="US" data-view="COUPLE">
+          <span class="material-symbols-outlined text-[14px] text-duo-rose">favorite</span>
+          <span>Us Mode</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentMode === 'PODS' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-mode="PODS" data-view="LOBBY">
+          <span class="material-symbols-outlined text-[14px] text-sunset-coral">groups</span>
+          <span>Pods Squad</span>
+        </button>
+        <div class="w-[1px] h-4 bg-border/80 shrink-0 mx-0.5"></div>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'GLADE' ? 'bg-mint-green/20 text-mint-green border border-mint-green/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="GLADE">
+          <span class="material-symbols-outlined text-[14px] text-mint-green">stadia_controller</span>
+          <span>Arcade</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'TV_MODE' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="TV_MODE">
+          <span class="material-symbols-outlined text-[14px] text-sunset-coral">tv</span>
+          <span>TV Cast</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'STORE' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="STORE">
+          <span class="material-symbols-outlined text-[14px] text-secondary">shopping_bag</span>
+          <span>Emporium</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'PRICING' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="PRICING">
+          <span class="material-symbols-outlined text-[14px] text-amber-gold">stars</span>
+          <span>Pricing</span>
+        </button>
+      </div>
     </header>
+
+    <!-- Floating Action Button (FAB) for 1-Tap Quick Room Creation on Mobile -->
+    <button id="mobile-fab-action" class="lg:hidden fixed bottom-22 right-4 z-40 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs shadow-glow-coral active:scale-95 flex items-center gap-1.5 border border-white/20 transition-all duration-300 transform hover:scale-105" title="Instant Room Creation">
+      <span class="material-symbols-outlined text-[18px]">add_circle</span>
+      <span class="tracking-wide">Create Room</span>
+    </button>
 
     <!-- Mobile Bottom Command Dock (Fixed thumb-friendly docking bar with elevated center flame button) -->
     <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/92 backdrop-blur-2xl border-t border-[#262B40]/80 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] select-none transition-transform duration-300 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-1 px-3">
@@ -538,4 +577,26 @@ export function bindHeaderEvents() {
       else if (sound === 'crickets') audio.playCrickets();
     });
   });
+
+  // Horizontal Scrolling Filter Pills (Swipeable Tabs)
+  const filterPills = document.querySelectorAll('.mobile-filter-pill');
+  filterPills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      audio.playClick();
+      const mode = pill.dataset.mode;
+      const view = pill.dataset.view;
+      if (mode) store.setMode(mode);
+      if (view) store.setView(view);
+    });
+  });
+
+  // Mobile Floating Action Button (FAB) - 1-Tap Quick Party Room Launch
+  const fabBtn = document.getElementById('mobile-fab-action');
+  if (fabBtn) {
+    fabBtn.addEventListener('click', () => {
+      audio.playChime();
+      store.createNewRoom();
+      store.setView('LOBBY');
+    });
+  }
 }
