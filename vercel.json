@@ -2,6 +2,7 @@
   "version": 2,
   "name": "bondfire",
   "outputDirectory": ".",
+  "buildCommand": "npm run build",
   "cleanUrls": true,
   "routes": [
     {

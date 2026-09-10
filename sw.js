@@ -32,7 +32,13 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('⚡ Pre-caching Bondfire v3 offline assets');
-      return cache.addAll(PRECACHE_ASSETS);
+      // Cache each asset independently: one missing/404 asset must not
+      // reject the whole install (cache.addAll fails atomically).
+      return Promise.allSettled(
+        PRECACHE_ASSETS.map((url) =>
+          cache.add(url).catch((err) => console.warn('⚡ Skipping uncacheable asset:', url, err))
+        )
+      );
     })
   );
   self.skipWaiting();
