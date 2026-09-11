@@ -21,15 +21,20 @@ export class GoogleAuthService {
   static renderSignInButton(elementId) {
     if (typeof window !== 'undefined' && window.google && window.google.accounts && document.getElementById(elementId)) {
       try {
+        const container = document.getElementById(elementId);
+        // Calculate responsive button width: 220px on small mobile up to 360px on tablet/desktop
+        const screenWidth = window.innerWidth || 360;
+        const targetWidth = Math.min(Math.max(screenWidth - 72, 220), 360);
+
         window.google.accounts.id.renderButton(
-          document.getElementById(elementId),
+          container,
           {
             theme: 'filled_black',
             size: 'large',
             type: 'standard',
             text: 'continue_with',
             shape: 'pill',
-            width: 320,
+            width: targetWidth,
             logo_alignment: 'left',
           }
         );

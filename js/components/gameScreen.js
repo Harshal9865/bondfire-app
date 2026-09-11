@@ -19,51 +19,87 @@ let confettiInstance = null;
 function resolveActiveDeck(state, selectedModeId) {
   const defaultDeck = getDeckForMode(selectedModeId);
   const customList = state.customGameDeck || [];
-  if (customList.length === 0) return defaultDeck;
+  const roomCampers = state.activeRoom?.campers || [];
+  const camperNames = roomCampers.map((c) => c.name).filter(Boolean);
+  const currentUserName = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'You';
 
-  const mappedCustom = customList.map((card, idx) => ({
-    round: idx + 1,
-    caseNumber: `CASE #${900 + idx}`,
-    defendant: card.author || 'Someone',
-    charge: card.title || 'Secret Mystery',
-    details: card.quote || 'Custom memory dropped into deck',
-    exhibitTitle: 'Exhibit A: Real Chat Quote',
-    exhibitSnippet: card.quote || '“...”',
-    defensePlea: '“I have no excuse, you caught me.”',
-    guiltyRoasts: ['Must buy next round of snacks for the squad', 'Must change nickname to Clown of the Week'],
-    confessionId: `CONFESSION #${900 + idx}`,
-    secretText: card.quote || card.title,
-    submittedAt: 'Custom Vault Memory',
-    shockRating: '💥 CUSTOM DROP',
-    suspects: ['Liam', 'Sarah', 'Alex', card.author || 'Leo Vance'],
-    actualAuthor: card.author || 'Leo Vance',
-    confessionContext: card.quote || card.title,
-    seatTarget: card.author || 'Leo Vance',
-    theme: '🔥 CUSTOM DROP',
-    question: card.quote || card.title,
-    promptHint: card.title || 'Be completely honest',
-    ratings: [
-      { id: 'HONEST', label: '100% Brutal Truth', color: 'mint-green', icon: 'verified', xp: 350 },
-      { id: 'CAP', label: 'Sugarcoated Cap', color: 'sunset-coral', icon: 'sentiment_dissatisfied', xp: 50 },
-      { id: 'GRENADE', label: 'Unhinged Emotional Grenade', color: 'amber-gold', icon: 'bomb', xp: 500 },
-    ],
-    category: 'CUSTOM DROP',
-    scenario: card.quote || card.title,
-    candidates: ['Liam', 'Sarah', 'Alex', card.author || 'Leo Vance'],
-    crownTitle: card.title || 'The Mystery Agent',
-    timestamp: 'Just now',
-    quote: card.quote || card.title,
-    correctAnswer: card.author || 'Leo Vance',
-    options: [
-      { name: card.author || 'Leo Vance', role: 'Mystery Drop' },
-      { name: 'Sarah', role: 'Trivia Legend' },
-      { name: 'Liam', role: 'Campfire Guitarist' },
-      { name: 'Alex', role: 'Late Night Owl' },
-    ],
-    context: card.title || 'Custom squad memory',
-  }));
+  // Dynamic roster of participants
+  const dynamicRoster = camperNames.length > 0 ? camperNames : [currentUserName, 'Camper 2', 'Camper 3', 'Camper 4'];
 
-  return [...mappedCustom, ...defaultDeck];
+  const adaptDeckToCampers = (deck) => {
+    if (camperNames.length === 0) return deck;
+    return deck.map((card, idx) => {
+      const targetCamper = camperNames[idx % camperNames.length];
+      const suspects = [...camperNames];
+      while (suspects.length < 4) {
+        suspects.push(`Camper ${suspects.length + 1}`);
+      }
+      const actualAuthor = suspects.includes(targetCamper) ? targetCamper : suspects[0];
+      const options = suspects.slice(0, 4).map((name) => ({
+        name,
+        role: name === currentUserName ? 'Host' : 'Camper'
+      }));
+
+      return {
+        ...card,
+        defendant: targetCamper,
+        seatTarget: targetCamper,
+        suspects: suspects.slice(0, 4),
+        candidates: suspects.slice(0, 4),
+        actualAuthor,
+        correctAnswer: actualAuthor,
+        options
+      };
+    });
+  };
+
+  const mappedCustom = customList.map((card, idx) => {
+    const author = card.author || currentUserName;
+    const suspects = [...new Set([author, ...dynamicRoster])].slice(0, 4);
+    while (suspects.length < 4) {
+      suspects.push(`Camper ${suspects.length + 1}`);
+    }
+
+    return {
+      round: idx + 1,
+      caseNumber: `CASE #${900 + idx}`,
+      defendant: author,
+      charge: card.title || 'Secret Mystery',
+      details: card.quote || 'Custom memory dropped into deck',
+      exhibitTitle: 'Exhibit A: Real Chat Quote',
+      exhibitSnippet: card.quote || '“...”',
+      defensePlea: '“I have no excuse, you caught me.”',
+      guiltyRoasts: ['Must buy next round of snacks for the squad', 'Must change nickname to Clown of the Week'],
+      confessionId: `CONFESSION #${900 + idx}`,
+      secretText: card.quote || card.title,
+      submittedAt: 'Custom Vault Memory',
+      shockRating: '💥 CUSTOM DROP',
+      suspects,
+      actualAuthor: author,
+      confessionContext: card.quote || card.title,
+      seatTarget: author,
+      theme: '🔥 CUSTOM DROP',
+      question: card.quote || card.title,
+      promptHint: card.title || 'Be completely honest',
+      ratings: [
+        { id: 'HONEST', label: '100% Brutal Truth', color: 'mint-green', icon: 'verified', xp: 350 },
+        { id: 'CAP', label: 'Sugarcoated Cap', color: 'sunset-coral', icon: 'sentiment_dissatisfied', xp: 50 },
+        { id: 'GRENADE', label: 'Unhinged Emotional Grenade', color: 'amber-gold', icon: 'bomb', xp: 500 },
+      ],
+      category: 'CUSTOM DROP',
+      scenario: card.quote || card.title,
+      candidates: suspects,
+      crownTitle: card.title || 'The Mystery Agent',
+      timestamp: 'Just now',
+      quote: card.quote || card.title,
+      correctAnswer: author,
+      options: suspects.map((name) => ({ name, role: name === currentUserName ? 'Host' : 'Camper' })),
+      context: card.title || 'Custom squad memory',
+    };
+  });
+
+  const adaptedDefault = adaptDeckToCampers(defaultDeck);
+  return customList.length === 0 ? adaptedDefault : [...mappedCustom, ...adaptedDefault];
 }
 
 export function renderGameScreen() {

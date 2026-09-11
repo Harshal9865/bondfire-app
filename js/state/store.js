@@ -315,18 +315,44 @@ class ReactiveStore {
     const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost';
     const activeRoom = {
       roomCode,
-      podName: podName || 'Campfire Squad Pod 🔥',
+      podName: podName || `${(user && user.displayName) ? user.displayName.split(' ')[0] : 'Campfire'}'s Squad Pod 🔥`,
       isHost: true,
       selectedGameMode: this.state.activeRoom?.selectedGameMode || 'RED_FLAG_COURT',
       players: [
-        { id: 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
-        { id: 'usr_2', name: 'Liam', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam' },
-        { id: 'usr_3', name: 'Sarah', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Sarah' },
-        { id: 'usr_4', name: 'Alex', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex' },
+        { id: user?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
       ],
     };
     this.setState({ activeRoom });
     return activeRoom;
+  }
+
+  addBotCamper() {
+    const activeRoom = { ...this.state.activeRoom };
+    if (!activeRoom.players) activeRoom.players = [];
+    if (activeRoom.players.length >= 8) return null;
+    const botNames = ['Liam', 'Sarah', 'Alex', 'Rohan', 'Zara', 'Devon', 'Nia'];
+    const existingNames = new Set(activeRoom.players.map((p) => p.name.replace(/ \(Bot\)$/, '')));
+    const available = botNames.filter((n) => !existingNames.has(n));
+    const nextName = available[0] || `Camper ${activeRoom.players.length + 1}`;
+    const newPlayer = {
+      id: `bot_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      name: `${nextName} (Bot)`,
+      role: 'PLAYER',
+      isReady: true,
+      isBot: true,
+      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(nextName)}`,
+    };
+    activeRoom.players = [...activeRoom.players, newPlayer];
+    this.setState({ activeRoom });
+    return newPlayer;
+  }
+
+  removeCamper(playerId) {
+    const activeRoom = { ...this.state.activeRoom };
+    if (activeRoom.players) {
+      activeRoom.players = activeRoom.players.filter((p) => p.id !== playerId);
+      this.setState({ activeRoom });
+    }
   }
 
   setGameMode(gameMode) {

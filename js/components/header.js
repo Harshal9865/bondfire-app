@@ -69,7 +69,7 @@ export function renderHeader() {
             </button>
             <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'FRIENDS' ? 'text-sunset-coral bg-sunset-coral/10 border border-sunset-coral/30 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="FRIENDS">
               <span class="material-symbols-outlined text-[15px] text-sunset-coral">diversity_3</span>
-              <span class="whitespace-nowrap">Friends</span>
+              <span>Friends</span>
             </button>
             <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'GLADE' ? 'text-mint-green bg-mint-green/10 border border-mint-green/30 font-bold' : 'text-gray-400 hover:text-mint-green'} transition-all" data-view="GLADE">
               <span class="material-symbols-outlined text-[15px] text-mint-green">stadia_controller</span>

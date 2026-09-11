@@ -33,8 +33,8 @@ export function renderAuthModal() {
 
 function renderAuthModalMarkup(reason) {
   return `
-    <div id="auth-modal-backdrop" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in select-none">
-      <div class="relative w-full max-w-md bg-surface-container-low border border-border/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/90 text-on-surface overflow-hidden">
+    <div id="auth-modal-backdrop" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in select-none">
+      <div class="relative w-full max-w-md bg-surface-container-low border border-border/80 rounded-2xl sm:rounded-3xl p-4 sm:p-7 shadow-2xl shadow-black/90 text-on-surface overflow-y-auto max-h-[92vh] no-scrollbar">
         
         <!-- Ambient Decorative Glows -->
         <div class="absolute -right-20 -top-20 w-48 h-48 rounded-full bg-sunset-coral/20 blur-3xl pointer-events-none"></div>

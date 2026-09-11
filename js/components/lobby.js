@@ -101,16 +101,24 @@ export function renderLobby() {
             const avatar = isCurrentUser && user && user.avatarUrl ? user.avatarUrl : (p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(displayName)}`);
 
             return `
-              <div class="bg-surface-container rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden shadow-md border border-border/80">
+              <div class="bg-surface-container rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden shadow-md border border-border/80 group">
                 <div class="flex items-center justify-between">
                   ${isHost ? `
                     <span class="inline-flex items-center gap-1 bg-secondary/15 text-secondary px-1.5 py-0.5 rounded font-caption text-caption font-semibold">
                       <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">crown</span> HOST
                     </span>
                   ` : `
-                    <span class="inline-flex items-center gap-1 bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded font-caption text-caption">#0${index + 1}</span>
+                    <div class="flex items-center gap-1.5">
+                      <span class="inline-flex items-center gap-1 bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded font-caption text-caption">#0${index + 1}</span>
+                      ${p.isBot ? '<span class="text-[9px] px-1 rounded bg-amber-gold/20 text-amber-gold font-bold">AI</span>' : ''}
+                    </div>
                   `}
-                  <span class="w-2 h-2 rounded-full ${p.isReady ? 'bg-tertiary' : 'bg-secondary animate-pulse'}"></span>
+                  <div class="flex items-center gap-1.5">
+                    ${(!isHost && room.isHost) ? `
+                      <button type="button" class="btn-kick-camper w-5 h-5 rounded-full bg-surface-bright hover:bg-sunset-coral hover:text-white flex items-center justify-center text-gray-400 text-xs transition-colors" data-player-id="${p.id}" title="Remove Camper">✕</button>
+                    ` : ''}
+                    <span class="w-2 h-2 rounded-full ${p.isReady ? 'bg-tertiary' : 'bg-secondary animate-pulse'}"></span>
+                  </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                   <div class="w-11 h-11 rounded-xl overflow-hidden bg-surface-container-high flex-shrink-0 shadow-inner flex items-center justify-center">
@@ -125,22 +133,34 @@ export function renderLobby() {
             `;
           }).join('')}
 
-          <!-- Slot 7: Invite Camper -->
-          <button class="bg-surface-container-low hover:bg-surface-container rounded-xl p-3 flex flex-col items-center justify-center gap-2 text-center min-h-[92px] transition-colors active:scale-95 group border border-dashed border-border" id="slot-invite-player" type="button">
+          <!-- Slot: Invite Real Camper -->
+          <button class="bg-surface-container-low hover:bg-surface-container rounded-xl p-3 flex flex-col items-center justify-center gap-2 text-center min-h-[92px] transition-colors active:scale-95 group border border-dashed border-border cursor-pointer" id="slot-invite-player" type="button">
             <div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
               <span class="material-symbols-outlined text-[20px]">person_add</span>
             </div>
             <span class="font-label-md text-label-md text-on-surface-variant font-semibold">Invite Camper</span>
           </button>
 
-          <!-- Slot 8: Share Pass -->
-          <button class="bg-surface-container-low hover:bg-surface-container rounded-xl p-3 flex flex-col items-center justify-center gap-2 text-center min-h-[92px] transition-colors active:scale-95 group border border-dashed border-border" id="slot-share-pass" type="button">
-            <div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-              <span class="material-symbols-outlined text-[20px]">qr_code_2</span>
-            </div>
-            <span class="font-label-md text-label-md text-on-surface-variant font-semibold">Share Pass</span>
-          </button>
+          <!-- Slot: Optional Add AI Camper -->
+          ${room.players.length < 8 ? `
+            <button class="bg-surface-container-low hover:bg-surface-container rounded-xl p-3 flex flex-col items-center justify-center gap-2 text-center min-h-[92px] transition-colors active:scale-95 group border border-dashed border-border cursor-pointer" id="slot-add-ai-camper" type="button" title="Add an AI player to test mechanics">
+              <div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-amber-gold group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-[20px]">smart_toy</span>
+              </div>
+              <span class="font-label-md text-label-md text-on-surface-variant font-semibold">+ AI Camper</span>
+            </button>
+          ` : ''}
         </div>
+
+        ${room.players.length === 1 ? `
+          <div class="mt-3 p-3 rounded-xl bg-surface-container-lowest border border-border/70 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-gold text-[18px]">cell_tower</span>
+              <span class="text-xs text-gray-300">Room is ready! Waiting for friends to join with code <strong class="text-white font-mono">#${room.roomCode}</strong></span>
+            </div>
+            <button type="button" id="btn-quick-copy-lobby" class="px-2.5 py-1 rounded-lg bg-surface-bright hover:bg-sunset-coral hover:text-white text-xs font-bold text-gray-200 transition-colors shrink-0">Copy Code</button>
+          </div>
+        ` : ''}
       </section>
 
       <!-- Drop a Memory Micro-Uploader Bento Slab -->
@@ -377,6 +397,42 @@ export function bindLobbyEvents() {
     audio.playClick();
     if (inviteModal) inviteModal.style.display = 'flex';
   };
+
+  // Add AI Camper
+  const addBotBtn = document.getElementById('slot-add-ai-camper');
+  if (addBotBtn) {
+    addBotBtn.addEventListener('click', () => {
+      audio.playChime();
+      store.addBotCamper();
+      store.setView('LOBBY');
+    });
+  }
+
+  // Kick / Remove Camper
+  const kickBtns = document.querySelectorAll('.btn-kick-camper');
+  kickBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      const pid = btn.dataset.playerId;
+      if (pid) {
+        store.removeCamper(pid);
+        store.setView('LOBBY');
+      }
+    });
+  });
+
+  // Quick Copy Code Button in Solo-Wait Banner
+  const quickCopyLobby = document.getElementById('btn-quick-copy-lobby');
+  if (quickCopyLobby) {
+    quickCopyLobby.addEventListener('click', () => {
+      audio.playClick();
+      const code = store.getState().activeRoom.roomCode;
+      navigator.clipboard?.writeText(code);
+      quickCopyLobby.textContent = '✓ Copied!';
+      setTimeout(() => (quickCopyLobby.textContent = 'Copy Code'), 2000);
+    });
+  }
 
   if (inviteSlot) inviteSlot.addEventListener('click', openInvite);
   if (sharePassSlot) sharePassSlot.addEventListener('click', openInvite);
