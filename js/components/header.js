@@ -37,49 +37,47 @@ export function renderHeader() {
           </div>
         </div>
 
-        <!-- Center: Curated Single-Deck Navigation Capsule (Desktop & Tablets >= 1024px) -->
-        <nav class="hidden lg:flex items-center p-1 rounded-full glass-pill border border-border/80 shadow-lg shadow-black/40">
+        <!-- Center: Curated Single-Deck Navigation Capsule (Desktop & Tablets >= 768px) -->
+        <nav class="hidden md:flex items-center p-1 rounded-full glass-pill border border-border/80 shadow-lg shadow-black/40 shrink-0 select-none">
           <!-- Mode Switcher Segment -->
-          <div class="flex items-center gap-1 p-0.5 bg-surface-dark/60 rounded-full border border-border/60" id="header-mode-switcher">
-            <button class="mode-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold ${currentMode === 'SOLO' ? 'bg-surface-bright text-white shadow-sm border border-amber-gold/40' : 'text-gray-400 hover:text-white'} transition-all" data-mode="SOLO">
+          <div class="flex items-center gap-1 p-0.5 bg-surface-dark/60 rounded-full border border-border/60 shrink-0" id="header-mode-switcher">
+            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'SOLO' ? 'bg-surface-bright text-white shadow-sm border border-amber-gold/40' : 'text-gray-400 hover:text-white'} transition-all" data-mode="SOLO">
               <span class="material-symbols-outlined text-[15px] ${currentMode === 'SOLO' ? 'text-amber-gold' : ''}">person</span>
-              <span>Solo</span>
+              <span class="whitespace-nowrap">Solo</span>
             </button>
-            <button class="mode-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold ${currentMode === 'US' ? 'bg-surface-bright text-white shadow-sm border border-duo-rose/40' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-mode="US">
+            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'US' ? 'bg-surface-bright text-white shadow-sm border border-duo-rose/40' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-mode="US">
               <span class="material-symbols-outlined text-[15px] ${currentMode === 'US' ? 'text-duo-rose' : ''}">favorite</span>
-              <span>Us Mode</span>
+              <span class="whitespace-nowrap">Us Mode</span>
             </button>
-            <button class="mode-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold ${currentMode === 'PODS' ? 'bg-surface-bright text-white shadow-sm border border-sunset-coral/40' : 'text-gray-400 hover:text-white'} relative transition-all" data-mode="PODS">
+            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${currentMode === 'PODS' ? 'bg-surface-bright text-white shadow-sm border border-sunset-coral/40' : 'text-gray-400 hover:text-white'} relative transition-all" data-mode="PODS">
               ${currentMode === 'PODS' ? '<span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-ping absolute -top-0.5 -right-0.5"></span>' : ''}
               <span class="material-symbols-outlined text-[15px] ${currentMode === 'PODS' ? 'text-sunset-coral' : ''}">groups</span>
-              <span>Pods</span>
+              <span class="whitespace-nowrap">Pods</span>
             </button>
           </div>
 
-          <!-- Subtle Vertical Divider -->
-          <div class="w-[1px] h-4 bg-border/80 mx-2"></div>
-
-          <!-- Direct Primary Experiences Links -->
-          <div class="flex items-center gap-1 pr-1" id="header-links">
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${currentView === 'VAULT' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="VAULT">
+          <!-- Extended Direct Experience Links (Expanded on Large Desktops >= 1200px) -->
+          <div class="hidden xl:flex items-center gap-1 pr-1 pl-1 shrink-0" id="header-links">
+            <div class="w-[1px] h-4 bg-border/80 mx-1.5 shrink-0"></div>
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'VAULT' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="VAULT">
               <span class="material-symbols-outlined text-[15px] text-tertiary">folder</span>
-              <span>Vault</span>
+              <span class="whitespace-nowrap">Vault</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${currentView === 'YEARBOOK' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="YEARBOOK">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'YEARBOOK' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="YEARBOOK">
               <span class="material-symbols-outlined text-[15px] text-amber-gold">auto_stories</span>
-              <span>Photobook</span>
+              <span class="whitespace-nowrap">Photobook</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${currentView === 'FRIENDS' ? 'text-sunset-coral bg-sunset-coral/10 border border-sunset-coral/30 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="FRIENDS">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'FRIENDS' ? 'text-sunset-coral bg-sunset-coral/10 border border-sunset-coral/30 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="FRIENDS">
               <span class="material-symbols-outlined text-[15px] text-sunset-coral">diversity_3</span>
-              <span>Friends</span>
+              <span class="whitespace-nowrap">Friends</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${currentView === 'GLADE' ? 'text-mint-green bg-mint-green/10 border border-mint-green/30 font-bold' : 'text-gray-400 hover:text-mint-green'} transition-all" data-view="GLADE">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'GLADE' ? 'text-mint-green bg-mint-green/10 border border-mint-green/30 font-bold' : 'text-gray-400 hover:text-mint-green'} transition-all" data-view="GLADE">
               <span class="material-symbols-outlined text-[15px] text-mint-green">stadia_controller</span>
-              <span>Pixel Glade</span>
+              <span class="whitespace-nowrap">Arcade</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${currentView === 'STORE' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="STORE">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'STORE' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="STORE">
               <span class="material-symbols-outlined text-[15px] text-secondary">shopping_bag</span>
-              <span>Emporium</span>
+              <span class="whitespace-nowrap">Emporium</span>
             </button>
           </div>
         </nav>

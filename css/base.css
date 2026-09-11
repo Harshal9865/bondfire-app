@@ -140,10 +140,16 @@ button, a, input, select, textarea, [role="button"], .cursor-pointer {
   user-select: none;
 }
 
-/* Mobile Word Break & Text Overlap Safeguards */
-p, h1, h2, h3, h4, span, div {
+/* Text Content Word Break & Safeguards */
+p, h1, h2, h3, h4, .user-text, .chat-message {
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+/* Ensure buttons, navbars, and interactive capsules never wrap vertically letter-by-letter */
+button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="button"], a {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
 }
 
 /* Safe area inset for modern mobile notches and home indicators */
