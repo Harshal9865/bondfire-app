@@ -114,9 +114,9 @@ export function renderHeader() {
           <!-- User Profile / Auth Trigger -->
           ${user.isLoggedIn && user.email ? `
             <div class="relative group cursor-pointer shrink-0" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
-              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white" style="width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 9999px;">
                 ${user.avatarUrl ? `
-                  <img src="${user.avatarUrl}" alt="${user.displayName || 'User'}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  <img src="${user.avatarUrl}" alt="${user.displayName || 'User'}" class="w-full h-full object-cover" style="width: 100%; height: 100%; object-fit: cover; border-radius: 9999px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                   <span style="display:none;" class="w-full h-full items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
                 ` : `
                   <span class="w-full h-full flex items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
