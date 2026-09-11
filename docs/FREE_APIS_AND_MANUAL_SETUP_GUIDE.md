@@ -9,9 +9,9 @@ This document outlines all free public APIs, STUN infrastructure, and manual dep
 To allow browsers and mobile phones to establish direct peer-to-peer data channels without purchasing expensive TURN servers or hosted socket servers, Bondfire connects directly to Google and Twilio's public free STUN gateways.
 
 ### Active Endpoints:
-- `stun:stun.l.google.com:19302` (Google Public STUN — 100% Free, Global Anycast)
-- `stun:stun1.l.google.com:19302` (Google Secondary STUN)
-- `stun:global.stun.twilio.com:3478?transport=udp` (Twilio Public STUN)
+- `stun:stun.l.google.com:19302` (Google Public STUN)
+- `stun:stun1.l.google.com:19302` (Google Public STUN)
+- `stun:global.stun.twilio.com:3478` (Twilio Public STUN)
 
 ### How to Get / Configure:
 1. **Zero Registration**: These endpoints are open-source and free public internet infrastructure.

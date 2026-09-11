@@ -9,7 +9,8 @@ import { store } from '../state/store.js';
 export const FREE_STUN_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:global.stun.twilio.com:3478' },
 ];
 
 export class P2PWebRTCService {
@@ -29,32 +30,37 @@ export class P2PWebRTCService {
     }
 
     this.isInitiator = isInitiator;
-    this.peerConnection = new RTCPeerConnection({ iceServers: FREE_STUN_SERVERS });
+    try {
+      this.peerConnection = new RTCPeerConnection({ iceServers: FREE_STUN_SERVERS });
 
-    if (this.isInitiator) {
-      // Create data channel as room host
-      this.dataChannel = this.peerConnection.createDataChannel('bondfire_mesh', {
-        ordered: true,
-      });
-      this.setupDataChannel(this.dataChannel);
-    } else {
-      // Listen for incoming data channel as camper guest
-      this.peerConnection.ondatachannel = (event) => {
-        this.dataChannel = event.channel;
+      if (this.isInitiator) {
+        // Create data channel as room host
+        this.dataChannel = this.peerConnection.createDataChannel('bondfire_mesh', {
+          ordered: true,
+        });
         this.setupDataChannel(this.dataChannel);
-      };
-    }
-
-    this.peerConnection.oniceconnectionstatechange = () => {
-      console.log('⚡ P2P WebRTC ICE State:', this.peerConnection?.iceConnectionState);
-      if (this.peerConnection?.iceConnectionState === 'connected') {
-        this.isConnected = true;
-      } else if (this.peerConnection?.iceConnectionState === 'disconnected' || this.peerConnection?.iceConnectionState === 'failed') {
-        this.isConnected = false;
+      } else {
+        // Listen for incoming data channel as camper guest
+        this.peerConnection.ondatachannel = (event) => {
+          this.dataChannel = event.channel;
+          this.setupDataChannel(this.dataChannel);
+        };
       }
-    };
 
-    return this.peerConnection;
+      this.peerConnection.oniceconnectionstatechange = () => {
+        console.log('⚡ P2P WebRTC ICE State:', this.peerConnection?.iceConnectionState);
+        if (this.peerConnection?.iceConnectionState === 'connected') {
+          this.isConnected = true;
+        } else if (this.peerConnection?.iceConnectionState === 'disconnected' || this.peerConnection?.iceConnectionState === 'failed') {
+          this.isConnected = false;
+        }
+      };
+
+      return this.peerConnection;
+    } catch (err) {
+      console.warn('⚠️ WebRTC Peer initialization warning (non-fatal):', err);
+      return null;
+    }
   }
 
   setupDataChannel(channel) {
