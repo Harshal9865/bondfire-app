@@ -122,6 +122,17 @@ export class WatchPartyPlayer {
 
         </div>
 
+        <!-- Compliance & Creator Credit Micro-Badge -->
+        <div class="px-4 py-2 bg-surface-container-lowest/90 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 font-mono gap-1">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-xs text-mint-green">verified_user</span>
+            <span>Official YouTube / HTML5 Stream Embed • Creator monetization & views credited</span>
+          </div>
+          <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" class="hover:text-gray-300 underline transition-colors">
+            YouTube ToS & Google Privacy
+          </a>
+        </div>
+
       </div>
     `;
   }

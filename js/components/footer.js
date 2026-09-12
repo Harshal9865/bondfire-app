@@ -7,6 +7,7 @@
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { openAuthModal } from './authModal.js';
+import { openLegalModal } from './legalModal.js';
 
 export function renderFooter() {
   return `
@@ -204,9 +205,9 @@ export function renderFooter() {
             <span class="text-gray-700">•</span>
             <span class="hover:text-gray-300 cursor-pointer transition-colors" id="btn-footer-privacy">Privacy Policy</span>
             <span class="text-gray-700">•</span>
-            <span class="font-mono text-gray-500">WebRTC P2P Mesh</span>
+            <span class="hover:text-gray-300 cursor-pointer transition-colors" id="btn-footer-compliance">Streaming & DMCA</span>
             <span class="text-gray-700">•</span>
-            <span class="font-mono text-gray-500">Fastify</span>
+            <span class="font-mono text-gray-500">WebRTC P2P Mesh</span>
             <span class="text-gray-700">•</span>
             <span class="font-mono text-gray-500">Vanilla JS + PWA</span>
           </div>
@@ -249,16 +250,9 @@ export function bindFooterEvents() {
 
   const termsBtn = document.getElementById('btn-footer-terms');
   const privacyBtn = document.getElementById('btn-footer-privacy');
-  const toastMount = document.getElementById('toast-mount');
+  const complianceBtn = document.getElementById('btn-footer-compliance');
 
-  const showLegalToast = (title) => {
-    audio.playClick();
-    if (toastMount) {
-      toastMount.innerHTML = `<div class="toast toast-mint show"><span class="material-symbols-outlined text-sm align-middle mr-1 text-mint-green">verified_user</span><span>${title}: Zero AI training on your private chat memories. 100% GDPR & CCPA compliant.</span></div>`;
-      setTimeout(() => (toastMount.innerHTML = ''), 3500);
-    }
-  };
-
-  if (termsBtn) termsBtn.addEventListener('click', () => showLegalToast('Bondfire Terms of Service'));
-  if (privacyBtn) privacyBtn.addEventListener('click', () => showLegalToast('Bondfire Privacy Policy'));
+  if (termsBtn) termsBtn.addEventListener('click', () => openLegalModal('terms'));
+  if (privacyBtn) privacyBtn.addEventListener('click', () => openLegalModal('privacy'));
+  if (complianceBtn) complianceBtn.addEventListener('click', () => openLegalModal('platforms'));
 }
