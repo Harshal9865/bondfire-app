@@ -14,11 +14,18 @@ export function renderYearbookScreen() {
   const state = store.getState();
   const room = state.activeRoom || { id: 'GOA-8842', name: 'The Goa Crew', type: 'SQUAD' };
 
+  const realPlayers = (state.activeRoom?.players || []).map((p) => p.name).filter(Boolean);
+  const hostUser = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'Host (You)';
+  const p1 = realPlayers[0] || hostUser;
+  const p2 = realPlayers[1] || realPlayers[0] || hostUser;
+  const p3 = realPlayers[2] || realPlayers[0] || hostUser;
+  const p4 = realPlayers[3] || realPlayers[1] || hostUser;
+
   const awards = [
-    { title: 'MVP Lore Master', winner: 'Harshal', icon: 'hotel_class', reason: 'Correctly remembered the 2021 Airbnb code', color: 'text-amber-gold bg-amber-gold/15' },
-    { title: 'The Chaos Agent', winner: 'Priya', icon: 'local_fire_department', reason: 'Defended Hawaiian pizza and started a 45-min debate', color: 'text-sunset-coral bg-sunset-coral/15' },
-    { title: 'First Asleep on Couch', winner: 'Sam', icon: 'bedtime', reason: 'Passed out at 10:14 PM with a slice of pizza', color: 'text-duo-rose bg-duo-rose/15' },
-    { title: 'Unforgivable Alibi', winner: 'Marcus', icon: 'notifications_active', reason: 'Voted legally liable by 65% of the room', color: 'text-mint-green bg-mint-green/15' }
+    { title: 'MVP Lore Master', winner: p1, icon: 'hotel_class', reason: 'Highest trivia and roast score in the squad room', color: 'text-amber-gold bg-amber-gold/15' },
+    { title: 'The Chaos Agent', winner: p2, icon: 'local_fire_department', reason: 'Dropped the most unhinged answers and spicy defense pleas', color: 'text-sunset-coral bg-sunset-coral/15' },
+    { title: 'Fastest Buzzer Finger', winner: p3, icon: 'bolt', reason: 'Locked in first answer in under 2.4 seconds', color: 'text-duo-rose bg-duo-rose/15' },
+    { title: 'Unforgivable Alibi', winner: p4, icon: 'notifications_active', reason: 'Voted guilty by the squad jury verdict', color: 'text-mint-green bg-mint-green/15' },
   ];
 
   return `
@@ -91,10 +98,10 @@ export function renderYearbookScreen() {
                   UNANIMOUS ROAST VERDICT
                 </span>
                 <p class="text-sm sm:text-base text-gray-200 italic font-sans leading-snug">
-                  "If anyone orders another Hawaiian pizza tonight, Priya is legally liable for calling the police."
+                  "If anyone orders another midnight snack delivery, ${p2} is legally liable for calling the police."
                 </p>
                 <div class="flex items-center justify-between mt-3 text-[11px] font-mono text-gray-400">
-                  <span>Voted guilty: Priya (65%)</span>
+                  <span>Voted guilty: ${p2} (65%)</span>
                   <span class="text-sunset-coral font-bold">VERIFIED INSIDE JOKE</span>
                 </div>
               </div>

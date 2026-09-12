@@ -161,7 +161,7 @@ function renderCampersRoster(friends) {
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="relative w-12 h-12 rounded-xl bg-surface-container-high border border-border overflow-hidden shrink-0 shadow-inner flex items-center justify-center">
-                  <img src="${friend.avatarUrl}" alt="${friend.name}" class="w-full h-full object-cover" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(friend.name)}'" />
+                  <img src="${friend.avatarUrl}" alt="${friend.name}" class="w-full h-full object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(friend.name)}'" />
                   <span class="w-3 h-3 rounded-full border-2 border-surface-container-low absolute -bottom-0.5 -right-0.5 ${isLive ? 'bg-mint-green animate-ping' : isOnline ? 'bg-mint-green' : 'bg-gray-600'}" title="${friend.status}"></span>
                 </div>
                 <div class="min-w-0">
@@ -366,57 +366,56 @@ function renderDiscoverTab(requests, citizenId, userHandle) {
         `}
       </div>
 
-      <!-- Campers You Recently Played With -->
+      <!-- Campers You Recently Played With (Real People Only) -->
       <div class="p-6 rounded-3xl bg-surface-container-low border border-border/80 shadow-lg">
         <h3 class="font-headline-sm text-headline-sm font-bold text-white mb-1">Campers You Recently Played With</h3>
-        <p class="text-xs text-gray-400 mb-4">Campers who recently shared inside jokes and roasts in your lobbies.</p>
+        <p class="text-xs text-gray-400 mb-4">Real people who joined your room lobbies or campfire sessions.</p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="p-3.5 rounded-2xl bg-surface border border-border flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-9 h-9 rounded-lg bg-surface-bright overflow-hidden shrink-0">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Devon" alt="Devon" class="w-full h-full object-cover" />
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-xs text-white truncate">Devon Vance</div>
-                <div class="text-[10px] text-gray-500 font-mono">@devon_v</div>
-              </div>
-            </div>
-            <button class="btn-quick-add-recent px-3 py-1 rounded-full bg-sunset-coral text-canvas text-[11px] font-bold active:scale-95 shrink-0" data-name="Devon Vance" data-user="devon_v">
-              + Add
-            </button>
-          </div>
+        ${(() => {
+          const currentUserName = (state.currentUser && state.currentUser.displayName) ? state.currentUser.displayName : 'Host';
+          const existingFriendNames = new Set((state.friendsList || []).map((f) => (f.name || '').toLowerCase()));
+          const roomCampers = (state.activeRoom?.players || []).filter((p) =>
+            !p.isBot &&
+            p.name !== currentUserName &&
+            !p.name.includes('(Host)') &&
+            !p.name.includes('(You)') &&
+            !existingFriendNames.has((p.name || '').toLowerCase())
+          );
 
-          <div class="p-3.5 rounded-2xl bg-surface border border-border flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-9 h-9 rounded-lg bg-surface-bright overflow-hidden shrink-0">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Ananya" alt="Ananya" class="w-full h-full object-cover" />
+          if (roomCampers.length === 0) {
+            return `
+              <div class="p-6 rounded-2xl bg-surface border border-dashed border-border/80 text-center">
+                <span class="material-symbols-outlined text-2xl text-sunset-coral mb-2">groups</span>
+                <div class="font-bold text-sm text-white mb-1">No Recent Campers Yet</div>
+                <p class="text-xs text-gray-400 max-w-sm mx-auto mb-3">Real people who join your room lobbies via code or link will appear here so you can add them to your squad list.</p>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-bright text-xs font-mono text-amber-gold border border-amber-gold/30">
+                  <span>Room Code: #${state.activeRoom?.roomCode || 'BONDFIRE'}</span>
+                </div>
               </div>
-              <div class="min-w-0">
-                <div class="font-bold text-xs text-white truncate">Ananya Sharma</div>
-                <div class="text-[10px] text-gray-500 font-mono">@ananya_s</div>
-              </div>
-            </div>
-            <button class="btn-quick-add-recent px-3 py-1 rounded-full bg-sunset-coral text-canvas text-[11px] font-bold active:scale-95 shrink-0" data-name="Ananya Sharma" data-user="ananya_s">
-              + Add
-            </button>
-          </div>
+            `;
+          }
 
-          <div class="p-3.5 rounded-2xl bg-surface border border-border flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-9 h-9 rounded-lg bg-surface-bright overflow-hidden shrink-0">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Rishi" alt="Rishi" class="w-full h-full object-cover" />
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-xs text-white truncate">Rishi Kapoor</div>
-                <div class="text-[10px] text-gray-500 font-mono">@rishi_k</div>
-              </div>
+          return `
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              ${roomCampers.map((p) => `
+                <div class="p-3.5 rounded-2xl bg-surface border border-border flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-lg bg-surface-bright overflow-hidden shrink-0">
+                      <img src="${p.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.name)}`}" alt="${p.name}" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="min-w-0">
+                      <div class="font-bold text-xs text-white truncate">${p.name}</div>
+                      <div class="text-[10px] text-gray-500 font-mono">Real Room Camper</div>
+                    </div>
+                  </div>
+                  <button class="btn-quick-add-recent px-3 py-1 rounded-full bg-sunset-coral text-canvas text-[11px] font-bold active:scale-95 shrink-0" data-name="${p.name}" data-user="${p.name.toLowerCase().replace(/\s+/g, '_')}">
+                    + Add
+                  </button>
+                </div>
+              `).join('')}
             </div>
-            <button class="btn-quick-add-recent px-3 py-1 rounded-full bg-sunset-coral text-canvas text-[11px] font-bold active:scale-95 shrink-0" data-name="Rishi Kapoor" data-user="rishi_k">
-              + Add
-            </button>
-          </div>
-        </div>
+          `;
+        })()}
       </div>
     </div>
   `;
@@ -588,7 +587,7 @@ export function bindFriendsEvents() {
         username: user,
         status: 'ONLINE',
         currentRoom: null,
-        avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`,
+        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
         sparks: 120,
         mutualGames: 2,
         role: 'Camper',

@@ -93,9 +93,9 @@ export function renderTvModeScreen() {
           </div>
         </div>
 
-        <!-- 4 Option Cards for the TV audience -->
+        <!-- Option Cards for the TV audience -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
-          ${(currentCard.options || ['Liam', 'Sarah', 'Alex', 'Rohan']).map((opt, idx) => `
+          ${(currentCard.options || (state.activeRoom?.players || []).map((p) => p.name)).map((opt, idx) => `
             <div class="p-4 rounded-2xl bg-surface-card border border-border flex items-center gap-3 text-left shadow-lg">
               <div class="w-10 h-10 rounded-xl bg-surface-raised flex items-center justify-center font-bold text-sm text-sunset-coral border border-border">
                 0${idx + 1}

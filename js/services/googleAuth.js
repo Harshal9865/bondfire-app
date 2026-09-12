@@ -61,7 +61,7 @@ export class GoogleAuthService {
         id: 'usr_g_' + Math.random().toString(36).substring(2, 9),
         displayName: formattedName,
         email: email,
-        avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(formattedName)}`,
+        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(formattedName)}`,
         isHost: true,
         isLoggedIn: true,
       };
@@ -89,7 +89,7 @@ export class GoogleAuthService {
         id: profile.sub,
         displayName: profile.name,
         email: profile.email,
-        avatarUrl: profile.picture || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(profile.name)}`,
+        avatarUrl: profile.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name)}`,
         isHost: true,
         isLoggedIn: true,
       };

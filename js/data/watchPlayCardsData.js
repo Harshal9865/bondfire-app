@@ -13,7 +13,7 @@ export const WATCH_PLAY_CARDS = [
     creator: {
       name: 'Rohan Joshi & The Squad',
       handle: '@rohan_adda',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Rohan'
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rohan'
     },
     mediaUrl: 'https://assets.mixkit.co/videos/preview/mixkit-friends-sitting-on-a-curb-and-talking-41584-large.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=80',
@@ -37,7 +37,7 @@ export const WATCH_PLAY_CARDS = [
     creator: {
       name: 'Campfire Music Jam',
       handle: '@campfire_jam',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Music'
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Music'
     },
     mediaUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-people-singing-in-a-car-42777-large.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=80',
@@ -61,7 +61,7 @@ export const WATCH_PLAY_CARDS = [
     creator: {
       name: 'Tapri Diaries',
       handle: '@tapri_tales',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Chai'
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chai'
     },
     mediaUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-hot-cups-of-coffee-41589-large.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&auto=format&fit=crop&q=80',

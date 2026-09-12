@@ -52,123 +52,16 @@ class ReactiveStore {
   }
 
   getDefaultFriendsList() {
-    const liveCode = generateRoomCode();
-    return [
-      {
-        id: 'fr_1',
-        name: 'Liam Vance',
-        username: 'liam_v',
-        status: 'IN_GAME', // 'IN_GAME' | 'ONLINE' | 'OFFLINE'
-        currentRoom: liveCode,
-        avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam',
-        sparks: 620,
-        mutualGames: 14,
-        role: 'Campfire Guitarist',
-        lastActive: 'Playing Now',
-      },
-      {
-        id: 'fr_2',
-        name: 'Sarah Chen',
-        username: 'sarah_c',
-        status: 'ONLINE',
-        currentRoom: null,
-        avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Sarah',
-        sparks: 480,
-        mutualGames: 9,
-        role: 'Trivia Legend',
-        lastActive: 'Active 2m ago',
-      },
-      {
-        id: 'fr_3',
-        name: 'Alex Rivera',
-        username: 'alex_r',
-        status: 'ONLINE',
-        currentRoom: null,
-        avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex',
-        sparks: 530,
-        mutualGames: 11,
-        role: 'Late Night Owl',
-        lastActive: 'Active 5m ago',
-      },
-      {
-        id: 'fr_4',
-        name: 'Rohan Verma',
-        username: 'rohan_v',
-        status: 'OFFLINE',
-        currentRoom: null,
-        avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Rohan',
-        sparks: 310,
-        mutualGames: 6,
-        role: 'Foodie Captain',
-        lastActive: 'Yesterday',
-      },
-    ];
+    return [];
   }
 
   getDefaultSquadsList() {
-    return [
-      {
-        id: 'sq_1',
-        name: 'The Goa Trip Crew',
-        emoji: '🏖️',
-        membersCount: 5,
-        members: ['fr_1', 'fr_2', 'fr_3', 'fr_4'],
-        deckName: 'Inside Joke Mystery Deck',
-        activeRoomCode: generateRoomCode(),
-        unreadMemories: 2,
-        isPinned: true,
-      },
-      {
-        id: 'sq_2',
-        name: 'College Roomies 2024',
-        emoji: '🍕',
-        membersCount: 4,
-        members: ['fr_1', 'fr_3'],
-        deckName: 'Late Night Dorm Quotes',
-        activeRoomCode: null,
-        unreadMemories: 0,
-        isPinned: false,
-      },
-      {
-        id: 'sq_3',
-        name: 'Midnight Date Night',
-        emoji: '💖',
-        membersCount: 2,
-        members: ['fr_2'],
-        deckName: 'Us Mode Love Capsule',
-        activeRoomCode: null,
-        unreadMemories: 1,
-        isPinned: false,
-      },
-    ];
+    return [];
   }
 
   getDefaultFriendRequests() {
     return {
-      incoming: [
-        {
-          id: 'req_1',
-          name: 'Ananya Sharma',
-          fromName: 'Ananya Sharma',
-          username: 'ananya_s',
-          fromUsername: 'ananya_s',
-          avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Ananya',
-          fromAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Ananya',
-          time: '15m ago',
-          mutualFriends: 3,
-        },
-        {
-          id: 'req_2',
-          name: 'Devon Vance',
-          fromName: 'Devon Vance',
-          username: 'devon_v',
-          fromUsername: 'devon_v',
-          avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Devon',
-          fromAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Devon',
-          time: '2h ago',
-          mutualFriends: 2,
-        },
-      ],
+      incoming: [],
       outgoing: [],
     };
   }
@@ -260,23 +153,37 @@ class ReactiveStore {
               parsed.activeRoom.language = 'hi-IN';
             }
             if (Array.isArray(parsed.activeRoom.players)) {
-              parsed.activeRoom.players = parsed.activeRoom.players.map((p) => {
-                if (p.name === 'Maya') {
-                  return { ...p, name: 'Host (You)', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost' };
-                }
-                if (p.avatar && p.avatar.includes('unsplash.com')) {
-                  return { ...p, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(p.name)}` };
-                }
-                return p;
-              });
+              const mockBotNames = new Set(['Liam', 'Sarah', 'Alex', 'Rohan', 'Zara', 'Devon', 'Nia']);
+              parsed.activeRoom.players = parsed.activeRoom.players.filter(
+                (p) => !p.isBot && !mockBotNames.has(p.name) && !p.name.includes('(Bot)')
+              );
+              if (parsed.activeRoom.players.length === 0) {
+                const hostName = (parsed.currentUser && parsed.currentUser.displayName) ? `${parsed.currentUser.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+                const hostAvatar = (parsed.currentUser && parsed.currentUser.avatarUrl) ? parsed.currentUser.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost';
+                parsed.activeRoom.players = [
+                  { id: parsed.currentUser?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar }
+                ];
+              }
             }
           }
-          if (!parsed.friendsList) parsed.friendsList = this.getDefaultFriendsList();
-          if (!parsed.squadsList) parsed.squadsList = this.getDefaultSquadsList();
+          if (Array.isArray(parsed.friendsList)) {
+            parsed.friendsList = parsed.friendsList.filter((f) => !['Liam Vance', 'Sarah Chen', 'Alex Rivera', 'Rohan Verma'].includes(f.name));
+          }
+          if (Array.isArray(parsed.squadsList)) {
+            parsed.squadsList = parsed.squadsList.filter((s) => !['The Goa Trip Crew', 'College Roomies 2024', 'Midnight Date Night'].includes(s.name));
+          }
+          if (Array.isArray(parsed.vaultMemories)) {
+            parsed.vaultMemories = parsed.vaultMemories.filter(
+              (m) => !['Liam', 'Sarah', 'Alex', 'Rohan', 'Sam'].includes(m.author)
+            );
+          }
+          if (!parsed.friendsList) parsed.friendsList = [];
+          if (!parsed.squadsList) parsed.squadsList = [];
           if (!parsed.friendRequests || Array.isArray(parsed.friendRequests) || !parsed.friendRequests.incoming) {
-            parsed.friendRequests = this.getDefaultFriendRequests();
+            parsed.friendRequests = { incoming: [], outgoing: [] };
           }
           if (!parsed.customGameDeck) parsed.customGameDeck = [];
+          if (!parsed.vaultMemories) parsed.vaultMemories = [];
           if (!parsed.memoryGraphNodes) parsed.memoryGraphNodes = this.getDefaultMemoryGraphNodes();
           if (!parsed.weeklyMission) parsed.weeklyMission = this.getDefaultWeeklyMission();
           return parsed;
@@ -291,25 +198,21 @@ class ReactiveStore {
       activeMode: 'PODS', // 'SOLO' | 'US' | 'PODS'
       soundEnabled: true,
       currentUser: this.getDefaultGuestUser(),
-      friendsList: this.getDefaultFriendsList(),
-      squadsList: this.getDefaultSquadsList(),
-      friendRequests: this.getDefaultFriendRequests(),
+      friendsList: [],
+      squadsList: [],
+      friendRequests: { incoming: [], outgoing: [] },
       memoryGraphNodes: this.getDefaultMemoryGraphNodes(),
       weeklyMission: this.getDefaultWeeklyMission(),
       activeRoom: {
         roomCode: generateRoomCode(),
-        podName: 'The Ahmedabad Squad 🏖️',
+        podName: 'My Squad Room',
         roomTemplate: 'SQUAD_NIGHT',
         humorTone: 'FRIENDLY_ROAST',
         language: 'hi-IN',
         isHost: true,
-        selectedGameMode: 'OUR_LORE',
+        selectedGameMode: 'RED_FLAG_COURT',
         players: [
-          { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost' },
-          { id: 'usr_2', name: 'Liam', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam' },
-          { id: 'usr_3', name: 'Sarah', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Sarah' },
-          { id: 'usr_4', name: 'Alex', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex' },
-          { id: 'usr_5', name: 'Rohan', role: 'PLAYER', isReady: false, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Rohan' },
+          { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost' },
         ],
       },
       activeGame: {
@@ -322,35 +225,7 @@ class ReactiveStore {
         timeRemaining: 20,
       },
       customGameDeck: [],
-      vaultMemories: [
-        {
-          id: 'mem_1',
-          type: 'CHAT_SCREENSHOT',
-          title: 'The 2 AM Samosa Breakdown',
-          quote: 'If I eat one more samosa I am legally changing my name to potato and moving into the fridge.',
-          author: 'Liam',
-          timestamp: 'Oct 14, 2019',
-          isPlayable: true,
-        },
-        {
-          id: 'mem_2',
-          type: 'PHOTO',
-          title: 'Lost in Anjuna Forest',
-          quote: 'Guys the Google Maps lady is crying. She has no idea where we are.',
-          author: 'Alex',
-          timestamp: 'Aug 18, 2022',
-          isPlayable: true,
-        },
-        {
-          id: 'mem_3',
-          type: 'VOICE_NOTE',
-          title: 'Manali Rain Voice Note',
-          quote: 'Listen to the rain in Manali... absolute peace.',
-          author: 'Sam',
-          timestamp: 'Sep 09, 2023',
-          isPlayable: true,
-        },
-      ],
+      vaultMemories: [],
     };
   }
 
@@ -375,20 +250,19 @@ class ReactiveStore {
     this.setState({ activeRoom });
   }
 
-  addRoomPlayer(name, avatar) {
-    if (!name) return;
-    const currentPlayers = this.state.activeRoom.players || [];
+  addRoomPlayer(name, avatar = null) {
+    if (!name || !name.trim()) return;
+    const activeRoom = { ...this.state.activeRoom };
+    if (!activeRoom.players) activeRoom.players = [];
+    const trimmed = name.trim();
     const newPlayer = {
       id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,
-      name: name.trim(),
+      name: trimmed,
       role: 'PLAYER',
       isReady: true,
-      avatar: avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`,
+      avatar: avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmed)}`,
     };
-    const activeRoom = {
-      ...this.state.activeRoom,
-      players: [...currentPlayers, newPlayer],
-    };
+    activeRoom.players = [...activeRoom.players, newPlayer];
     this.setState({ activeRoom });
     return newPlayer;
   }
@@ -439,7 +313,7 @@ class ReactiveStore {
     const roomCode = generateRoomCode();
     const user = this.state.currentUser;
     const hostName = (user && user.isLoggedIn && user.displayName) ? `${user.displayName.split(' ')[0]} (Host)` : 'Host (You)';
-    const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost';
+    const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost';
     const activeRoom = {
       roomCode,
       podName: podName || `${(user && user.displayName) ? user.displayName.split(' ')[0] : 'Campfire'}'s Squad Pod 🔥`,
@@ -453,33 +327,12 @@ class ReactiveStore {
     return activeRoom;
   }
 
-  addBotCamper() {
-    const activeRoom = { ...this.state.activeRoom };
-    if (!activeRoom.players) activeRoom.players = [];
-    if (activeRoom.players.length >= 8) return null;
-    const botNames = ['Liam', 'Sarah', 'Alex', 'Rohan', 'Zara', 'Devon', 'Nia'];
-    const existingNames = new Set(activeRoom.players.map((p) => p.name.replace(/ \(Bot\)$/, '')));
-    const available = botNames.filter((n) => !existingNames.has(n));
-    const nextName = available[0] || `Camper ${activeRoom.players.length + 1}`;
-    const newPlayer = {
-      id: `bot_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      name: `${nextName} (Bot)`,
-      role: 'PLAYER',
-      isReady: true,
-      isBot: true,
-      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(nextName)}`,
-    };
-    activeRoom.players = [...activeRoom.players, newPlayer];
-    this.setState({ activeRoom });
-    return newPlayer;
-  }
-
   removeCamper(playerId) {
     const activeRoom = { ...this.state.activeRoom };
     if (activeRoom.players) {
       activeRoom.players = activeRoom.players.filter((p) => p.id !== playerId);
-      this.setState({ activeRoom });
     }
+    this.setState({ activeRoom });
   }
 
   setGameMode(gameMode) {
@@ -511,7 +364,7 @@ class ReactiveStore {
 
   addFriend(friend) {
     const cleanUsername = (friend.username || friend.name || 'camper').toLowerCase().replace(/\s+/g, '_').replace('@', '');
-    const avatar = friend.avatarUrl || friend.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(friend.name || 'Camper')}`;
+    const avatar = friend.avatarUrl || friend.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(friend.name || 'Camper')}`;
     const newFriend = {
       id: `fr_${Date.now()}`,
       name: friend.name || 'New Camper',
@@ -560,7 +413,7 @@ class ReactiveStore {
     const req = (this.state.friendRequests?.incoming || []).find((r) => r.id === requestId);
     if (req) {
       const cleanUsername = (req.fromUsername || req.fromName || 'camper').toLowerCase().replace(/\s+/g, '_').replace('@', '');
-      const avatar = req.fromAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(req.fromName)}`;
+      const avatar = req.fromAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(req.fromName)}`;
       const newFriend = {
         id: `fr_${Date.now()}`,
         name: req.fromName,
@@ -642,18 +495,22 @@ class ReactiveStore {
 
     // Inject into customGameDeck for playable live party rounds
     const authorName = memory.author || this.state.currentUser?.displayName || 'Host';
+    const activePlayers = (this.state.activeRoom?.players || []).map((p) => ({
+      name: p.name,
+      role: p.role || 'Camper',
+      avatar: p.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.name)}`,
+    }));
+    const options = activePlayers.length > 0 ? activePlayers : [
+      { name: authorName, role: 'Memory Author', avatar: this.state.currentUser?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(authorName)}` },
+    ];
+
     const newGameCard = {
       round: (this.state.customGameDeck?.length || 0) + 1,
       timestamp: 'Today · Pod Ingestion',
       quote: memory.quote || memory.title || '“No context needed, you know what you did.”',
       correctAnswer: authorName,
-      options: [
-        { name: authorName, role: 'Memory Author', avatar: this.state.currentUser?.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(authorName)}` },
-        { name: 'Sarah', role: 'Board Game Host', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDySvCa7Hc5xAULiWC4iNdKkkcDRSbOWNZ81f_W0uhYgGu9-jGyhudyaIo5ZWOt0v0rl9d3yWndIZbie4X8vPISEqJwcU93S0OwvvtGsiISqoRTpEceomCg-di_2I5BF9jeZepBVKx_0RoNxq6d7TJDUEj9bJd62XseRoL3n3cfqEcQazhb_IZM5sLgsaJwmTTmdcBEgjK5aos5_QDeTEMdpm1WcKNEwSMuKY5WhMT2viHUCE8tXX3IGA' },
-        { name: 'Liam', role: 'Campfire Guitarist', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmwuDdkf2JKU_FNP18beYeY54Rz_EbBHfwxAwsyn4tS1T3U5YNgmSC1WPW_6TUur3NpEhH3bq2d5N5NPRonMsPcP8OiiyyCqosSaMmTH5uUB8mSK_CcZoo6IniUTD5Frt9TZCNZZLLeKRENQGHoapodjHvYqod50pXY1xl6XN6H3cNt0A5CZbVGOAYrDOdOs7NWbQ-AfTAxR5fzZUBftESRetw_934QcPVBQpoADdzgKbZA3-VkQmkkw' },
-        { name: 'Alex', role: 'Late Night Owl', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuATy2qu59ulmLgSkSbicSnc3Ux_P-5__PswfNDRTh4DCxvBC1Nt1879TnM1QtXDWyeCpzydz2vOpowwsb8yYQuvBQX8PprAAInIKvHwvRtKLoRY1mcKCkd-kVKfp8R0fAwqm4fll2Lxu1GJajGsHHwLGc0u53pqH_L_TV13Ayr9SmhKglYLeUMfzPIiaWuIKJA1BHnwTZu27vluYLBYgzCWLh5l592qWfBdolQbA-WGufMWzSmFKKvRXA' }
-      ],
-      context: `Inside Joke: ${memory.title || 'Private Pod Moment'}`
+      options,
+      context: `Inside Joke: ${memory.title || 'Private Pod Moment'}`,
     };
     const customGameDeck = [newGameCard, ...(this.state.customGameDeck || [])];
     this.setState({ vaultMemories, customGameDeck });

@@ -167,10 +167,15 @@ export class MediaProcessor {
   }
 
   // 5. Convert parsed messages into ready-to-play Game Question Cards
-  static convertChatMemoriesToCards(memories, squadRoster = ['Liam', 'Sarah', 'Alex', 'Rohan', 'You']) {
+  static convertChatMemoriesToCards(memories, squadRoster = null) {
+    let roster = squadRoster;
+    if (!roster || roster.length === 0) {
+      const roomPlayers = (window.bonfireStore?.getState?.()?.activeRoom?.players || []).map((p) => p.name).filter(Boolean);
+      roster = roomPlayers.length > 0 ? roomPlayers : ['You'];
+    }
     return memories.map((mem, idx) => {
       const author = mem.author || 'Someone';
-      const wrongOptions = squadRoster.filter((name) => name.toLowerCase() !== author.toLowerCase()).slice(0, 3);
+      const wrongOptions = roster.filter((name) => name.toLowerCase() !== author.toLowerCase()).slice(0, 3);
       const allChoices = [...wrongOptions, author].sort(() => Math.random() - 0.5);
 
       return {

@@ -11,13 +11,14 @@ import { getRandomTruth, getRandomDare } from '../data/truthOrDareData.js';
 export function renderSpinBottleGame() {
   const state = store.getState();
   const room = state.activeRoom || {};
-  const players = room.players || [
-    { id: 'p1', name: 'You (Host)', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Host' },
-    { id: 'p2', name: 'Liam', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam' },
-    { id: 'p3', name: 'Sarah', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Sarah' },
-    { id: 'p4', name: 'Alex', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex' },
-    { id: 'p5', name: 'Rohan', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Rohan' }
-  ];
+  const currentHostName = (state.currentUser && state.currentUser.displayName) ? `${state.currentUser.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+  const currentHostAvatar = (state.currentUser && state.currentUser.avatarUrl) ? state.currentUser.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host';
+
+  const players = (room.players && room.players.length > 0)
+    ? room.players
+    : [
+        { id: state.currentUser?.id || 'p1', name: currentHostName, avatar: currentHostAvatar }
+      ];
 
   return `
     <div class="flex flex-col items-center justify-between w-full max-w-xl mx-auto px-4 py-6 select-none relative min-h-[85vh]">
@@ -116,7 +117,7 @@ export function renderSpinBottleGame() {
           <!-- Victim Header -->
           <div class="text-center pb-3 border-b border-border/80">
             <span class="px-2.5 py-0.5 rounded-full bg-sunset-coral/20 text-sunset-coral text-[10px] font-mono font-bold uppercase tracking-wider">The Bottle Has Chosen</span>
-            <h3 class="font-display text-2xl font-bold text-white mt-1" id="victim-name">Liam</h3>
+            <h3 class="font-display text-2xl font-bold text-white mt-1" id="victim-name">Player</h3>
             <p class="text-xs text-gray-400 mt-0.5">Pick your poison: Answer honestly or face the squad's dare</p>
           </div>
 

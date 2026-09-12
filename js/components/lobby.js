@@ -239,7 +239,7 @@ export function renderLobby() {
             const isHost = p.role === 'HOST';
             const isCurrentUser = isHost || p.name === 'Host (You)';
             const displayName = isCurrentUser ? (user && user.isLoggedIn && user.displayName ? `${user.displayName.split(' ')[0]} (Host)` : 'You (Host)') : p.name;
-            const avatar = isCurrentUser && user && user.avatarUrl ? user.avatarUrl : (p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(displayName)}`);
+            const avatar = isCurrentUser && user && user.avatarUrl ? user.avatarUrl : (p.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`);
 
             return `
               <div class="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">

@@ -28,44 +28,46 @@ function resolveActiveDeck(state, selectedModeId) {
   const customList = state.customGameDeck || [];
   const roomCampers = state.activeRoom?.players || state.activeRoom?.campers || [];
   const camperNames = roomCampers.map((c) => c.name).filter(Boolean);
-  const currentUserName = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'You';
+  const currentUserName = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'Host (You)';
 
-  // Dynamic roster of participants
-  const dynamicRoster = camperNames.length > 0 ? camperNames : [currentUserName, 'Camper 2', 'Camper 3', 'Camper 4'];
+  // Dynamic roster of participants (real players only)
+  const dynamicRoster = camperNames.length > 0 ? camperNames : [currentUserName];
 
   const adaptDeckToCampers = (deck) => {
-    if (camperNames.length === 0) return deck;
+    const participants = dynamicRoster.length > 0 ? dynamicRoster : [currentUserName];
     return deck.map((card, idx) => {
-      const targetCamper = camperNames[idx % camperNames.length];
-      const suspects = [...camperNames];
-      while (suspects.length < 4) {
-        suspects.push(`Camper ${suspects.length + 1}`);
-      }
+      const targetCamper = participants[idx % participants.length];
+      const suspects = [...participants];
       const actualAuthor = suspects.includes(targetCamper) ? targetCamper : suspects[0];
-      const options = suspects.slice(0, 4).map((name) => ({
+      const options = suspects.map((name) => ({
         name,
-        role: name === currentUserName ? 'Host' : 'Camper'
+        role: name === currentUserName ? 'Host' : 'Player',
       }));
+
+      const sanitizeText = (str) => {
+        if (!str || typeof str !== 'string') return str;
+        return str.replace(/\b(Liam|Sarah|Alex|Rohan|Maya)\b/g, targetCamper);
+      };
 
       return {
         ...card,
         defendant: targetCamper,
         seatTarget: targetCamper,
-        suspects: suspects.slice(0, 4),
-        candidates: suspects.slice(0, 4),
+        suspects: suspects,
+        candidates: suspects,
         actualAuthor,
         correctAnswer: actualAuthor,
-        options
+        options: options.length > 0 ? options : [{ name: currentUserName, role: 'Player' }],
+        details: sanitizeText(card.details),
+        exhibitSnippet: sanitizeText(card.exhibitSnippet),
+        confessionContext: sanitizeText(card.confessionContext),
       };
     });
   };
 
   const mappedCustom = customList.map((card, idx) => {
     const author = card.author || currentUserName;
-    const suspects = [...new Set([author, ...dynamicRoster])].slice(0, 4);
-    while (suspects.length < 4) {
-      suspects.push(`Camper ${suspects.length + 1}`);
-    }
+    const suspects = [...new Set([author, ...dynamicRoster])];
 
     return {
       round: idx + 1,
@@ -128,7 +130,7 @@ export function renderGameScreen() {
 
   const user = state.currentUser;
   const currentUserName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'You';
-  const userAvatar = (user && user.avatarUrl) ? user.avatarUrl : `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(currentUserName)}`;
+  const userAvatar = (user && user.avatarUrl) ? user.avatarUrl : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUserName)}`;
 
   return `
     <div class="relative w-full max-w-[640px] mx-auto px-4 pt-6 pb-24 select-none text-on-surface">
@@ -423,7 +425,8 @@ function renderOurLoreView(card, game, currentUserName) {
 
 // B. WHO SAID THIS VIEW
 function renderWhoSaidThisView(card, game, currentUserName) {
-  const suspects = card.suspects || ['Aarav', 'Liam', 'Sarah', 'Priya'];
+  const roomCampers = (store.getState().activeRoom?.players || []).map((p) => p.name).filter(Boolean);
+  const suspects = card.suspects && card.suspects.length > 0 ? card.suspects : (roomCampers.length > 0 ? roomCampers : [currentUserName]);
   return `
     <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="who-said-card">
       <div class="flex items-center justify-between pb-3 border-b border-border/70">
@@ -455,7 +458,7 @@ function renderWhoSaidThisView(card, game, currentUserName) {
           const isSelected = game.selectedOption === suspect;
           return `
             <button class="game-opt-btn p-3 rounded-xl border ${isSelected ? 'bg-amber-gold text-canvas border-amber-gold shadow-sm font-bold' : 'bg-surface-container-lowest border-border/80 text-gray-200 hover:border-amber-gold/50'} flex items-center gap-2.5 text-left text-xs font-bold transition-all active:scale-98 cursor-pointer" data-option="${suspect}" ${game.isAnswerRevealed ? 'disabled' : ''}>
-              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(suspect)}" class="w-8 h-8 rounded-lg bg-surface-bright shrink-0" />
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(suspect)}" class="w-8 h-8 rounded-lg bg-surface-bright shrink-0" />
               <span class="truncate">${suspect}</span>
             </button>
           `;
@@ -465,9 +468,9 @@ function renderWhoSaidThisView(card, game, currentUserName) {
       <!-- Reveal Banner -->
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-amber-gold/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
         <div class="flex items-center gap-2 text-amber-gold font-bold text-sm mb-1.5">
-          <span>EXPOSED: It was ${card.correctSuspect || 'Sarah'}!</span>
+          <span>EXPOSED: It was ${card.correctSuspect || suspects[0] || currentUserName}!</span>
         </div>
-        <p class="text-xs text-gray-300 font-mono mb-3">${card.revealedSnippet || 'Sarah was 4.8 km away when claiming she was at the gate.'}</p>
+        <p class="text-xs text-gray-300 font-mono mb-3">${card.revealedSnippet || `${card.correctSuspect || suspects[0] || currentUserName} was caught live in the chat.`}</p>
         <div class="flex justify-end">
           <button id="btn-next-round" class="px-5 py-2 rounded-full bg-amber-gold text-canvas font-bold text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-1">
             <span>Next Quote</span>
@@ -591,7 +594,7 @@ function renderRedFlagCourtView(card, game, currentUserName) {
       <div class="my-4 p-4 rounded-xl bg-surface-container-lowest border border-border/60 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl overflow-hidden bg-surface-container-high border-2 border-sunset-coral shadow shrink-0">
-            <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(card.defendant)}" alt="${card.defendant}" />
+            <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(card.defendant)}" alt="${card.defendant}" />
           </div>
           <div>
             <div class="text-[10px] font-mono uppercase text-sunset-coral font-bold tracking-wider">DEFENDANT AT THE STAND</div>
@@ -712,7 +715,7 @@ function renderConfessionVaultView(card, game) {
           return `
             <button class="game-opt-btn p-3 rounded-xl border ${isSelected ? 'bg-primary-container/20 border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest border-border/80'} flex items-center gap-3 text-left transition-all active:scale-98 cursor-pointer" data-option="${suspect}" ${game.isAnswerRevealed ? 'disabled' : ''}>
               <div class="w-10 h-10 rounded-xl overflow-hidden bg-surface-container-high shrink-0 border border-border">
-                <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(suspect)}" alt="${suspect}" />
+                <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(suspect)}" alt="${suspect}" />
               </div>
               <div class="min-w-0 flex-1">
                 <span class="font-label-lg text-sm text-white block truncate font-bold">${suspect}</span>
@@ -759,7 +762,7 @@ function renderHotSeatView(card, game) {
       <div class="my-4 p-4 rounded-xl bg-gradient-to-r from-sunset-coral/15 to-amber-gold/15 border border-sunset-coral/40 flex items-center gap-4">
         <div class="relative">
           <div class="w-14 h-14 rounded-2xl overflow-hidden bg-surface-container-high border-2 border-sunset-coral shadow-lg">
-            <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(card.seatTarget)}" alt="${card.seatTarget}" />
+            <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(card.seatTarget)}" alt="${card.seatTarget}" />
           </div>
           <span class="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-sunset-coral text-white flex items-center justify-center shadow">
             <span class="material-symbols-outlined text-xs">local_fire_department</span>
@@ -847,7 +850,7 @@ function renderMostLikelyToView(card, game) {
           return `
             <button class="game-opt-btn p-3.5 rounded-xl border ${isSelected ? 'bg-primary-container/20 border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest border-border/80'} flex items-center gap-3 text-left transition-all active:scale-98 cursor-pointer" data-option="${cand}" ${game.isAnswerRevealed ? 'disabled' : ''}>
               <div class="w-10 h-10 rounded-xl overflow-hidden bg-surface-container-high shrink-0 border border-border">
-                <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cand)}" alt="${cand}" />
+                <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cand)}" alt="${cand}" />
               </div>
               <div class="min-w-0 flex-1">
                 <span class="font-label-lg text-sm text-white block truncate font-bold">${cand}</span>
@@ -882,7 +885,7 @@ function renderInsideJokeView(card, game, currentUserName, userAvatar) {
     if (opt.name === 'Maya') {
       return { ...opt, name: currentUserName, avatar: userAvatar };
     }
-    return { ...opt, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(opt.name)}` };
+    return { ...opt, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(opt.name)}` };
   });
 
   return `

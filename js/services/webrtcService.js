@@ -113,7 +113,7 @@ export class P2PWebRTCService {
           name: data.user.displayName || 'P2P Camper',
           role: 'PLAYER',
           isReady: true,
-          avatar: data.user.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(data.user.displayName || 'P2P')}`,
+          avatar: data.user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.user.displayName || 'P2P')}`,
         };
         store.setState({
           activeRoom: {

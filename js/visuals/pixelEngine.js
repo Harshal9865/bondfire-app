@@ -18,16 +18,38 @@ export class PixelGladeEngine {
     this.embers = [];
     this.stars = [];
 
-    const user = store?.getState()?.currentUser;
+    const state = store?.getState();
+    const user = state?.currentUser;
     const hostName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'Host (You)';
+    const roomPlayers = state?.activeRoom?.players || [];
 
-    // Characters positioned around campfire
-    this.characters = [
-      { id: 'c1', name: hostName, role: 'Host', color: '#FF5A5F', x: 0.22, y: 0.68, quote: 'I am legally changing my name to potato.', speechTimer: 0, animFrame: 0 },
-      { id: 'c2', name: 'Liam', role: 'Player', color: '#FFB703', x: 0.36, y: 0.74, quote: 'Just follow the bassline guys...', speechTimer: 0, animFrame: 0 },
-      { id: 'c3', name: 'Sarah', role: 'Player', color: '#F72585', x: 0.64, y: 0.74, quote: 'My sunglasses were on my head the whole time!', speechTimer: 0, animFrame: 0 },
-      { id: 'c4', name: 'Alex', role: 'Player', color: '#4ADE80', x: 0.78, y: 0.68, quote: 'Google Maps lady is literally crying.', speechTimer: 0, animFrame: 0 },
+    const seatColors = ['#FF5A5F', '#FFB703', '#F72585', '#4ADE80', '#38BDF8', '#A78BFA'];
+    const seatPositions = [
+      { x: 0.22, y: 0.68 },
+      { x: 0.36, y: 0.74 },
+      { x: 0.64, y: 0.74 },
+      { x: 0.78, y: 0.68 },
+      { x: 0.30, y: 0.62 },
+      { x: 0.70, y: 0.62 },
     ];
+
+    if (roomPlayers.length > 0) {
+      this.characters = roomPlayers.slice(0, 6).map((p, idx) => ({
+        id: p.id || `c_${idx}`,
+        name: p.name,
+        role: p.role || 'Camper',
+        color: seatColors[idx % seatColors.length],
+        x: seatPositions[idx % seatPositions.length].x,
+        y: seatPositions[idx % seatPositions.length].y,
+        quote: idx === 0 ? 'Welcome to the campfire ✨' : 'Squad vibe locked in 🔥',
+        speechTimer: 0,
+        animFrame: 0,
+      }));
+    } else {
+      this.characters = [
+        { id: 'c1', name: hostName, role: 'Host', color: '#FF5A5F', x: 0.50, y: 0.70, quote: 'Welcome to the Campfire ✨', speechTimer: 0, animFrame: 0 },
+      ];
+    }
 
     this.init();
   }

@@ -116,10 +116,10 @@ export function renderHero() {
               </div>
             </div>
 
-            <!-- 4 Avatar Voting Choices with Live Progress Bars -->
+            <!-- Real People Avatar Voting Choices -->
             <div class="space-y-2.5" id="hero-demo-options">
-              <!-- Choice 1: You / User -->
-              <div class="p-3 rounded-xl bg-canvas/60 border border-border hover:border-sunset-coral/60 transition-all cursor-pointer relative overflow-hidden hero-demo-opt" data-option="${userName}">
+              <!-- Choice 1: Real User -->
+              <div class="p-3 rounded-xl bg-canvas/60 border border-border hover:border-sunset-coral/60 transition-all cursor-pointer relative overflow-hidden hero-demo-opt" data-option="${userName}" data-correct="true">
                 <div class="absolute inset-0 bg-sunset-coral/15 w-[65%] rounded-xl pointer-events-none"></div>
                 <div class="relative z-10 flex items-center justify-between">
                   <div class="flex items-center gap-3">
@@ -133,46 +133,38 @@ export function renderHero() {
                 </div>
               </div>
 
-              <!-- Choice 2: Liam (CORRECT ANSWER) -->
-              <div class="p-3 rounded-xl bg-canvas/60 border border-border hover:border-amber-gold/60 transition-all cursor-pointer relative overflow-hidden hero-demo-opt" data-option="Liam">
-                <div class="absolute inset-0 bg-amber-gold/10 w-[20%] rounded-xl pointer-events-none"></div>
-                <div class="relative z-10 flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs border border-border">LM</div>
-                    <span class="text-sm font-medium text-gray-300">Liam</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-xs font-medium text-gray-400">
-                    <span>1 Vote</span>
-                    <span class="text-gray-500 text-[11px]">(20%)</span>
+              ${(state.activeRoom?.players || []).filter(p => p.name !== userName && !p.name.includes('(You)') && !p.isBot).map((p, idx) => `
+                <div class="p-3 rounded-xl bg-canvas/60 border border-border hover:border-amber-gold/60 transition-all cursor-pointer relative overflow-hidden hero-demo-opt" data-option="${p.name}">
+                  <div class="absolute inset-0 bg-amber-gold/10 w-[25%] rounded-xl pointer-events-none"></div>
+                  <div class="relative z-10 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs border border-border">${p.name.substring(0, 2).toUpperCase()}</div>
+                      <span class="text-sm font-medium text-gray-300">${p.name}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-medium text-gray-400">
+                      <span>1 Vote</span>
+                      <span class="text-gray-500 text-[11px]">(25%)</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              `).join('')}
 
-              <!-- Choice 3: Sarah -->
-              <div class="p-3 rounded-xl bg-canvas/60 border border-border hover:border-duo-rose/60 transition-all cursor-pointer relative overflow-hidden hero-demo-opt" data-option="Sarah">
-                <div class="absolute inset-0 bg-duo-rose/10 w-[15%] rounded-xl pointer-events-none"></div>
-                <div class="relative z-10 flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary flex items-center justify-center font-bold text-xs border border-border">SH</div>
-                    <span class="text-sm font-medium text-gray-300">Sarah</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-xs font-medium text-gray-400">
-                    <span>1 Vote</span>
-                    <span class="text-gray-500 text-[11px]">(15%)</span>
+              ${(state.activeRoom?.players || []).filter(p => !p.isBot).length <= 1 ? `
+                <div class="p-3 rounded-xl bg-canvas/60 border border-dashed border-border/80 hover:border-mint-green/60 transition-all cursor-pointer relative overflow-hidden hero-demo-opt" data-option="Invite Friend" id="btn-hero-invite-camper">
+                  <div class="relative z-10 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-surface-bright text-mint-green flex items-center justify-center font-bold text-xs border border-mint-green/40">
+                        <span class="material-symbols-outlined text-[15px]">person_add</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-gray-200 block">+ Invite Real Friend</span>
+                        <span class="text-[10px] text-gray-500 font-mono">Join code: #${state.activeRoom?.roomCode || 'BONDFIRE'}</span>
+                      </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded bg-mint-green/10 text-mint-green text-[10px] font-mono font-bold">REAL PEOPLE ONLY</span>
                   </div>
                 </div>
-              </div>
-
-              <!-- Choice 4: Alex -->
-              <div class="p-3 rounded-xl bg-canvas/60 border border-border opacity-70 hover:opacity-100 transition-all cursor-pointer hero-demo-opt" data-option="Alex">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-surface-bright text-on-surface flex items-center justify-center font-bold text-xs border border-border">AX</div>
-                    <span class="text-sm font-medium text-gray-300">Alex</span>
-                  </div>
-                  <span class="text-xs text-gray-500">0 Votes</span>
-                </div>
-              </div>
+              ` : ''}
             </div>
 
             <!-- Feedback Toast / Notice -->
@@ -299,7 +291,7 @@ export function renderHero() {
                 </div>
                 <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs">
                   <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-amber-gold">emoji_events</span><span class="font-medium text-gray-200 text-[11px]">Roast Champion</span></div>
-                  <span class="retro-led-amber font-bold text-[11px]">Liam (+450)</span>
+                  <span class="retro-led-amber font-bold text-[11px]">${(store.getState()?.currentUser?.displayName ? store.getState().currentUser.displayName.split(' ')[0] : 'Squad Host')} (+450)</span>
                 </div>
               </div>
             </div>
@@ -645,22 +637,35 @@ export function bindHeroEvents() {
 
       audio.playClick();
       const chosen = btn.dataset.option;
+      if (chosen === 'Invite Friend') {
+        const state = store.getState();
+        const code = state.activeRoom?.roomCode || 'BONDFIRE';
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(`${window.location.origin}/#room=${code}`);
+          demoFeedback.innerHTML = `<span class="text-mint-green font-mono">Room link copied! Send it to your friend to join live.</span>`;
+        } else {
+          demoFeedback.innerHTML = `<span class="text-amber-gold font-mono">Ask your friend to enter code #${code} to join!</span>`;
+        }
+        return;
+      }
+
+      const isCorrect = btn.dataset.correct === 'true';
       const allBtns = demoContainer.querySelectorAll('.hero-demo-opt');
       allBtns.forEach((b) => (b.style.pointerEvents = 'none'));
 
-      if (chosen === 'Liam') {
+      if (isCorrect) {
         audio.playCorrect();
         confettiInstance.burst(50);
         btn.classList.add('border-mint-green', 'bg-mint-green/20');
-        demoFeedback.innerHTML = `<span class="text-mint-green inline-flex items-center gap-1 font-mono"><span class="material-symbols-outlined text-xs">auto_awesome</span><span>EXACT MATCH! Liam sent this during the Austin Airbnb trip. (+140 Pod XP)</span></span>`;
+        demoFeedback.innerHTML = `<span class="text-mint-green inline-flex items-center gap-1 font-mono"><span class="material-symbols-outlined text-xs">auto_awesome</span><span>EXACT MATCH! ${chosen} sent this during the squad trip. (+140 Pod XP)</span></span>`;
       } else {
         audio.playTick();
         btn.classList.add('border-sunset-coral', 'bg-sunset-coral/20');
-        const correctBtn = demoContainer.querySelector('[data-option="Liam"]');
+        const correctBtn = demoContainer.querySelector('[data-correct="true"]');
         if (correctBtn) {
           correctBtn.classList.add('border-mint-green', 'bg-mint-green/20');
         }
-        demoFeedback.innerHTML = `<span class="text-amber-gold font-mono">Nice guess! It was actually Liam. Voted & Archived to 2026 Yearbook</span>`;
+        demoFeedback.innerHTML = `<span class="text-amber-gold font-mono">Good guess! Voted & Archived to your 2026 Live Squad Vault.</span>`;
       }
     });
   }

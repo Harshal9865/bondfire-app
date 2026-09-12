@@ -77,47 +77,6 @@ function renderAuthModalMarkup(reason) {
           </button>
         </div>
 
-        <!-- Quick Multi-Account Test Profiles Switcher -->
-        <div class="p-3 rounded-2xl bg-surface-container-lowest/90 border border-border/80 mb-4 relative z-10">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] uppercase font-mono text-amber-gold font-bold flex items-center gap-1">
-              <span class="material-symbols-outlined text-[13px]">switch_account</span>
-              <span>1-Click Test Accounts</span>
-            </span>
-            <span class="text-[9px] text-gray-500 font-mono">Multi-player Testing</span>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-            <button type="button" class="btn-quick-login p-1.5 rounded-xl bg-surface-container hover:bg-surface-bright border border-border flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-name="Harshal (Host)" data-email="harshal@bondfire.app" data-role="HOST" data-avatar="https://api.dicebear.com/7.x/bottts/svg?seed=HarshalHost">
-              <div class="w-7 h-7 rounded-lg overflow-hidden bg-primary-container/20">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=HarshalHost" class="w-full h-full object-cover" />
-              </div>
-              <span class="text-[11px] font-bold text-white truncate w-full">Harshal</span>
-              <span class="text-[8px] text-sunset-coral font-bold uppercase">Host</span>
-            </button>
-            <button type="button" class="btn-quick-login p-1.5 rounded-xl bg-surface-container hover:bg-surface-bright border border-border flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-name="Liam" data-email="liam@bondfire.app" data-role="PLAYER" data-avatar="https://api.dicebear.com/7.x/bottts/svg?seed=Liam">
-              <div class="w-7 h-7 rounded-lg overflow-hidden bg-secondary-container/20">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Liam" class="w-full h-full object-cover" />
-              </div>
-              <span class="text-[11px] font-bold text-white truncate w-full">Liam</span>
-              <span class="text-[8px] text-amber-gold font-bold uppercase">Camper</span>
-            </button>
-            <button type="button" class="btn-quick-login p-1.5 rounded-xl bg-surface-container hover:bg-surface-bright border border-border flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-name="Sarah" data-email="sarah@bondfire.app" data-role="PLAYER" data-avatar="https://api.dicebear.com/7.x/bottts/svg?seed=Sarah">
-              <div class="w-7 h-7 rounded-lg overflow-hidden bg-tertiary-container/20">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sarah" class="w-full h-full object-cover" />
-              </div>
-              <span class="text-[11px] font-bold text-white truncate w-full">Sarah</span>
-              <span class="text-[8px] text-mint-green font-bold uppercase">Camper</span>
-            </button>
-            <button type="button" class="btn-quick-login p-1.5 rounded-xl bg-surface-container hover:bg-surface-bright border border-border flex flex-col items-center gap-1 text-center transition-all active:scale-95" data-name="Alex" data-email="alex@bondfire.app" data-role="PLAYER" data-avatar="https://api.dicebear.com/7.x/bottts/svg?seed=Alex">
-              <div class="w-7 h-7 rounded-lg overflow-hidden bg-surface-bright">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Alex" class="w-full h-full object-cover" />
-              </div>
-              <span class="text-[11px] font-bold text-white truncate w-full">Alex</span>
-              <span class="text-[8px] text-duo-rose font-bold uppercase">Camper</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Google Identity Services (GSI) Button & Account Chooser -->
         <div class="relative z-10 flex flex-col items-center gap-2 mb-4">
           <!-- Official Google Sign-In button container (Native Account Chooser) -->
@@ -277,45 +236,4 @@ function bindAuthModalEvents() {
     });
   }
 
-  // 1-Click Multi-Account Switcher for Real Player Testing
-  const quickLoginBtns = document.querySelectorAll('.btn-quick-login');
-  quickLoginBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      audio.playChime();
-      const name = btn.dataset.name;
-      const email = btn.dataset.email;
-      const role = btn.dataset.role;
-      const avatar = btn.dataset.avatar;
-
-      store.updateUserProfile({
-        isLoggedIn: true,
-        displayName: name,
-        email: email,
-        avatarUrl: avatar,
-        isHost: role === 'HOST',
-      });
-
-      // Also ensure current user is reflected in activeRoom
-      const room = store.getState().activeRoom;
-      if (room) {
-        let players = [...room.players];
-        const existingIdx = players.findIndex((p) => p.name === name || p.role === role);
-        if (existingIdx !== -1) {
-          players[existingIdx] = { ...players[existingIdx], name, avatar, isReady: true };
-        } else {
-          players.push({
-            id: `usr_${Date.now()}`,
-            name,
-            role,
-            isReady: true,
-            avatar,
-          });
-        }
-        store.setState({ activeRoom: { ...room, players } });
-      }
-
-      closeAuthModal();
-      store.setView('PROFILE');
-    });
-  });
 }
