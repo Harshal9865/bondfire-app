@@ -11,7 +11,8 @@ import { OUR_LORE_DECK } from '../data/indianCultureDecks.js';
 export const ROOM_TEMPLATES = [
   {
     id: 'SQUAD_NIGHT',
-    name: 'Squad Night 🔥',
+    name: 'Squad Night',
+    icon: 'local_fire_department',
     tagline: 'Friends, roasts, inside jokes & questionable decisions',
     defaultGame: 'OUR_LORE',
     defaultTone: 'FRIENDLY_ROAST',
@@ -20,7 +21,8 @@ export const ROOM_TEMPLATES = [
   },
   {
     id: 'COUPLE_DATE',
-    name: 'Couple Date Night 💖',
+    name: 'Couple Date Night',
+    icon: 'favorite',
     tagline: 'Our firsts, reaction predictions & gentle intimacy',
     defaultGame: 'OUR_LORE',
     defaultTone: 'ROMANTIC',
@@ -29,7 +31,8 @@ export const ROOM_TEMPLATES = [
   },
   {
     id: 'FAMILY_ADDA',
-    name: 'Family Adda ☕',
+    name: 'Family Adda',
+    icon: 'local_cafe',
     tagline: 'Wholesome Antakshari, festival memories & relative trivia',
     defaultGame: 'EMOJI_CINEMA',
     defaultTone: 'FAMILY_SAFE',
@@ -38,7 +41,8 @@ export const ROOM_TEMPLATES = [
   },
   {
     id: 'COLLEGE_HOSTEL',
-    name: 'Hostel Night 🍕',
+    name: 'Hostel Night',
+    icon: 'local_pizza',
     tagline: 'Maggi incidents, 3 AM philosophy & roommate exposes',
     defaultGame: 'WHO_SAID_THIS',
     defaultTone: 'SAVAGE_ROAST',
@@ -47,7 +51,8 @@ export const ROOM_TEMPLATES = [
   },
   {
     id: 'WEDDING_HOUSE',
-    name: 'Wedding House 🥁',
+    name: 'Wedding House',
+    icon: 'celebration',
     tagline: 'Sangeet choreography, gossip & cousin rivalries',
     defaultGame: 'MOST_LIKELY_TO',
     defaultTone: 'LIGHT_TEASING',
@@ -56,7 +61,8 @@ export const ROOM_TEMPLATES = [
   },
   {
     id: 'WATCH_PARTY',
-    name: 'Watch & Play 🎬',
+    name: 'Watch & Play',
+    icon: 'movie',
     tagline: 'Interactive 20s Reels with pause-and-predict rounds',
     defaultGame: 'REEL_COURT',
     defaultTone: 'FRIENDLY_ROAST',
@@ -106,7 +112,7 @@ export function renderLobby() {
 
       <!-- Quick Social Sharing: 1-Tap WhatsApp & QR -->
       <div class="grid grid-cols-2 gap-3 mb-4">
-        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`🔥 Join our private Bondfire Adda tonight! Room Code: ${room.roomCode} -> http://localhost:3000/#/ROOMS`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
+        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Join our private Bondfire Adda tonight! Room Code: ${room.roomCode} -> http://localhost:3000/#/ROOMS`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
           <span class="material-symbols-outlined text-[18px]">chat</span>
           <span>1-Tap WhatsApp Invite</span>
         </a>
@@ -120,12 +126,12 @@ export function renderLobby() {
       <!-- ARCADE MULTIPLAYER: SPIN THE BOTTLE HERO BANNER -->
       <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-sunset-coral/20 via-surface to-amber-gold/20 border border-sunset-coral/40 shadow-xl flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-sunset-coral/20 border border-sunset-coral/40 flex items-center justify-center text-2xl shrink-0 shadow-sm">
-            🍾
+          <div class="w-12 h-12 rounded-2xl bg-sunset-coral/20 border border-sunset-coral/40 flex items-center justify-center text-sunset-coral shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-2xl text-sunset-coral">wine_bar</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-sunset-coral/30 text-sunset-coral">Arcade Multiplayer</span>
+              <span class="retro-pixel-badge px-2 py-0.5 rounded text-[8px] bg-sunset-coral/30 text-sunset-coral">Arcade Multiplayer</span>
               <span class="text-xs text-mint-green font-mono font-bold">5 Players Ready</span>
             </div>
             <h4 class="font-display text-sm sm:text-base font-bold text-white mt-0.5">Spin the Bottle (Truth or Dare)</h4>
@@ -155,12 +161,12 @@ export function renderLobby() {
             return `
               <button class="btn-select-template p-3 rounded-xl border text-left transition-all relative overflow-hidden ${isSelected ? 'bg-sunset-coral/15 border-sunset-coral shadow-glow-coral' : 'bg-surface-bright/50 border-border/70 hover:border-gray-500'}" data-template="${tmpl.id}">
                 <div class="flex items-center justify-between mb-1">
-                  <span class="font-bold text-xs text-white truncate">${tmpl.name}</span>
+                  <span class="font-bold text-xs text-white truncate flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-amber-gold">${tmpl.icon || 'star'}</span><span>${tmpl.name}</span></span>
                   ${isSelected ? `<span class="w-2 h-2 rounded-full bg-sunset-coral"></span>` : ''}
                 </div>
                 <p class="text-[10px] text-gray-400 line-clamp-2 leading-relaxed">${tmpl.tagline}</p>
                 <div class="mt-2 flex items-center gap-1">
-                  <span class="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-white/10 text-gray-300 uppercase">${tmpl.badge}</span>
+                  <span class="retro-pixel-badge px-1.5 py-0.5 rounded text-[8px] bg-white/10 text-gray-300">${tmpl.badge}</span>
                 </div>
               </button>
             `;
@@ -203,8 +209,8 @@ export function renderLobby() {
             ${[
               { tone: 'FAMILY_SAFE', label: 'Family Safe' },
               { tone: 'FRIENDLY_ROAST', label: 'Friendly' },
-              { tone: 'SAVAGE_ROAST', label: 'Savage 🔥' },
-              { tone: 'ROMANTIC', label: 'Romantic 💖' }
+              { tone: 'SAVAGE_ROAST', label: 'Savage' },
+              { tone: 'ROMANTIC', label: 'Romantic' }
             ].map((item) => {
               const isActive = (room.humorTone || 'FRIENDLY_ROAST') === item.tone;
               return `
@@ -238,11 +244,11 @@ export function renderLobby() {
               <div class="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">
                 <div class="relative">
                   <img src="${avatar}" class="w-10 h-10 rounded-lg bg-surface-bright object-cover" />
-                  ${isHost ? `<div class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-gold flex items-center justify-center text-[10px]">👑</div>` : ''}
+                  ${isHost ? `<div class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-gold text-canvas flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-[11px] font-bold">hotel_class</span></div>` : ''}
                 </div>
                 <div class="flex flex-col overflow-hidden">
                   <span class="text-xs font-bold text-white truncate">${displayName}</span>
-                  <span class="text-[9px] font-bold ${p.isReady ? 'text-mint-green' : 'text-gray-500'} uppercase tracking-wider">${p.isReady ? 'Ready' : 'Joining...'}</span>
+                  <span class="retro-pixel-badge text-[8.5px] ${p.isReady ? 'text-mint-green' : 'text-gray-500'}">${p.isReady ? 'Ready' : 'Joining...'}</span>
                 </div>
               </div>
             `;
@@ -289,7 +295,7 @@ export function renderLobby() {
         <div class="w-full max-w-sm bg-surface rounded-2xl border border-border p-6 text-center">
           <div class="flex justify-between items-center mb-4">
             <h3 class="font-display font-bold text-lg text-white">Join Room QR Code</h3>
-            <button id="btn-close-invite-modal" class="text-gray-400 hover:text-white text-xl font-bold">✕</button>
+            <button id="btn-close-invite-modal" class="text-gray-400 hover:text-white flex items-center justify-center p-1"><span class="material-symbols-outlined text-lg">close</span></button>
           </div>
           <div class="p-4 bg-white rounded-xl mb-4 flex items-center justify-center">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`http://localhost:3000/#/ROOMS?code=${room.roomCode}`)}" class="w-44 h-44" alt="Room QR Code" />
@@ -297,12 +303,14 @@ export function renderLobby() {
           <p class="text-xs text-gray-400 font-mono mb-2">Scan with camera to jump in without login</p>
           <span class="font-mono text-2xl font-black text-amber-gold tracking-widest">${room.roomCode}</span>
         </div>
+      </div>
+
       <!-- Add Camper Modal -->
       <div id="add-camper-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="w-full max-w-sm bg-surface rounded-2xl border border-border p-6 text-left flex flex-col gap-4">
           <div class="flex justify-between items-center">
             <h3 class="font-display font-bold text-lg text-white">Add a Friend to Room</h3>
-            <button id="btn-close-camper-modal" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+            <button id="btn-close-camper-modal" class="text-gray-400 hover:text-white flex items-center justify-center p-1"><span class="material-symbols-outlined text-lg">close</span></button>
           </div>
           <div>
             <label class="text-xs text-gray-400 font-mono uppercase block mb-1.5">Friend's Name</label>
@@ -319,7 +327,7 @@ export function renderLobby() {
         <div class="w-full max-w-md bg-surface rounded-2xl border border-border p-6 text-left flex flex-col gap-4">
           <div class="flex justify-between items-center">
             <h3 class="font-display font-bold text-lg text-white">Add Custom Squad Card</h3>
-            <button id="btn-close-custom-card-modal" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+            <button id="btn-close-custom-card-modal" class="text-gray-400 hover:text-white flex items-center justify-center p-1"><span class="material-symbols-outlined text-lg">close</span></button>
           </div>
           <div>
             <label class="text-xs text-gray-400 font-mono uppercase block mb-1.5">Card Title / Situation</label>
@@ -509,7 +517,7 @@ export function bindLobbyEvents() {
       modalCustomCard.classList.add('hidden');
       inputCardTitle.value = '';
       inputCardQuote.value = '';
-      alert('✅ Custom Squad Card added to your active deck!');
+      alert('Custom Squad Card added to your active deck!');
       store.notify();
     });
   }

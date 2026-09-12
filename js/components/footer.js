@@ -33,7 +33,7 @@ export function renderFooter() {
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="font-display font-bold text-2xl text-white tracking-tight">Bondfire</span>
-                  <span class="text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-sunset-coral/15 text-sunset-coral border border-sunset-coral/30">Beta</span>
+                  <span class="retro-pixel-badge text-[8px] tracking-widest px-2 py-0.5 rounded-full bg-sunset-coral/15 text-sunset-coral border border-sunset-coral/30">Beta</span>
                 </div>
               </div>
 
@@ -254,7 +254,7 @@ export function bindFooterEvents() {
   const showLegalToast = (title) => {
     audio.playClick();
     if (toastMount) {
-      toastMount.innerHTML = `<div class="toast toast-mint show"><span>📜 ${title}: Zero AI training on your private chat memories. 100% GDPR & CCPA compliant.</span></div>`;
+      toastMount.innerHTML = `<div class="toast toast-mint show"><span class="material-symbols-outlined text-sm align-middle mr-1 text-mint-green">verified_user</span><span>${title}: Zero AI training on your private chat memories. 100% GDPR & CCPA compliant.</span></div>`;
       setTimeout(() => (toastMount.innerHTML = ''), 3500);
     }
   };

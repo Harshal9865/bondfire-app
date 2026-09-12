@@ -25,13 +25,16 @@ export function renderSpinBottleGame() {
       <!-- Top Title & Room Info -->
       <div class="w-full flex items-center justify-between mb-4">
         <div>
-          <span class="text-[10px] font-mono font-bold text-sunset-coral uppercase tracking-wider">Arcade Multiplayer</span>
-          <h2 class="font-display text-2xl font-bold text-white tracking-tight">Spin the Bottle 🍾</h2>
+          <span class="retro-pixel-badge text-[9.5px] text-sunset-coral">Arcade Multiplayer</span>
+          <h2 class="font-display text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>Spin the Bottle</span>
+            <span class="material-symbols-outlined text-amber-gold text-[22px]">wine_bar</span>
+          </h2>
         </div>
         <div class="flex items-center gap-2">
           <button id="btn-bottle-spice" class="px-3 py-1.5 rounded-full bg-surface border border-border hover:border-sunset-coral text-xs font-bold text-amber-gold flex items-center gap-1.5 transition-colors">
-            <span>🌶️</span>
-            <span id="spice-level-text">Spicy</span>
+            <span class="material-symbols-outlined text-sunset-coral text-[16px]">local_fire_department</span>
+            <span id="spice-level-text" class="retro-pixel-badge text-[10px]">Spicy</span>
           </button>
           <button id="btn-exit-bottle" class="p-2 rounded-full bg-surface border border-border text-gray-400 hover:text-white transition-colors">
             <span class="material-symbols-outlined text-[18px]">close</span>
@@ -120,13 +123,13 @@ export function renderSpinBottleGame() {
           <!-- Truth vs Dare Choice Buttons -->
           <div class="grid grid-cols-2 gap-3" id="choice-buttons-grid">
             <button id="btn-choose-truth" class="py-4 rounded-2xl bg-amber-gold/15 hover:bg-amber-gold/25 border border-amber-gold/40 text-amber-gold font-bold text-sm transition-all active:scale-95 flex flex-col items-center gap-1.5 shadow-sm">
-              <span class="text-2xl">🤫</span>
-              <span>TRUTH</span>
+              <span class="material-symbols-outlined text-[26px]">visibility_off</span>
+              <span class="retro-pixel-badge text-[12px]">TRUTH</span>
             </button>
 
             <button id="btn-choose-dare" class="py-4 rounded-2xl bg-sunset-coral/15 hover:bg-sunset-coral/25 border border-sunset-coral/40 text-sunset-coral font-bold text-sm transition-all active:scale-95 flex flex-col items-center gap-1.5 shadow-sm">
-              <span class="text-2xl">🔥</span>
-              <span>DARE</span>
+              <span class="material-symbols-outlined text-[26px]">local_fire_department</span>
+              <span class="retro-pixel-badge text-[12px]">DARE</span>
             </button>
           </div>
 
@@ -163,11 +166,13 @@ export function renderSpinBottleGame() {
 
           <!-- Done / Pass Buttons -->
           <div class="flex gap-2 pt-2">
-            <button id="btn-close-challenge" class="flex-1 py-3 rounded-full bg-surface-bright border border-border text-gray-300 font-bold text-xs hover:text-white transition-colors">
-              Pass / Chicken Out 🐔
+            <button id="btn-close-challenge" class="flex-1 py-3 rounded-full bg-surface-bright border border-border text-gray-300 font-bold text-xs hover:text-white transition-colors flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[14px]">flag</span>
+              <span>Pass / Chicken Out</span>
             </button>
-            <button id="btn-done-challenge" class="flex-[2] py-3 rounded-full bg-mint-green text-canvas font-bold text-xs shadow-sm hover:brightness-110 active:scale-95 transition-all">
-              Completed! Next Spin 🎯
+            <button id="btn-done-challenge" class="flex-[2] py-3 rounded-full bg-mint-green text-canvas font-bold text-xs shadow-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">task_alt</span>
+              <span class="retro-pixel-badge text-[10px]">Completed! Next Spin</span>
             </button>
           </div>
 
@@ -279,8 +284,8 @@ export function bindSpinBottleEvents() {
       audio.playClick();
       lastType = 'TRUTH';
       if (promptBadge) {
-        promptBadge.textContent = 'TRUTH 🤫';
-        promptBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-gold/20 text-amber-gold';
+        promptBadge.textContent = 'TRUTH';
+        promptBadge.className = 'px-2.5 py-0.5 rounded retro-pixel-badge text-[9.5px] bg-amber-gold/20 text-amber-gold border border-amber-gold/30';
       }
       if (promptText) promptText.textContent = `"${getRandomTruth(currentSpice)}"`;
       if (promptBox) promptBox.classList.remove('hidden');
@@ -293,8 +298,8 @@ export function bindSpinBottleEvents() {
       audio.playClick();
       lastType = 'DARE';
       if (promptBadge) {
-        promptBadge.textContent = 'DARE 🔥';
-        promptBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-sunset-coral/20 text-sunset-coral';
+        promptBadge.textContent = 'DARE';
+        promptBadge.className = 'px-2.5 py-0.5 rounded retro-pixel-badge text-[9.5px] bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30';
       }
       if (promptText) promptText.textContent = `"${getRandomDare(currentSpice === 'SAVAGE' ? 'CHAOS' : currentSpice)}"`;
       if (promptBox) promptBox.classList.remove('hidden');
@@ -329,8 +334,8 @@ export function bindSpinBottleEvents() {
       audio.playChime();
       lastType = 'DARE';
       if (promptBadge) {
-        promptBadge.textContent = 'CUSTOM SQUAD DARE ✍️';
-        promptBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-sunset-coral/30 text-sunset-coral';
+        promptBadge.textContent = 'CUSTOM SQUAD DARE';
+        promptBadge.className = 'retro-pixel-badge px-2 py-0.5 rounded text-[8px] bg-sunset-coral/30 text-sunset-coral';
       }
       if (promptText) promptText.textContent = `"${val}"`;
       if (promptBox) promptBox.classList.remove('hidden');

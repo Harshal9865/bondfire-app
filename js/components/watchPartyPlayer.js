@@ -102,15 +102,21 @@ export class WatchPartyPlayer {
 
           <!-- Live Reaction Buttons & Trigger Predict -->
           <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
-            ${['🔥', '😂', '💀', '🍿', '👏'].map((emoji) => `
-              <button class="btn-stream-reaction w-9 h-9 rounded-full bg-surface-bright hover:bg-surface-container-high border border-border flex items-center justify-center text-base transition-transform active:scale-90" data-emoji="${emoji}">
-                ${emoji}
+            ${[
+              { icon: 'local_fire_department', color: 'text-coral-red', label: 'FIRE' },
+              { icon: 'sentiment_very_satisfied', color: 'text-amber-gold', label: 'LAUGH' },
+              { icon: 'hotel_class', color: 'text-rose-glow', label: 'STAR' },
+              { icon: 'celebration', color: 'text-mint-green', label: 'HYPE' },
+              { icon: 'movie', color: 'text-blue-400', label: 'CINEMA' }
+            ].map((rx) => `
+              <button class="btn-stream-reaction w-9 h-9 rounded-full bg-surface-bright hover:bg-surface-container-high border border-border flex items-center justify-center transition-transform active:scale-90" data-label="${rx.label}">
+                <span class="material-symbols-outlined text-base ${rx.color}">${rx.icon}</span>
               </button>
             `).join('')}
 
             <button id="btn-trigger-predict-modal" class="px-3 py-2 rounded-xl bg-amber-gold/20 border border-amber-gold text-amber-gold font-bold text-xs hover:bg-amber-gold/30 transition-all flex items-center gap-1.5 ml-1">
-              <span>🎯</span>
-              <span>Predict Round</span>
+              <span class="material-symbols-outlined text-sm">ads_click</span>
+              <span class="retro-pixel-badge text-[8px]">Predict Round</span>
             </button>
           </div>
 
@@ -155,12 +161,12 @@ export class WatchPartyPlayer {
       });
     }
 
-    // Reaction Blast (Spawn floating emojis)
+    // Reaction Blast (Spawn floating retro tokens)
     document.querySelectorAll('.btn-stream-reaction').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const emoji = btn.getAttribute('data-emoji');
+        const label = btn.getAttribute('data-label') || 'HYPE';
         audio.playBip();
-        this.spawnReaction(emoji);
+        this.spawnReaction(label);
       });
     });
 
@@ -173,7 +179,7 @@ export class WatchPartyPlayer {
       });
     }
 
-    // Init Floating Emoji Canvas
+    // Init Floating Token Canvas
     this.initCanvas();
   }
 
@@ -214,16 +220,18 @@ export class WatchPartyPlayer {
     canvas.height = canvas.offsetHeight;
 
     const particles = [];
+    const colors = ['#FF5A5F', '#FFB703', '#06D6A0', '#F72585', '#3B82F6'];
 
-    this.spawnReaction = (emoji) => {
-      for (let i = 0; i < 6; i++) {
+    this.spawnReaction = (label) => {
+      for (let i = 0; i < 5; i++) {
         particles.push({
-          emoji,
-          x: canvas.width * 0.3 + Math.random() * (canvas.width * 0.4),
+          label: `+${label}`,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          x: canvas.width * 0.2 + Math.random() * (canvas.width * 0.6),
           y: canvas.height,
-          vx: (Math.random() - 0.5) * 4,
-          vy: -(6 + Math.random() * 6),
-          size: 24 + Math.random() * 12,
+          vx: (Math.random() - 0.5) * 3,
+          vy: -(5 + Math.random() * 5),
+          size: 11 + Math.random() * 3,
           opacity: 1
         });
       }
@@ -238,8 +246,12 @@ export class WatchPartyPlayer {
         p.opacity -= 0.015;
 
         ctx.globalAlpha = Math.max(0, p.opacity);
-        ctx.font = `${p.size}px sans-serif`;
-        ctx.fillText(p.emoji, p.x, p.y);
+        ctx.font = `bold ${p.size}px 'Silkscreen', monospace`;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.fillText(p.label, p.x, p.y);
+        ctx.shadowBlur = 0;
 
         if (p.opacity <= 0 || p.y < -50) {
           particles.splice(i, 1);

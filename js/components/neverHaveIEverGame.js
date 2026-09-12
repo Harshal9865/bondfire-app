@@ -59,16 +59,16 @@ export function renderNeverHaveIEverGame() {
       <!-- Category Filter Pills -->
       <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-4 scrollbar-none">
         <button class="nhie-cat-filter px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${activeCategory === 'ALL' ? 'bg-white text-dark font-black shadow-sm' : 'bg-surface border border-border text-gray-400 hover:text-white'}" data-cat="ALL">
-          🔥 All Prompts
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">local_fire_department</span><span class="retro-pixel-badge text-[9.5px]">All Prompts</span></span>
         </button>
         <button class="nhie-cat-filter px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${activeCategory === 'CHAOS' ? 'bg-sunset-coral text-white font-black shadow-sm' : 'bg-surface border border-border text-gray-400 hover:text-white'}" data-cat="CHAOS">
-          🤪 Party Chaos
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">celebration</span><span class="retro-pixel-badge text-[9.5px]">Party Chaos</span></span>
         </button>
         <button class="nhie-cat-filter px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${activeCategory === 'DATING_CRUSHES' ? 'bg-duo-rose text-white font-black shadow-sm' : 'bg-surface border border-border text-gray-400 hover:text-white'}" data-cat="DATING_CRUSHES">
-          💖 Dating & Crushes
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">favorite</span><span class="retro-pixel-badge text-[9.5px]">Dating & Crushes</span></span>
         </button>
         <button class="nhie-cat-filter px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${activeCategory === 'COLLEGE_HOSTEL' ? 'bg-amber-gold text-dark font-black shadow-sm' : 'bg-surface border border-border text-gray-400 hover:text-white'}" data-cat="COLLEGE_HOSTEL">
-          🍕 Hostel & College
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">school</span><span class="retro-pixel-badge text-[9.5px]">Hostel & College</span></span>
         </button>
       </div>
 
@@ -94,13 +94,13 @@ export function renderNeverHaveIEverGame() {
         <!-- Player Actions: Drop Finger or Safe -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
           <button id="btn-nhie-drop-finger" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-sm shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span class="text-lg">🙈</span>
-            <span>I've Done This! (Drop Finger)</span>
+            <span class="material-symbols-outlined text-[18px]">pan_tool</span>
+            <span class="retro-pixel-badge text-[10px]">I've Done This! (Drop Finger)</span>
           </button>
 
           <button id="btn-nhie-safe" class="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright border border-border text-gray-300 hover:text-white font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span>😇</span>
-            <span>I'm Safe</span>
+            <span class="material-symbols-outlined text-[18px] text-mint-green">verified</span>
+            <span class="retro-pixel-badge text-[10px]">I'm Safe</span>
           </button>
 
           <button id="btn-nhie-next-card" class="p-3.5 rounded-2xl bg-surface-bright hover:bg-surface-bright/80 text-amber-gold hover:text-white border border-border transition-all active:scale-95" title="Next Card">
@@ -130,8 +130,8 @@ export function renderNeverHaveIEverGame() {
             return `
               <div class="flex items-center justify-between p-3 rounded-xl ${isEliminated ? 'bg-red-500/10 border border-red-500/30 opacity-70' : 'bg-surface-bright/50 border border-border'} transition-all">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-duo-rose/20 to-amber-gold/20 border ${isEliminated ? 'border-red-500' : 'border-border'} flex items-center justify-center text-lg shrink-0">
-                    ${p.avatar || '😎'}
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-duo-rose/20 to-amber-gold/20 border ${isEliminated ? 'border-red-500' : 'border-border'} flex items-center justify-center shrink-0">
+                    ${p.avatar && !p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-base">person</span>'}
                   </div>
                   <div>
                     <div class="flex items-center gap-1.5">
@@ -139,10 +139,10 @@ export function renderNeverHaveIEverGame() {
                       ${isSelf ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-duo-rose/20 text-duo-rose font-bold">YOU</span>' : ''}
                       ${isEliminated ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-500/30 text-red-300 font-bold">OUT</span>' : ''}
                     </div>
-                    <!-- Visual Fingers Left -->
-                    <div class="flex items-center gap-1 mt-1 text-[11px]">
+                    <!-- Visual Retro Stamina / Finger Health Meter -->
+                    <div class="flex items-center gap-1 mt-1.5">
                       ${Array.from({ length: 10 }).map((_, i) => `
-                        <span class="${i < fingers ? 'text-duo-rose' : 'text-gray-600 opacity-40'} transition-all">✋</span>
+                        <span class="w-1.5 h-3.5 rounded-sm ${i < fingers ? 'bg-duo-rose shadow-sm shadow-duo-rose/50' : 'bg-gray-700/60'} transition-all inline-block"></span>
                       `).join('')}
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export function renderNeverHaveIEverGame() {
         <div class="w-full max-w-md bg-surface border border-border rounded-3xl p-6 shadow-2xl relative">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
-              <span class="text-2xl">✍️</span>
+              <span class="material-symbols-outlined text-amber-gold text-[22px]">edit_note</span>
               <h3 class="font-display text-lg font-bold text-white">Create Custom Prompt</h3>
             </div>
             <button id="btn-close-nhie-modal" class="text-gray-400 hover:text-white p-1">

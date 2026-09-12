@@ -137,7 +137,7 @@ export function bindVaultUploadEvents() {
       el.innerHTML = `
         ${src ? `<img src="${src}" class="w-full h-full object-cover filter blur-[2px] group-hover:blur-none transition-all duration-300" />` : `<div class="w-full h-full flex flex-col items-center justify-center bg-surface-bright"><span class="material-symbols-outlined text-[24px] text-gray-500 mb-2">description</span><span class="text-[10px] text-gray-400 px-2 truncate w-full text-center">${file.name}</span></div>`}
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3">
-          <span class="text-[10px] font-bold text-amber-gold">Parsed ✅</span>
+          <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-mint-green">check_circle</span><span class="retro-pixel-badge text-[8px] text-mint-green">Parsed</span></span>
         </div>
       `;
       galleryTrack.prepend(el);

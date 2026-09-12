@@ -110,9 +110,9 @@ export function renderHero() {
                 “If anyone orders another Hawaiian pizza tonight I am literally revoking my Netflix password for all 5 of you.”
               </p>
               <div class="mt-3 flex items-center gap-2 text-[11px] text-amber-gold/90 font-medium">
-                <span>🔥 8 reactions</span>
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-sunset-coral">local_fire_department</span><span class="retro-led-coral text-[11px]">8 reactions</span></span>
                 <span>•</span>
-                <span>Context: Austin Airbnb trip</span>
+                <span class="font-mono text-gray-400">Context: Austin Airbnb trip</span>
               </div>
             </div>
 
@@ -191,7 +191,7 @@ export function renderHero() {
 
             <!-- Floating Interactive Badge -->
             <div class="mt-4 sm:mt-0 sm:absolute sm:-bottom-5 sm:-right-4 bg-gradient-to-r from-surface to-surface-bright border border-amber-gold/50 rounded-2xl px-4 py-2.5 shadow-glow-amber flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-105 transition-transform" id="hero-yearbook-badge">
-              <span class="text-xl shrink-0">📖</span>
+              <span class="material-symbols-outlined text-xl text-amber-gold shrink-0">auto_stories</span>
               <div class="flex flex-col text-left min-w-0">
                 <span class="text-xs font-bold text-white tracking-tight truncate">Saved to Pod 2026 Yearbook</span>
                 <span class="text-[10px] text-amber-gold font-medium truncate">Auto-compiled into Hardcover Print</span>
@@ -220,10 +220,10 @@ export function renderHero() {
           <div class="group relative bg-surface rounded-3xl border border-border hover:border-duo-rose/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-rose/20 cursor-pointer" id="card-mode-us">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-duo-rose/15 border border-duo-rose/40 flex items-center justify-center text-2xl">
-                  💑
+                <div class="w-12 h-12 rounded-2xl bg-duo-rose/15 border border-duo-rose/40 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl text-duo-rose">favorite</span>
                 </div>
-                <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-duo-rose/15 text-duo-rose border border-duo-rose/30">
+                <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-duo-rose/15 text-duo-rose border border-duo-rose/30">
                   Us Mode
                 </span>
               </div>
@@ -241,23 +241,23 @@ export function renderHero() {
               <!-- Mini Visual Feature Preview -->
               <div class="p-3 rounded-2xl bg-canvas border border-border space-y-2">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
-                  <span>Featured Mode</span>
-                  <span class="text-duo-rose font-bold">2-Player Sync</span>
+                  <span class="retro-pixel-badge text-[9px]">Featured Mode</span>
+                  <span class="retro-led-rose text-[10px]">2-Player Sync</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-center text-xs">
                   <div class="p-2 rounded-xl bg-surface border border-border">
-                    <div class="text-[9px] text-gray-400">2021 First Date</div>
-                    <div class="font-bold text-white mt-0.5 text-[11px]">Luna Cafe ☕</div>
+                    <div class="text-[9px] text-gray-400 font-mono">2021 First Date</div>
+                    <div class="font-bold text-white mt-0.5 text-[11px] flex items-center justify-center gap-1"><span>Luna Cafe</span><span class="material-symbols-outlined text-[13px] text-amber-gold">local_cafe</span></div>
                   </div>
                   <div class="p-2 rounded-xl bg-surface border border-border">
-                    <div class="text-[9px] text-gray-400">2024 Anniversary</div>
-                    <div class="font-bold text-duo-rose mt-0.5 text-[11px]">Dolomite Peaks 🏔️</div>
+                    <div class="text-[9px] text-gray-400 font-mono">2024 Anniversary</div>
+                    <div class="font-bold text-duo-rose mt-0.5 text-[11px] flex items-center justify-center gap-1"><span>Dolomite Peaks</span><span class="material-symbols-outlined text-[13px] text-duo-rose">landscape</span></div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-duo-rose">
-              <span>Explore Couples Vault</span>
+              <span class="retro-pixel-badge text-[10px]">Explore Couples Vault</span>
               <span>→</span>
             </div>
           </div>
@@ -266,14 +266,14 @@ export function renderHero() {
           <div class="group relative bg-surface rounded-3xl border-2 border-sunset-coral/50 shadow-glow-coral/20 transition-all duration-300 p-6 flex flex-col justify-between cursor-pointer" id="card-mode-pods">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-sunset-coral/15 border border-sunset-coral/40 flex items-center justify-center text-2xl">
-                  👥
+                <div class="w-12 h-12 rounded-2xl bg-sunset-coral/15 border border-sunset-coral/40 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl text-sunset-coral">groups</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40">
+                  <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40">
                     Pod Mode
                   </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-gold text-canvas">POPULAR</span>
+                  <span class="retro-pixel-badge text-[9px] px-2 py-0.5 rounded bg-amber-gold text-canvas">POPULAR</span>
                 </div>
               </div>
               <div>
@@ -290,21 +290,21 @@ export function renderHero() {
               <!-- Mini Visual Feature Preview -->
               <div class="p-3 rounded-2xl bg-canvas border border-border space-y-2">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
-                  <span>Active Mini-Game</span>
-                  <span class="text-sunset-coral">3–16 Players</span>
+                  <span class="retro-pixel-badge text-[9px]">Active Mini-Game</span>
+                  <span class="retro-led-coral text-[10px]">3–16 Players</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs">
-                  <span class="font-medium text-gray-200 text-[11px]">🎙️ Audio Mystery Round</span>
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-sunset-coral">mic</span><span class="font-medium text-gray-200 text-[11px]">Audio Mystery Round</span></div>
                   <span class="px-1.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[9px] font-mono">0:04 Clip</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs">
-                  <span class="font-medium text-gray-200 text-[11px]">🏆 Roast Champion</span>
-                  <span class="text-amber-gold font-bold text-[11px]">Liam (+450)</span>
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-amber-gold">emoji_events</span><span class="font-medium text-gray-200 text-[11px]">Roast Champion</span></div>
+                  <span class="retro-led-amber font-bold text-[11px]">Liam (+450)</span>
                 </div>
               </div>
             </div>
             <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-sunset-coral">
-              <span>Launch Squad Room</span>
+              <span class="retro-pixel-badge text-[10px]">Launch Squad Room</span>
               <span>→</span>
             </div>
           </div>
@@ -313,10 +313,10 @@ export function renderHero() {
           <div class="group relative bg-surface rounded-3xl border border-border hover:border-amber-gold/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-amber/20 cursor-pointer" id="card-mode-solo">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/40 flex items-center justify-center text-2xl">
-                  👤
+                <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/40 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl text-amber-gold">person</span>
                 </div>
-                <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-gold/15 text-amber-gold border border-amber-gold/30">
+                <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-amber-gold/15 text-amber-gold border border-amber-gold/30">
                   Time Capsule
                 </span>
               </div>
@@ -334,11 +334,11 @@ export function renderHero() {
               <!-- Mini Visual Feature Preview -->
               <div class="p-3 rounded-2xl bg-canvas border border-border space-y-2">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
-                  <span>Vault Status</span>
-                  <span class="text-amber-gold font-mono text-[10px]">🔒 Encrypted</span>
+                  <span class="retro-pixel-badge text-[9px]">Vault Status</span>
+                  <span class="flex items-center gap-1 text-amber-gold font-mono text-[10px]"><span class="material-symbols-outlined text-[12px]">lock</span><span class="retro-pixel-badge text-[9px]">ENCRYPTED</span></span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface border border-border text-xs space-y-1">
-                  <div class="flex justify-between text-gray-400 text-[9px]">
+                  <div class="flex justify-between text-gray-400 text-[9px] font-mono">
                     <span>Sealed Letter #04</span>
                     <span>Opens Dec 31, 2028</span>
                   </div>
@@ -347,7 +347,7 @@ export function renderHero() {
               </div>
             </div>
             <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-amber-gold">
-              <span>Seal First Capsule</span>
+              <span class="retro-pixel-badge text-[10px]">Seal First Capsule</span>
               <span>→</span>
             </div>
           </div>
@@ -356,10 +356,10 @@ export function renderHero() {
           <div class="group relative bg-surface rounded-3xl border border-border hover:border-mint-green/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-mint/20 cursor-pointer" id="card-mode-glade">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-mint-green/15 border border-mint-green/40 flex items-center justify-center text-2xl">
-                  🏕️
+                <div class="w-12 h-12 rounded-2xl bg-mint-green/15 border border-mint-green/40 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl text-mint-green">cabin</span>
                 </div>
-                <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-mint-green/15 text-mint-green border border-mint-green/30">
+                <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-mint-green/15 text-mint-green border border-mint-green/30">
                   Pixel Arcade
                 </span>
               </div>
@@ -377,17 +377,17 @@ export function renderHero() {
               <!-- Mini Visual Feature Preview -->
               <div class="p-3 rounded-2xl bg-canvas border border-border space-y-2">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
-                  <span>Retro Activities</span>
-                  <span class="text-mint-green font-mono text-[10px]">Chiptune Live</span>
+                  <span class="retro-pixel-badge text-[9px]">Retro Activities</span>
+                  <span class="retro-led-mint text-[10px]">Chiptune Live</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface border border-border text-xs flex items-center justify-between">
-                  <span class="text-white text-[11px]">🎨 32x32 Graffiti</span>
-                  <span class="text-mint-green text-[10px] font-bold">1-Click Print</span>
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-mint-green">palette</span><span class="text-white text-[11px] font-arcade">32×32 Graffiti</span></div>
+                  <span class="retro-pixel-badge text-mint-green text-[9px]">1-Click Print</span>
                 </div>
               </div>
             </div>
             <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-mint-green">
-              <span>Enter Pixel Glade</span>
+              <span class="retro-pixel-badge text-[10px]">Enter Pixel Glade</span>
               <span>→</span>
             </div>
           </div>
@@ -403,8 +403,9 @@ export function renderHero() {
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
             <!-- Left Column: Copy & Details (Matching Image 1) -->
             <div class="lg:col-span-5 space-y-6">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-gold/10 border border-amber-gold/30 text-amber-gold text-xs font-bold uppercase tracking-wider">
-                <span>📖 PHYSICAL KEEPSAKE</span>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-gold/10 border border-amber-gold/30 text-amber-gold text-xs font-bold">
+                <span class="material-symbols-outlined text-[14px]">auto_stories</span>
+                <span class="retro-pixel-badge text-[10px]">PHYSICAL KEEPSAKE</span>
               </div>
               <h2 class="font-display text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
                 Turn game night into a physical keepsake.
@@ -492,10 +493,10 @@ export function renderHero() {
                     <div class="bg-[#161928] rounded-2xl p-4 border border-[#262B40] flex flex-col justify-between shadow-inner min-h-[220px]">
                       <div>
                         <div class="text-xs font-bold text-white mb-2 font-mono uppercase">POD AWARDS 2025</div>
-                        <div class="space-y-2 text-[11px] text-gray-400">
-                          <div class="flex justify-between py-0.5 border-b border-white/5"><span>👑 Lore Master</span><span class="text-white font-bold">Harshal</span></div>
-                          <div class="flex justify-between py-0.5 border-b border-white/5"><span>🍕 Hawaiian Pizza Ally</span><span class="text-white font-bold">Marcus</span></div>
-                          <div class="flex justify-between py-0.5 border-b border-white/5"><span>💤 First Asleep on Couch</span><span class="text-white font-bold">Sam</span></div>
+                        <div class="space-y-2 text-[11px] text-gray-400 font-mono">
+                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-amber-gold">hotel_class</span><span>Lore Master</span></span><span class="text-white font-bold">Harshal</span></div>
+                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-sunset-coral">local_pizza</span><span>Hawaiian Pizza Ally</span></span><span class="text-white font-bold">Marcus</span></div>
+                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-duo-rose">bedtime</span><span>First Asleep on Couch</span></span><span class="text-white font-bold">Sam</span></div>
                         </div>
                       </div>
                       <div class="w-full py-2 rounded-xl bg-amber-gold/20 text-amber-gold text-[10px] font-bold text-center border border-amber-gold/30 hover:bg-amber-gold/30 transition-colors uppercase tracking-wider font-mono mt-2">
@@ -651,7 +652,7 @@ export function bindHeroEvents() {
         audio.playCorrect();
         confettiInstance.burst(50);
         btn.classList.add('border-mint-green', 'bg-mint-green/20');
-        demoFeedback.innerHTML = `<span class="text-mint-green">✨ EXACT MATCH! Liam sent this during the Austin Airbnb trip. (+140 Pod XP)</span>`;
+        demoFeedback.innerHTML = `<span class="text-mint-green inline-flex items-center gap-1 font-mono"><span class="material-symbols-outlined text-xs">auto_awesome</span><span>EXACT MATCH! Liam sent this during the Austin Airbnb trip. (+140 Pod XP)</span></span>`;
       } else {
         audio.playTick();
         btn.classList.add('border-sunset-coral', 'bg-sunset-coral/20');
@@ -659,7 +660,7 @@ export function bindHeroEvents() {
         if (correctBtn) {
           correctBtn.classList.add('border-mint-green', 'bg-mint-green/20');
         }
-        demoFeedback.innerHTML = `<span class="text-amber-gold">Nice guess! It was actually Liam. Voted & Archived to 2026 Yearbook 📖</span>`;
+        demoFeedback.innerHTML = `<span class="text-amber-gold font-mono">Nice guess! It was actually Liam. Voted & Archived to 2026 Yearbook</span>`;
       }
     });
   }

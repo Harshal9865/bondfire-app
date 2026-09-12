@@ -60,7 +60,7 @@ export function renderShowsScreen() {
       <div class="mb-6 p-4 rounded-2xl bg-surface-bright border border-border/80 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-amber-gold/20 text-amber-gold flex items-center justify-center font-bold text-lg">
-            🎙️
+            <span class="material-symbols-outlined text-amber-gold text-xl">mic</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
@@ -80,13 +80,14 @@ export function renderShowsScreen() {
       <div class="flex items-center justify-between gap-2 border-b border-border/70 pb-3 mb-6 flex-wrap">
         <div class="flex items-center gap-2">
           ${[
-            { id: 'ALL', label: 'All Interactive Cards' },
-            { id: 'REEL_COURT', label: '⚖️ Reel Courtroom' },
-            { id: 'LYRICS', label: '🎵 Antakshari Lyrics' },
-            { id: 'ENDINGS', label: '🎬 Guess the Ending' }
+            { id: 'ALL', label: 'All Interactive Cards', icon: 'grid_view' },
+            { id: 'REEL_COURT', label: 'Reel Courtroom', icon: 'gavel' },
+            { id: 'LYRICS', label: 'Antakshari Lyrics', icon: 'music_note' },
+            { id: 'ENDINGS', label: 'Guess the Ending', icon: 'movie' }
           ].map((tab) => `
-            <button class="btn-shows-filter px-4 py-2 rounded-full text-xs font-bold transition-all ${activeFilter === tab.id ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral shadow-sm' : 'text-gray-400 hover:text-white bg-surface-bright border border-border'}" data-filter="${tab.id}">
-              ${tab.label}
+            <button class="btn-shows-filter flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all ${activeFilter === tab.id ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral shadow-sm' : 'text-gray-400 hover:text-white bg-surface-bright border border-border'}" data-filter="${tab.id}">
+              <span class="material-symbols-outlined text-sm">${tab.icon}</span>
+              <span>${tab.label}</span>
             </button>
           `).join('')}
         </div>

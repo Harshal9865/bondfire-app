@@ -127,13 +127,13 @@ export function renderMostLikelyToGame() {
 
                 <div class="relative z-10 flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-surface border ${isLeader ? 'border-amber-gold' : 'border-border'} flex items-center justify-center text-xl shrink-0">
-                      ${p.avatar || '😎'}
+                    <div class="w-11 h-11 rounded-full bg-surface border ${isLeader ? 'border-amber-gold' : 'border-border'} flex items-center justify-center shrink-0">
+                      ${p.avatar && !p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-lg">person</span>'}
                     </div>
                     <div>
                       <div class="flex items-center gap-1.5">
                         <span class="text-sm font-bold text-white group-hover:text-amber-gold transition-colors">${p.name}</span>
-                        ${isLeader ? '<span class="text-base" title="Squad Consensus">👑</span>' : ''}
+                        ${isLeader ? '<span class="material-symbols-outlined text-amber-gold text-base" title="Squad Consensus">hotel_class</span>' : ''}
                       </div>
                       <span class="text-[11px] text-gray-400">${revealed ? `${percentage}% consensus` : 'Tap to cast vote'}</span>
                     </div>
@@ -141,7 +141,7 @@ export function renderMostLikelyToGame() {
 
                   <div class="flex flex-col items-end">
                     <span class="font-mono text-lg font-black ${isLeader ? 'text-amber-gold' : 'text-white'}">
-                      ${revealed ? `${count}` : '🗳️'}
+                      ${revealed ? `${count}` : '<span class="material-symbols-outlined text-sm text-gray-400">how_to_vote</span>'}
                     </span>
                     <span class="text-[10px] text-gray-400 font-mono">${revealed ? 'votes' : 'vote'}</span>
                   </div>
@@ -157,7 +157,7 @@ export function renderMostLikelyToGame() {
         <div class="w-full max-w-md bg-surface border border-border rounded-3xl p-6 shadow-2xl relative">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
-              <span class="text-2xl">🗳️</span>
+              <span class="material-symbols-outlined text-2xl text-coral-red">how_to_vote</span>
               <h3 class="font-display text-lg font-bold text-white">Create Custom Ballot</h3>
             </div>
             <button id="btn-close-mlt-modal" class="text-gray-400 hover:text-white p-1">

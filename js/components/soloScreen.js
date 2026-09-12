@@ -35,8 +35,8 @@ export function renderSoloScreen() {
           </div>
         </div>
         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-bold shrink-0">
-          <span>🔥</span>
-          <span>12-DAY STREAK</span>
+          <span class="material-symbols-outlined text-[16px] text-amber-gold">local_fire_department</span>
+          <span class="retro-pixel-badge text-[10px]">12-DAY STREAK</span>
         </div>
       </div>
 
@@ -61,7 +61,7 @@ export function renderSoloScreen() {
       <!-- "On This Day" Resurfaced Memory Tile -->
       <div class="p-5 rounded-2xl bg-surface-container border border-border/80 shadow-xl flex flex-col gap-4">
         <div class="flex items-center justify-between">
-          <span class="px-2.5 py-1 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 font-caption text-[11px] font-bold">🗓️ 3 YEARS AGO TODAY (SEPTEMBER 2023)</span>
+          <span class="px-2.5 py-1 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 font-caption text-[11px] font-bold flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">event</span><span class="retro-pixel-badge text-[9.5px]">3 YEARS AGO TODAY (SEPTEMBER 2023)</span></span>
           <span class="text-xs text-gray-400 font-mono">Private to You</span>
         </div>
 
@@ -129,7 +129,7 @@ export function renderSoloScreen() {
         <div id="sealed-capsules-list" class="flex flex-col gap-2.5">
           <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-border/70 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
-              <span class="text-2xl shrink-0">🔒</span>
+              <span class="material-symbols-outlined text-amber-gold text-[22px] shrink-0">lock</span>
               <div class="min-w-0">
                 <div class="font-bold text-xs sm:text-sm text-white truncate">Capsule #4 · 30th Birthday Letter</div>
                 <div class="text-xs text-amber-gold font-mono truncate">Unlocks on Dec 31, 2026 (112 days remaining)</div>
@@ -145,10 +145,10 @@ export function renderSoloScreen() {
         <div class="relative w-full max-w-lg bg-surface-container-low border border-amber-gold/40 rounded-3xl p-6 shadow-2xl text-on-surface flex flex-col gap-4">
           <div class="flex justify-between items-center pb-3 border-b border-border/80">
             <div class="flex items-center gap-2">
-              <span class="text-2xl">🔒</span>
+              <span class="material-symbols-outlined text-amber-gold text-[22px]">lock</span>
               <h3 class="font-headline-sm text-base text-amber-gold font-bold">Seal a Letter to Future Self</h3>
             </div>
-            <button class="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-gray-400 hover:text-white" id="btn-close-letter-modal">✕</button>
+            <button class="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-gray-400 hover:text-white" id="btn-close-letter-modal"><span class="material-symbols-outlined text-[16px]">close</span></button>
           </div>
 
           <div>
@@ -172,8 +172,8 @@ export function renderSoloScreen() {
           </div>
 
           <button class="w-full py-3 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral hover:brightness-110 text-canvas font-bold text-xs shadow transition-transform active:scale-95 flex items-center justify-center gap-2" id="btn-confirm-seal-letter" type="button">
-            <span>🔒</span>
-            <span>Digitally Seal With Wax Stamp</span>
+            <span class="material-symbols-outlined text-[16px]">lock</span>
+            <span class="retro-pixel-badge text-[10px]">Digitally Seal With Wax Stamp</span>
           </button>
         </div>
       </div>
@@ -200,7 +200,7 @@ export function bindSoloEvents() {
     saveReflectionBtn.addEventListener('click', () => {
       const text = reflectionInput.value.trim();
       if (!text) {
-        showToast('Please write a short reflection before saving ✨', 'amber');
+        showToast('Please write a short reflection before saving', 'amber');
         return;
       }
 
@@ -223,7 +223,7 @@ export function bindSoloEvents() {
       const currentMemories = store.getState().vaultMemories || [];
       store.setState({ vaultMemories: [newMemory, ...currentMemories] });
 
-      showToast('✨ Daily reflection sealed into Vault (+15 Sparks)!', 'mint');
+      showToast('Daily reflection sealed into Vault (+15 Sparks)!', 'mint');
       reflectionInput.value = '';
     });
   }
@@ -290,7 +290,7 @@ export function bindSoloEvents() {
       const title = titleInput?.value.trim() || 'Sealed Note to Self';
       const content = contentInput?.value.trim();
       if (!content) {
-        showToast('Please write your letter before sealing 🔒', 'amber');
+        showToast('Please write your letter before sealing', 'amber');
         return;
       }
       audio.playCorrect();
@@ -301,17 +301,17 @@ export function bindSoloEvents() {
       capsuleEl.className = 'p-3.5 rounded-xl bg-surface-container-lowest border border-amber-gold/50 flex items-center justify-between gap-3 animate-fade-in';
       capsuleEl.innerHTML = `
         <div class="flex items-center gap-3 min-w-0">
-          <span class="text-2xl shrink-0">🔒</span>
+          <span class="material-symbols-outlined text-amber-gold text-[22px] shrink-0">lock</span>
           <div class="min-w-0">
             <div class="font-bold text-xs sm:text-sm text-white truncate">${title}</div>
             <div class="text-xs text-amber-gold font-mono truncate">Unlocks in 1 Year · Sealed with Wax Stamp</div>
           </div>
         </div>
-        <span class="px-2.5 py-1 rounded-full bg-mint-green/20 text-mint-green border border-mint-green/30 text-[10px] font-bold uppercase font-mono shrink-0">Just Sealed ✓</span>
+        <span class="retro-pixel-badge px-2.5 py-1 rounded-full bg-mint-green/20 text-mint-green border border-mint-green/30 text-[9px] shrink-0 inline-flex items-center gap-1"><span class="material-symbols-outlined text-xs">verified</span><span>Just Sealed</span></span>
       `;
       listContainer.prepend(capsuleEl);
 
-      showToast('Wax stamp applied! Letter sealed for 1 year (+25 Sparks) 🔒', 'mint');
+      showToast('Wax stamp applied! Letter sealed for 1 year (+25 Sparks)', 'mint');
       modal.style.display = 'none';
       if (titleInput) titleInput.value = '';
       if (contentInput) contentInput.value = '';

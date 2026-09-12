@@ -203,7 +203,7 @@ function renderCampersRoster(friends) {
               <!-- Sparks Gifting Action -->
               <button class="btn-gift-sparks px-2.5 py-1 rounded-full bg-surface-bright hover:bg-amber-gold hover:text-canvas text-amber-gold text-[11px] font-bold transition-all active:scale-95 flex items-center gap-1 shrink-0 ${friend.giftedToday ? 'opacity-50 pointer-events-none' : ''}" data-id="${friend.id}" data-name="${friend.name}" type="button" title="Gift 20 Sparks">
                 <span class="material-symbols-outlined text-[13px]">volunteer_activism</span>
-                <span>${friend.giftedToday ? 'Gifted ✓' : '+20 Sparks'}</span>
+                <span>${friend.giftedToday ? 'Gifted' : '+20 Sparks'}</span>
               </button>
             </div>
 
@@ -356,8 +356,8 @@ function renderDiscoverTab(requests, citizenId, userHandle) {
                     <span class="material-symbols-outlined text-[14px]">check</span>
                     <span>Accept</span>
                   </button>
-                  <button class="btn-decline-request px-3 py-1.5 rounded-full bg-surface-bright text-gray-400 hover:text-white text-xs font-semibold transition-colors" data-id="${req.id}">
-                    ✕
+                  <button class="btn-decline-request px-3 py-1.5 rounded-full bg-surface-bright text-gray-400 hover:text-white text-xs font-semibold transition-colors flex items-center justify-center" data-id="${req.id}">
+                    <span class="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
               </div>
@@ -471,13 +471,13 @@ export function bindFriendsEvents() {
       const friendId = btn.dataset.id;
       const friendName = btn.dataset.name;
       store.sendSparkGift(friendId);
-      btn.innerHTML = '<span>Gifted ✓</span>';
+      btn.innerHTML = '<span>Gifted</span>';
       btn.classList.add('opacity-50', 'pointer-events-none');
 
       // Toast feedback
       const toastMount = document.getElementById('toast-mount');
       if (toastMount) {
-        toastMount.innerHTML = `<div class="toast toast-mint show"><span>✨ +20 Sparks sent to ${friendName}! You gained +5 Karma Sparks!</span></div>`;
+        toastMount.innerHTML = `<div class="toast toast-mint show"><span class="material-symbols-outlined text-sm text-mint-green mr-1 align-middle">auto_awesome</span><span>+20 Sparks sent to ${friendName}! You gained +5 Karma Sparks!</span></div>`;
         setTimeout(() => (toastMount.innerHTML = ''), 3000);
       }
     });
@@ -503,7 +503,7 @@ export function bindFriendsEvents() {
       const currentCode = store.getState().activeRoom?.roomCode || generateRoomCode();
       const toastMount = document.getElementById('toast-mount');
       if (toastMount) {
-        toastMount.innerHTML = `<div class="toast toast-amber show"><span>🎟️ Room #${currentCode} invite dispatched to ${friendName}!</span></div>`;
+        toastMount.innerHTML = `<div class="toast toast-amber show"><span class="material-symbols-outlined text-sm text-amber-gold mr-1 align-middle">confirmation_number</span><span>Room #${currentCode} invite dispatched to ${friendName}!</span></div>`;
         setTimeout(() => (toastMount.innerHTML = ''), 3000);
       }
     });
@@ -517,7 +517,7 @@ export function bindFriendsEvents() {
       const friendName = btn.dataset.name;
       const toastMount = document.getElementById('toast-mount');
       if (toastMount) {
-        toastMount.innerHTML = `<div class="toast toast-coral show"><span>⚡ 1v1 Memory Duel request fired to ${friendName}!</span></div>`;
+        toastMount.innerHTML = `<div class="toast toast-coral show"><span class="material-symbols-outlined text-sm text-sunset-coral mr-1 align-middle">bolt</span><span>1v1 Memory Duel request fired to ${friendName}!</span></div>`;
         setTimeout(() => (toastMount.innerHTML = ''), 3000);
       }
     });
@@ -546,7 +546,7 @@ export function bindFriendsEvents() {
         activeRoom: {
           ...currentRoom,
           roomCode: code,
-          podName: `${squadName} 🔥`,
+          podName: squadName,
         },
       });
       store.setView('LOBBY');
@@ -594,7 +594,7 @@ export function bindFriendsEvents() {
         role: 'Camper',
         lastActive: 'Just now',
       });
-      btn.textContent = 'Added ✓';
+      btn.textContent = 'Added';
       btn.classList.add('opacity-60', 'pointer-events-none');
     });
   });
@@ -612,7 +612,7 @@ export function bindFriendsEvents() {
         searchInput.value = '';
         const toastMount = document.getElementById('toast-mount');
         if (toastMount) {
-          toastMount.innerHTML = `<div class="toast toast-mint show"><span>📬 Friend Request dispatched to ${query}!</span></div>`;
+          toastMount.innerHTML = `<div class="toast toast-mint show"><span class="material-symbols-outlined text-sm text-mint-green mr-1 align-middle">mark_email_read</span><span>Friend Request dispatched to ${query}!</span></div>`;
           setTimeout(() => (toastMount.innerHTML = ''), 3000);
         }
       }
@@ -640,7 +640,7 @@ export function bindFriendsEvents() {
         audio.playCorrect();
         store.createSquad({
           name: squadName.trim(),
-          emoji: '⚡',
+          icon: 'bolt',
           deckName: 'Custom Inside Joke Deck',
         });
         store.setView('FRIENDS');

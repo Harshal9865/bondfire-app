@@ -316,24 +316,24 @@ export function renderHeader() {
           </div>
           <div class="grid grid-cols-5 gap-1.5">
             <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="buzzer" title="Wrong Buzzer">
-              <span class="text-base">🚨</span>
-              <span class="text-[9px] text-gray-300 font-bold">Buzzer</span>
+              <span class="material-symbols-outlined text-coral-red text-base">notifications_active</span>
+              <span class="text-[9px] text-gray-300 font-bold font-mono">Buzzer</span>
             </button>
             <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="airhorn" title="Airhorn">
-              <span class="text-base">🎺</span>
-              <span class="text-[9px] text-gray-300 font-bold">Airhorn</span>
+              <span class="material-symbols-outlined text-amber-gold text-base">campaign</span>
+              <span class="text-[9px] text-gray-300 font-bold font-mono">Airhorn</span>
             </button>
             <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="rimshot" title="Rimshot">
-              <span class="text-base">🥁</span>
-              <span class="text-[9px] text-gray-300 font-bold">Rimshot</span>
+              <span class="material-symbols-outlined text-mint-green text-base">music_note</span>
+              <span class="text-[9px] text-gray-300 font-bold font-mono">Rimshot</span>
             </button>
             <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="cheer" title="Crowd Cheer">
-              <span class="text-base">👏</span>
-              <span class="text-[9px] text-gray-300 font-bold">Cheer</span>
+              <span class="material-symbols-outlined text-rose-glow text-base">celebration</span>
+              <span class="text-[9px] text-gray-300 font-bold font-mono">Cheer</span>
             </button>
             <button class="btn-sheet-fx py-2 px-1 rounded-xl bg-surface border border-border/80 hover:bg-surface-bright text-center text-xs flex flex-col items-center gap-0.5 active:scale-90 transition-all" data-sound="crickets" title="Awkward Silence">
-              <span class="text-base">🦗</span>
-              <span class="text-[9px] text-gray-300 font-bold">Silence</span>
+              <span class="material-symbols-outlined text-gray-400 text-base">volume_off</span>
+              <span class="text-[9px] text-gray-300 font-bold font-mono">Silence</span>
             </button>
           </div>
         </div>

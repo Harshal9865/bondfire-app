@@ -44,8 +44,9 @@ export function renderProfileScreen() {
           </div>
           <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-white flex items-center gap-3">
             <span>Citizen Passport</span>
-            <span class="text-xs uppercase px-2.5 py-1 rounded-full ${tier === 'PRO' || tier === 'LIFETIME' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 shadow-glow-coral' : 'bg-surface border border-border text-gray-400'} font-bold">
-              ${tier === 'PRO' ? '⭐ Pod Pro Active' : (tier === 'LIFETIME' ? '👑 Lifetime VIP' : 'Free Spark')}
+            <span class="retro-pixel-badge text-[9px] px-2.5 py-1 rounded-full ${tier === 'PRO' || tier === 'LIFETIME' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 shadow-glow-coral' : 'bg-surface border border-border text-gray-400'} font-bold inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs text-amber-gold">${tier === 'PRO' ? 'hotel_class' : (tier === 'LIFETIME' ? 'workspace_premium' : 'bolt')}</span>
+              <span>${tier === 'PRO' ? 'Pod Pro Active' : (tier === 'LIFETIME' ? 'Lifetime VIP' : 'Free Spark')}</span>
             </span>
           </h1>
         </div>
@@ -140,10 +141,10 @@ export function renderProfileScreen() {
           <div class="bg-surface rounded-3xl border border-border/80 p-6 shadow-xl flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/30 flex items-center justify-center text-amber-gold text-2xl">
-                ✨
+                <span class="material-symbols-outlined text-amber-gold text-2xl">auto_awesome</span>
               </div>
               <div>
-                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Sparks Vault</span>
+                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block font-arcade">Sparks Vault</span>
                 <span class="font-room-code text-2xl font-bold text-white">${sparks.toLocaleString()}</span>
                 <span class="text-xs text-gray-400 ml-1">Sparks</span>
               </div>
@@ -268,7 +269,7 @@ export function renderProfileScreen() {
                 <div class="p-3.5 rounded-2xl bg-canvas border border-border/70 flex items-center justify-between hover:border-sunset-coral/50 transition-colors">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-surface-bright flex items-center justify-center text-lg">
-                      👥
+                      <span class="material-symbols-outlined text-sunset-coral text-xl">groups</span>
                     </div>
                     <div class="flex flex-col">
                       <span class="text-sm font-bold text-white">${pod.name}</span>
@@ -376,7 +377,7 @@ export function bindProfileEvents() {
       btn.classList.add('border-amber-gold', 'shadow-glow-amber', 'scale-105');
 
       store.updateUserProfile({ avatarUrl: url });
-      triggerToast('Avatar updated! Synced across all your pods ✨');
+      triggerToast('Avatar updated! Synced across all your pods');
     });
   });
 

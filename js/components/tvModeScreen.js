@@ -72,7 +72,7 @@ export function renderTvModeScreen() {
       <main class="flex-1 flex flex-col items-center justify-center my-6 max-w-5xl mx-auto w-full z-10 text-center">
         <!-- Question Badge -->
         <div class="mb-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sunset-coral/15 border border-sunset-coral/40 text-sunset-coral font-bold text-xs uppercase tracking-widest">
-          <span>✨ WHO SAID THIS IN THE GROUP CHAT?</span>
+          <span class="retro-pixel-badge flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">psychology</span> WHO SAID THIS IN THE GROUP CHAT?</span>
         </div>
 
         <!-- Giant Dialogue Display Card -->
@@ -87,7 +87,7 @@ export function renderTvModeScreen() {
           </blockquote>
 
           <div class="mt-6 flex items-center justify-center gap-4 text-xs font-mono text-amber-gold/90">
-            <span class="flex items-center gap-1"><span>🔥</span> 8 Reactions</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-coral-red text-sm">local_fire_department</span> 8 Reactions</span>
             <span>•</span>
             <span class="text-mint-green font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span> Buzzers Active</span>
           </div>
@@ -130,20 +130,20 @@ export function renderTvModeScreen() {
         <!-- TV Live Soundboard Trigger -->
         <div class="flex items-center gap-2">
           <button class="tv-sfx-btn px-3 py-2 rounded-xl bg-surface-bright hover:bg-surface-raised text-red-400 font-bold text-xs flex items-center gap-1.5 transition-transform active:scale-95 border border-red-500/20" data-sfx="wrong">
-            <span>🚨</span>
-            <span>Buzzer</span>
+            <span class="material-symbols-outlined text-sm">notifications_active</span>
+            <span class="font-mono">Buzzer</span>
           </button>
           <button class="tv-sfx-btn px-3 py-2 rounded-xl bg-surface-bright hover:bg-surface-raised text-amber-gold font-bold text-xs flex items-center gap-1.5 transition-transform active:scale-95 border border-amber-gold/20" data-sfx="airhorn">
-            <span>📯</span>
-            <span>Airhorn</span>
+            <span class="material-symbols-outlined text-sm">campaign</span>
+            <span class="font-mono">Airhorn</span>
           </button>
           <button class="tv-sfx-btn px-3 py-2 rounded-xl bg-surface-bright hover:bg-surface-raised text-mint-green font-bold text-xs flex items-center gap-1.5 transition-transform active:scale-95 border border-mint-green/20" data-sfx="rimshot">
-            <span>🥁</span>
-            <span>Rimshot</span>
+            <span class="material-symbols-outlined text-sm">music_note</span>
+            <span class="font-mono">Rimshot</span>
           </button>
           <button class="tv-sfx-btn px-3 py-2 rounded-xl bg-surface-bright hover:bg-surface-raised text-secondary font-bold text-xs flex items-center gap-1.5 transition-transform active:scale-95 border border-secondary/20" data-sfx="cheer">
-            <span>👏</span>
-            <span>Applause</span>
+            <span class="material-symbols-outlined text-sm">celebration</span>
+            <span class="font-mono">Applause</span>
           </button>
         </div>
 

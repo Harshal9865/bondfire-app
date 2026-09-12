@@ -8,7 +8,7 @@ export const WATCH_PLAY_CARDS = [
   {
     id: 'wp_reel_court_1',
     cardType: 'REEL_COURT',
-    badge: 'REEL COURTROOM ⚖️',
+    badge: 'REEL COURTROOM',
     title: 'Exhibit A: The "Bas Signal Pe Hoon" Text',
     creator: {
       name: 'Rohan Joshi & The Squad',
@@ -32,7 +32,7 @@ export const WATCH_PLAY_CARDS = [
   {
     id: 'wp_lyric_2',
     cardType: 'COMPLETE_THE_LYRIC',
-    badge: 'ANTAKSHARI 🎵',
+    badge: 'ANTAKSHARI',
     title: 'Late Night Road Trip Sing-Along: Ilahi',
     creator: {
       name: 'Campfire Music Jam',
@@ -56,7 +56,7 @@ export const WATCH_PLAY_CARDS = [
   {
     id: 'wp_ending_3',
     cardType: 'GUESS_THE_ENDING',
-    badge: 'GUESS THE ENDING 🎬',
+    badge: 'GUESS THE ENDING',
     title: 'The Viral Street Chai Fumble',
     creator: {
       name: 'Tapri Diaries',

@@ -21,7 +21,7 @@ export class CuteChaiGame {
       height: 32,
       vy: 0,
       isGrounded: true,
-      emoji: '🏃‍♂️'
+      sprite: 'runner'
     };
 
     this.obstacles = [];
@@ -119,12 +119,18 @@ export class CuteChaiGame {
     this.spawnCounter++;
     if (this.spawnCounter > 75) {
       this.spawnCounter = 0;
-      const obstacleTypes = ['🕳️', '🐕', '🛺', '👵'];
-      const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+      const obstacleTypes = [
+        { label: 'POTHOLE', color: '#FF5A5F', w: 22, h: 10 },
+        { label: 'BARRIER', color: '#FFB703', w: 14, h: 22 },
+        { label: 'CONE', color: '#F72585', w: 12, h: 18 }
+      ];
+      const ob = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
       this.obstacles.push({
         x: this.width + 20,
-        y: 135,
-        type,
+        y: 155 - ob.h,
+        w: ob.w,
+        h: ob.h,
+        color: ob.color,
         speed: 3.5
       });
     }
@@ -135,7 +141,11 @@ export class CuteChaiGame {
       ob.x -= ob.speed;
 
       // Hitbox check
-      if (Math.abs(ob.x - this.player.x) < 20 && this.player.y > 115) {
+      if (
+        this.player.x + 18 > ob.x &&
+        this.player.x < ob.x + ob.w &&
+        this.player.y + 24 > ob.y
+      ) {
         this.isGameOver = true;
         this.isRunning = false;
         audio.playWrongBuzzer();
@@ -145,75 +155,114 @@ export class CuteChaiGame {
 
       if (ob.x < -30) {
         this.obstacles.splice(i, 1);
-        this.score += 10;
+        this.score += 25;
       }
     }
   }
 
   draw() {
-    this.ctx.fillStyle = '#0B0E17';
+    this.ctx.fillStyle = '#070910';
     this.ctx.fillRect(0, 0, this.width, this.height);
 
-    // Ground line
-    this.ctx.strokeStyle = '#262B40';
+    // Grid lines for retro synthwave feel
+    this.ctx.strokeStyle = '#151A28';
+    this.ctx.lineWidth = 1;
+    for (let x = 0; x < this.width; x += 30) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, 155);
+      this.ctx.stroke();
+    }
+
+    // Neon Ground line
+    this.ctx.strokeStyle = '#FF5A5F';
     this.ctx.lineWidth = 2;
+    this.ctx.shadowColor = '#FF5A5F';
+    this.ctx.shadowBlur = 6;
     this.ctx.beginPath();
     this.ctx.moveTo(0, 155);
     this.ctx.lineTo(this.width, 155);
     this.ctx.stroke();
+    this.ctx.shadowBlur = 0;
 
-    // Draw Player (Carrying Chai tray)
-    this.ctx.font = '24px sans-serif';
-    this.ctx.fillText(this.player.emoji, this.player.x - 10, this.player.y + 20);
-    this.ctx.font = '16px sans-serif';
-    this.ctx.fillText('☕', this.player.x + 8, this.player.y + 4);
+    // Draw Player (Pixel Art Runner with Chai Cup)
+    const px = this.player.x;
+    const py = this.player.y;
 
-    // Draw Obstacles
+    // Head
+    this.ctx.fillStyle = '#FFD166';
+    this.ctx.fillRect(px + 4, py, 8, 8);
+    // Body / Hoodie
+    this.ctx.fillStyle = '#06D6A0';
+    this.ctx.fillRect(px + 2, py + 8, 12, 12);
+    // Legs
+    this.ctx.fillStyle = '#3B82F6';
+    const legOffset = this.isRunning ? (Math.floor(Date.now() / 100) % 2 ? 3 : -3) : 0;
+    this.ctx.fillRect(px + 3 + legOffset, py + 20, 4, 8);
+    this.ctx.fillRect(px + 9 - legOffset, py + 20, 4, 8);
+
+    // Chai Tray & Tea Cup (Retro Pixel vector)
+    this.ctx.fillStyle = '#FFB703';
+    this.ctx.fillRect(px + 12, py + 6, 8, 3); // tray
+    this.ctx.fillStyle = '#FFFFFF';
+    this.ctx.fillRect(px + 14, py + 1, 5, 5); // cup
+    this.ctx.fillStyle = '#FF5A5F';
+    this.ctx.fillRect(px + 15, py - 2, 3, 2); // steam
+
+    // Draw Obstacles (Retro Cyber Neon Hurdles)
     for (const ob of this.obstacles) {
-      this.ctx.font = '20px sans-serif';
-      this.ctx.fillText(ob.type, ob.x, ob.y + 15);
+      this.ctx.fillStyle = ob.color;
+      this.ctx.shadowColor = ob.color;
+      this.ctx.shadowBlur = 6;
+      this.ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+      this.ctx.shadowBlur = 0;
+
+      // Inner pixel stripe
+      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.fillRect(ob.x + 2, ob.y + 2, ob.w - 4, 2);
     }
 
-    // HUD: Timer & Score
-    this.ctx.fillStyle = '#FFAE33';
-    this.ctx.font = 'bold 12px monospace';
-    this.ctx.fillText(`⏱️ 00:${this.gameTimer.toString().padStart(2, '0')}s`, 15, 25);
-    this.ctx.fillStyle = '#4DE082';
-    this.ctx.fillText(`PTS: ${this.score}`, this.width - 70, 25);
+    // HUD: Timer & Score in Silkscreen Retro Font
+    this.ctx.fillStyle = '#FFB703';
+    this.ctx.font = "bold 10px 'Silkscreen', monospace";
+    this.ctx.fillText(`TIME: 00:${this.gameTimer.toString().padStart(2, '0')}S`, 15, 22);
+
+    this.ctx.fillStyle = '#06D6A0';
+    this.ctx.fillText(`SCORE: ${this.score}`, this.width - 95, 22);
 
     // Overlays
     if (!this.isRunning && !this.isGameOver && !this.hasWon) {
-      this.ctx.fillStyle = 'rgba(11, 14, 23, 0.75)';
+      this.ctx.fillStyle = 'rgba(7, 9, 16, 0.82)';
       this.ctx.fillRect(0, 0, this.width, this.height);
       this.ctx.fillStyle = '#FFFFFF';
-      this.ctx.font = 'bold 14px "Space Grotesk", sans-serif';
+      this.ctx.font = "bold 11px 'Silkscreen', monospace";
       this.ctx.textAlign = 'center';
-      this.ctx.fillText('☕ Tap or Press Space to Deliver Chai!', this.width / 2, this.height / 2 - 5);
-      this.ctx.font = '11px monospace';
-      this.ctx.fillStyle = '#FFAE33';
-      this.ctx.fillText('Dodge potholes & rickshaws for 15s', this.width / 2, this.height / 2 + 18);
+      this.ctx.fillText('CHAI SPRINT: PRESS SPACE TO JUMP', this.width / 2, this.height / 2 - 6);
+      this.ctx.font = "9px 'Silkscreen', monospace";
+      this.ctx.fillStyle = '#FFB703';
+      this.ctx.fillText('DELIVER TO TABLE BEFORE TIME EXPIRES', this.width / 2, this.height / 2 + 16);
       this.ctx.textAlign = 'left';
     } else if (this.isGameOver) {
-      this.ctx.fillStyle = 'rgba(11, 14, 23, 0.85)';
+      this.ctx.fillStyle = 'rgba(7, 9, 16, 0.88)';
       this.ctx.fillRect(0, 0, this.width, this.height);
       this.ctx.fillStyle = '#FF5A5F';
-      this.ctx.font = 'bold 16px "Space Grotesk", sans-serif';
+      this.ctx.font = "bold 13px 'Silkscreen', monospace";
       this.ctx.textAlign = 'center';
-      this.ctx.fillText('💥 CHAI SPILLED!', this.width / 2, this.height / 2 - 5);
-      this.ctx.font = '11px monospace';
+      this.ctx.fillText('MISSION FAILED: CHAI DROPPED', this.width / 2, this.height / 2 - 6);
+      this.ctx.font = "9px 'Silkscreen', monospace";
       this.ctx.fillStyle = '#FFFFFF';
-      this.ctx.fillText('Tap to Try Again', this.width / 2, this.height / 2 + 18);
+      this.ctx.fillText('TAP OR PRESS SPACE TO RETRY', this.width / 2, this.height / 2 + 16);
       this.ctx.textAlign = 'left';
     } else if (this.hasWon) {
-      this.ctx.fillStyle = 'rgba(11, 14, 23, 0.85)';
+      this.ctx.fillStyle = 'rgba(7, 9, 16, 0.88)';
       this.ctx.fillRect(0, 0, this.width, this.height);
-      this.ctx.fillStyle = '#4DE082';
-      this.ctx.font = 'bold 16px "Space Grotesk", sans-serif';
+      this.ctx.fillStyle = '#06D6A0';
+      this.ctx.font = "bold 12px 'Silkscreen', monospace";
       this.ctx.textAlign = 'center';
-      this.ctx.fillText('🎉 CHAI DELIVERED TO THE TABLE!', this.width / 2, this.height / 2 - 5);
-      this.ctx.font = '11px monospace';
-      this.ctx.fillStyle = '#FFAE33';
-      this.ctx.fillText('+200 Sparks Awarded! Tap to Replay', this.width / 2, this.height / 2 + 18);
+      this.ctx.fillText('MISSION COMPLETE: CHAI DELIVERED!', this.width / 2, this.height / 2 - 6);
+      this.ctx.font = "9px 'Silkscreen', monospace";
+      this.ctx.fillStyle = '#FFB703';
+      this.ctx.fillText('+200 SPARKS EARNED · TAP TO REPLAY', this.width / 2, this.height / 2 + 16);
       this.ctx.textAlign = 'left';
     }
   }

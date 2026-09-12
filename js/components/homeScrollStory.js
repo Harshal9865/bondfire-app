@@ -72,8 +72,9 @@ export function renderHomeScrollStory() {
 
         <!-- Mode 2: Squads & Pods (Popular) -->
         <div class="rounded-3xl bg-gradient-to-b from-[#1E1926] to-[#121522] border-2 border-sunset-coral/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-glow-coral group relative">
-          <div class="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-sunset-coral text-canvas font-bold text-[10px] uppercase tracking-wider shadow">
-            MOST POPULAR 🔥
+          <div class="absolute -top-3 right-6 retro-pixel-badge px-3 py-0.5 rounded-full bg-sunset-coral text-canvas text-[9px] shadow inline-flex items-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">local_fire_department</span>
+            <span>MOST POPULAR</span>
           </div>
           <div>
             <div class="w-12 h-12 rounded-2xl bg-sunset-coral/20 border border-sunset-coral/40 flex items-center justify-center text-sunset-coral mb-5 group-hover:scale-110 transition-transform">
@@ -229,13 +230,13 @@ export function renderHomeScrollStory() {
 
               <!-- Right Page: Superlatives & Scores -->
               <div class="bg-[#1C2033] rounded-xl p-3 border border-white/5 flex flex-col justify-between shadow-inner">
-                <div class="text-[11px] font-bold text-white mb-1">POD AWARDS 2025</div>
-                <div class="space-y-1.5 text-[10px] text-gray-400">
-                  <div class="flex justify-between"><span>👑 Lore Master</span><span class="text-white font-bold">Harshal</span></div>
-                  <div class="flex justify-between"><span>🍕 Hawaiian Pizza Ally</span><span class="text-white font-bold">Marcus</span></div>
-                  <div class="flex justify-between"><span>💤 First Asleep on Couch</span><span class="text-white font-bold">Sam</span></div>
+                <div class="text-[11px] font-bold text-white mb-1 font-mono uppercase">POD AWARDS 2025</div>
+                <div class="space-y-1.5 text-[10px] text-gray-400 font-mono">
+                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-amber-gold">hotel_class</span><span>Lore Master</span></span><span class="text-white font-bold">Harshal</span></div>
+                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-sunset-coral">local_pizza</span><span>Hawaiian Pizza Ally</span></span><span class="text-white font-bold">Marcus</span></div>
+                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-duo-rose">bedtime</span><span>First Asleep on Couch</span></span><span class="text-white font-bold">Sam</span></div>
                 </div>
-                <div class="w-full py-1.5 rounded-lg bg-amber-gold/20 text-amber-gold text-[10px] font-bold text-center border border-amber-gold/30">
+                <div class="w-full py-1.5 rounded-lg bg-amber-gold/20 text-amber-gold text-[10px] font-bold text-center border border-amber-gold/30 uppercase tracking-wider font-mono">
                   ARCHIVED FOREVER
                 </div>
               </div>

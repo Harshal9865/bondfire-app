@@ -166,15 +166,15 @@ export const REEL_COURTROOM_DECK = [
 export const EMOJI_CINEMA_DECK = [
   {
     round: 1,
-    emojis: '🚂 💨 🏃‍♀️ 👨 🤝 🌻',
-    prompt: 'Guess the iconic Bollywood film from the emojis:',
+    icons: ['train', 'air', 'directions_run', 'man', 'handshake', 'local_florist'],
+    prompt: 'Guess the iconic Bollywood film from the vector clue sequence:',
     options: ['Dilwale Dulhania Le Jayenge', 'Jab We Met', 'Chennai Express', 'Gadar'],
     correctIndex: 0,
     iconicDialogue: '“Ja Simran ja, jee le apni zindagi!”'
   },
   {
     round: 2,
-    emojis: '🎒 🏔️ 🎸 🍷 🌅 💔',
+    icons: ['backpack', 'landscape', 'music_note', 'wine_bar', 'wb_twilight', 'heart_broken'],
     prompt: 'Which coming-of-age friendship classic is this?',
     options: ['Yeh Jawaani Hai Deewani', 'Zindagi Na Milegi Dobara', 'Dil Chahta Hai', 'Rockstar'],
     correctIndex: 0,
@@ -182,7 +182,7 @@ export const EMOJI_CINEMA_DECK = [
   },
   {
     round: 3,
-    emojis: '🚗 🇪🇸 🤿 🍅 🪂 💍',
+    icons: ['directions_car', 'flight', 'scuba_diving', 'restaurant', 'paragliding', 'diamond'],
     prompt: 'Identify the bachelor road trip masterpiece:',
     options: ['Zindagi Na Milegi Dobara', 'Dil Dhadakne Do', 'Queen', 'Karwaan'],
     correctIndex: 0,

@@ -517,5 +517,73 @@
   border-color: rgba(255, 174, 51, 0.5);
 }
 
+/* 14. RETRO GAMING TYPOGRAPHY & LED NEON / DIGITAL DOTTED SYSTEM */
+.font-retro {
+  font-family: 'Press Start 2P', monospace;
+}
 
+.font-arcade {
+  font-family: 'Silkscreen', monospace;
+}
 
+.font-terminal {
+  font-family: 'VT323', monospace;
+}
+
+.font-digital {
+  font-family: 'DotGothic16', monospace;
+}
+
+/* LED Digital Neon Glows */
+.retro-led-amber {
+  font-family: 'DotGothic16', 'VT323', monospace;
+  color: #FFB703;
+  text-shadow: 0 0 6px rgba(255, 183, 3, 0.9), 0 0 16px rgba(255, 183, 3, 0.6), 0 0 28px rgba(255, 183, 3, 0.3);
+  letter-spacing: 0.06em;
+}
+
+.retro-led-coral {
+  font-family: 'DotGothic16', 'VT323', monospace;
+  color: #FF5A5F;
+  text-shadow: 0 0 6px rgba(255, 90, 95, 0.9), 0 0 16px rgba(255, 90, 95, 0.6), 0 0 28px rgba(255, 90, 95, 0.3);
+  letter-spacing: 0.06em;
+}
+
+.retro-led-mint {
+  font-family: 'DotGothic16', 'VT323', monospace;
+  color: #4ADE80;
+  text-shadow: 0 0 6px rgba(74, 222, 128, 0.9), 0 0 16px rgba(74, 222, 128, 0.6), 0 0 28px rgba(74, 222, 128, 0.3);
+  letter-spacing: 0.06em;
+}
+
+.retro-led-rose {
+  font-family: 'DotGothic16', 'VT323', monospace;
+  color: #F72585;
+  text-shadow: 0 0 6px rgba(247, 37, 133, 0.9), 0 0 16px rgba(247, 37, 133, 0.6), 0 0 28px rgba(247, 37, 133, 0.3);
+  letter-spacing: 0.06em;
+}
+
+/* Retro Pixel Badges & Labels */
+.retro-pixel-badge {
+  font-family: 'Silkscreen', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.retro-arcade-title {
+  font-family: 'Space Grotesk', 'Silkscreen', sans-serif;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.retro-sub-display {
+  font-family: 'Silkscreen', monospace;
+  letter-spacing: 0.04em;
+}
+
+/* Digital Dot-Matrix Container */
+.retro-dotted-box {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 8px 8px;
+}

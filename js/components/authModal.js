@@ -45,7 +45,7 @@ function renderAuthModalMarkup(reason) {
           <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sunset-coral to-amber-gold p-[1px] flex items-center justify-center">
               <div class="w-full h-full bg-canvas rounded-[7px] flex items-center justify-center text-amber-gold font-bold text-xs">
-                🔥
+                <span class="material-symbols-outlined text-[16px] text-amber-gold">local_fire_department</span>
               </div>
             </div>
             <div>

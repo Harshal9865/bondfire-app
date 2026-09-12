@@ -24,10 +24,13 @@ export function renderArcadeScreen() {
         <div>
           <div class="flex items-center gap-2 mb-1">
             <span class="w-2.5 h-2.5 rounded-full bg-mint-green animate-pulse"></span>
-            <span class="text-[11px] font-mono font-bold text-mint-green uppercase tracking-wider">Multiplayer Arcade Arena</span>
+            <span class="retro-pixel-badge text-[9px] text-mint-green tracking-wider">Multiplayer Arcade Arena</span>
           </div>
-          <h2 class="font-display text-2xl sm:text-3xl font-black text-white tracking-tight">The Party Hearth 🔥</h2>
-          <p class="text-xs text-gray-400 mt-1">
+          <h2 class="font-display text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+            <span>The Party Hearth</span>
+            <span class="material-symbols-outlined text-coral-red text-2xl">local_fire_department</span>
+          </h2>
+          <p class="text-xs text-gray-400 mt-1 font-mono">
             Room: <span class="text-amber-gold font-bold">${room.podName || "The Ahmedabad Squad"}</span> (${room.roomCode}) · ${players.length} Campers Ready
           </p>
         </div>
@@ -42,14 +45,14 @@ export function renderArcadeScreen() {
 
       <!-- Campers Pill Avatar Strip -->
       <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
-        <span class="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider shrink-0 mr-1">Campers:</span>
+        <span class="retro-pixel-badge text-[9px] text-gray-400 tracking-wider shrink-0 mr-1">Campers:</span>
         ${players.map((p) => `
           <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-bright/70 border border-border shrink-0 shadow-sm">
-            <span class="text-base">${p.avatar || '😎'}</span>
-            <span class="text-xs font-bold text-white">${p.name}</span>
+            <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs text-gray-300 bg-surface">${p.avatar && !p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-[14px] text-sunset-coral">person</span>'}</span>
+            <span class="text-xs font-bold text-white font-mono">${p.name}</span>
           </div>
         `).join('')}
-        <a href="#/ROOMS" class="px-3 py-1.5 rounded-full bg-sunset-coral/20 hover:bg-sunset-coral/30 border border-sunset-coral/40 text-sunset-coral text-xs font-bold shrink-0 transition-all">
+        <a href="#/ROOMS" class="px-3 py-1.5 rounded-full bg-sunset-coral/20 hover:bg-sunset-coral/30 border border-sunset-coral/40 text-sunset-coral text-xs font-bold shrink-0 transition-all font-mono">
           + Add Friend
         </a>
       </div>
@@ -63,14 +66,14 @@ export function renderArcadeScreen() {
           
           <div>
             <div class="flex items-center justify-between mb-3">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40">
+              <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[9px] bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40">
                 CLASSIC PARTY
               </span>
               <span class="text-xs text-mint-green font-mono font-bold">2–12 Players</span>
             </div>
 
             <div class="flex items-center gap-3 mb-2">
-              <span class="text-3xl">🍾</span>
+              <span class="material-symbols-outlined text-3xl text-sunset-coral">wine_bar</span>
               <h3 class="font-display text-xl font-bold text-white group-hover:text-sunset-coral transition-colors">Spin the Bottle</h3>
             </div>
 
@@ -91,19 +94,19 @@ export function renderArcadeScreen() {
           
           <div>
             <div class="flex items-center justify-between mb-3">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-duo-rose/20 text-duo-rose border border-duo-rose/40">
+              <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[9px] bg-duo-rose/20 text-duo-rose border border-duo-rose/40">
                 SURVIVOR SHOWDOWN
               </span>
-              <span class="text-xs text-duo-rose font-mono font-bold">10 Fingers Left</span>
+              <span class="text-xs text-duo-rose font-mono font-bold">10 Stamina Left</span>
             </div>
 
             <div class="flex items-center gap-3 mb-2">
-              <span class="text-3xl">✋</span>
+              <span class="material-symbols-outlined text-3xl text-duo-rose">pan_tool</span>
               <h3 class="font-display text-xl font-bold text-white group-hover:text-duo-rose transition-colors">Never Have I Ever</h3>
             </div>
 
             <p class="text-xs text-gray-300 leading-relaxed mb-4">
-              Start with 10 fingers. Drop a finger when caught guilty of awkward everyday crimes, dating habits, and hostel secrets. Custom prompts supported!
+              Start with 10 stamina points. Drop a point when caught guilty of awkward everyday crimes, dating habits, and hostel secrets.
             </p>
           </div>
 
@@ -119,14 +122,14 @@ export function renderArcadeScreen() {
           
           <div>
             <div class="flex items-center justify-between mb-3">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-gold/20 text-amber-gold border border-amber-gold/40">
+              <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[9px] bg-amber-gold/20 text-amber-gold border border-amber-gold/40">
                 LIVE BALLOT
               </span>
               <span class="text-xs text-amber-gold font-mono font-bold">Consensus Vote</span>
             </div>
 
             <div class="flex items-center gap-3 mb-2">
-              <span class="text-3xl">🗳️</span>
+              <span class="material-symbols-outlined text-3xl text-amber-gold">how_to_vote</span>
               <h3 class="font-display text-xl font-bold text-white group-hover:text-amber-gold transition-colors">Most Likely To</h3>
             </div>
 
@@ -147,19 +150,19 @@ export function renderArcadeScreen() {
           
           <div>
             <div class="flex items-center justify-between mb-3">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#7C4DFF]/20 text-[#A480FF] border border-[#7C4DFF]/40">
+              <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[9px] bg-[#7C4DFF]/20 text-[#A480FF] border border-[#7C4DFF]/40">
                 WATCH & PLAY 2.0
               </span>
               <span class="text-xs text-[#A480FF] font-mono font-bold">Synced Playback</span>
             </div>
 
             <div class="flex items-center gap-3 mb-2">
-              <span class="text-3xl">🎬</span>
+              <span class="material-symbols-outlined text-3xl text-[#A480FF]">movie</span>
               <h3 class="font-display text-xl font-bold text-white group-hover:text-[#A480FF] transition-colors">Watch Party Stream</h3>
             </div>
 
             <p class="text-xs text-gray-300 leading-relaxed mb-4">
-              Paste any YouTube or MP4 video URL. Stream together with floating emoji reaction rains and synchronized Pause-and-Predict squad trivia rounds.
+              Paste any video link to watch synchronized with your friends. Features live retro reaction tokens and prompt predictions.
             </p>
           </div>
 

@@ -74,12 +74,12 @@ function resolveActiveDeck(state, selectedModeId) {
       confessionId: `CONFESSION #${900 + idx}`,
       secretText: card.quote || card.title,
       submittedAt: 'Custom Vault Memory',
-      shockRating: '💥 CUSTOM DROP',
+      shockRating: 'CUSTOM DROP',
       suspects,
       actualAuthor: author,
       confessionContext: card.quote || card.title,
       seatTarget: author,
-      theme: '🔥 CUSTOM DROP',
+      theme: 'CUSTOM DROP',
       question: card.quote || card.title,
       promptHint: card.title || 'Be completely honest',
       ratings: [
@@ -189,24 +189,24 @@ export function renderGameScreen() {
         </div>
         <div class="grid grid-cols-5 gap-1.5 text-center">
           <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-red-400 flex flex-col items-center gap-0.5 border border-red-500/20" data-sfx="wrong">
-            <span class="text-base">🚨</span>
-            <span class="text-[10px] truncate">Buzzer</span>
+            <span class="material-symbols-outlined text-sm text-red-400">notifications_active</span>
+            <span class="text-[10px] font-mono truncate">Buzzer</span>
           </button>
           <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-amber-gold flex flex-col items-center gap-0.5 border border-amber-gold/20" data-sfx="airhorn">
-            <span class="text-base">📯</span>
-            <span class="text-[10px] truncate">Airhorn</span>
+            <span class="material-symbols-outlined text-sm text-amber-gold">campaign</span>
+            <span class="text-[10px] font-mono truncate">Airhorn</span>
           </button>
           <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-mint-green flex flex-col items-center gap-0.5 border border-mint-green/20" data-sfx="rimshot">
-            <span class="text-base">🥁</span>
-            <span class="text-[10px] truncate">Rimshot</span>
+            <span class="material-symbols-outlined text-sm text-mint-green">music_note</span>
+            <span class="text-[10px] font-mono truncate">Rimshot</span>
           </button>
           <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-secondary flex flex-col items-center gap-0.5 border border-secondary/20" data-sfx="cheer">
-            <span class="text-base">👏</span>
-            <span class="text-[10px] truncate">Cheer</span>
+            <span class="material-symbols-outlined text-sm text-secondary">celebration</span>
+            <span class="text-[10px] font-mono truncate">Cheer</span>
           </button>
           <button class="btn-sfx p-2 rounded-xl bg-surface-container hover:bg-surface-bright active:scale-95 transition-all text-xs font-bold text-gray-400 flex flex-col items-center gap-0.5 border border-border" data-sfx="crickets">
-            <span class="text-base">🦗</span>
-            <span class="text-[10px] truncate">Silence</span>
+            <span class="material-symbols-outlined text-sm text-gray-400">volume_off</span>
+            <span class="text-[10px] font-mono truncate">Silence</span>
           </button>
         </div>
       </div>
@@ -219,31 +219,32 @@ export function renderGameScreen() {
         <div class="flex items-center justify-between gap-1.5 w-full">
           <span class="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold shrink-0">Live Reactions:</span>
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="reaction-container">
-            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-emoji="😂" type="button">
-              <span class="text-sm">😂</span>
-              <span class="font-label-md text-caption text-on-surface count">14</span>
+            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-icon="sentiment_very_satisfied" data-color="#FFB703" type="button">
+              <span class="material-symbols-outlined text-sm text-amber-gold">sentiment_very_satisfied</span>
+              <span class="font-label-md text-caption text-on-surface count font-mono">14</span>
             </button>
-            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-emoji="💀" type="button">
-              <span class="text-sm">💀</span>
-              <span class="font-label-md text-caption text-on-surface count">28</span>
+            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-icon="mood_bad" data-color="#F72585" type="button">
+              <span class="material-symbols-outlined text-sm text-rose-glow">mood_bad</span>
+              <span class="font-label-md text-caption text-on-surface count font-mono">28</span>
             </button>
-            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-emoji="🚩" type="button">
-              <span class="text-sm">🚩</span>
-              <span class="font-label-md text-caption text-primary count">9</span>
+            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-icon="flag" data-color="#FF5A5F" type="button">
+              <span class="material-symbols-outlined text-sm text-primary">flag</span>
+              <span class="font-label-md text-caption text-primary count font-mono">9</span>
             </button>
-            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-emoji="🍿" type="button">
-              <span class="text-sm">🍿</span>
-              <span class="font-label-md text-caption text-secondary count">12</span>
+            <button class="reaction-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-high active:scale-90 hover:bg-surface-variant transition-transform shadow-sm" data-icon="movie" data-color="#06D6A0" type="button">
+              <span class="material-symbols-outlined text-sm text-secondary">movie</span>
+              <span class="font-label-md text-caption text-secondary count font-mono">12</span>
             </button>
           </div>
           <!-- Quick Buzzer / Send Reaction Pin & Private Panic Button -->
           <div class="flex items-center gap-1.5 shrink-0">
             <button id="btn-panic-soften" class="px-2.5 py-1.5 rounded-full bg-surface-container-high border border-sunset-coral/40 hover:bg-sunset-coral/20 text-sunset-coral font-label-md text-caption font-bold flex items-center gap-1 transition-all active:scale-95" title="Private Panic Button: anonymously swap this card if uncomfortable">
-              <span>🛡️</span>
+              <span class="material-symbols-outlined text-[15px]">security</span>
               <span class="hidden sm:inline">Soften</span>
             </button>
-            <button id="btn-reveal-now" class="px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-md text-caption font-bold hover:brightness-110 active:scale-95 transition-all" ${game.isAnswerRevealed ? 'disabled' : ''}>
-              Reveal Now ⚡
+            <button id="btn-reveal-now" class="px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-md text-caption font-bold hover:brightness-110 active:scale-95 transition-all flex items-center gap-1" ${game.isAnswerRevealed ? 'disabled' : ''}>
+              <span>Reveal Now</span>
+              <span class="material-symbols-outlined text-xs">bolt</span>
             </button>
           </div>
         </div>
@@ -252,10 +253,10 @@ export function renderGameScreen() {
           <div class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-secondary text-[15px]">auto_stories</span>
             <span class="font-caption text-caption text-on-surface-variant">
-              Auto-archiving highlights into <span class="text-secondary font-semibold">2026 Photobook</span> 📖
+              Auto-archiving highlights into <span class="text-secondary font-semibold">2026 Photobook</span>
             </span>
           </div>
-          <span class="font-caption text-caption text-tertiary font-bold tracking-wide">+250 XP</span>
+          <span class="font-caption text-caption text-tertiary font-bold tracking-wide font-mono">+250 XP</span>
         </div>
       </div>
 
@@ -264,13 +265,13 @@ export function renderGameScreen() {
         <div class="max-w-lg w-full rounded-2xl bg-surface-container p-5 sm:p-6 border border-border shadow-2xl">
           <div class="flex justify-between items-center pb-3 mb-4 border-b border-border/80">
             <div class="flex items-center gap-2.5">
-              <span class="text-2xl">⚡</span>
+              <span class="material-symbols-outlined text-2xl text-amber-gold">bolt</span>
               <div>
                 <h3 class="font-headline-sm text-base sm:text-lg text-white font-bold">Switch Party Game</h3>
                 <p class="text-xs text-on-surface-variant">Change the mode instantly for the whole squad</p>
               </div>
             </div>
-            <button class="w-8 h-8 rounded-full bg-surface-bright hover:bg-surface-container-high flex items-center justify-center text-white" id="btn-close-game-mode-modal">✕</button>
+            <button class="w-8 h-8 rounded-full bg-surface-bright hover:bg-surface-container-high flex items-center justify-center text-white" id="btn-close-game-mode-modal"><span class="material-symbols-outlined text-sm">close</span></button>
           </div>
 
           <div class="flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
@@ -278,7 +279,7 @@ export function renderGameScreen() {
               const isCurrent = mode.id === selectedModeId;
               return `
                 <button class="btn-select-game-mode text-left p-3.5 rounded-xl border ${isCurrent ? 'bg-primary-container/15 border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest/80 border-border/70 hover:border-border hover:bg-surface-container-high'} transition-all active:scale-[0.99] flex items-start gap-3 group cursor-pointer" data-mode="${mode.id}">
-                  <span class="text-2xl shrink-0 mt-0.5">${mode.emoji}</span>
+                  <span class="material-symbols-outlined text-2xl shrink-0 mt-0.5 text-amber-gold">${mode.icon || 'sports_esports'}</span>
                   <div class="min-w-0 flex-1">
                     <div class="flex items-center justify-between gap-2 mb-0.5">
                       <span class="font-headline-sm text-sm font-bold text-white group-hover:text-sunset-coral transition-colors">${mode.name}</span>
@@ -346,8 +347,9 @@ function renderOurLoreView(card, game, currentUserName) {
           <span class="px-2.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[10px] font-mono font-bold tracking-widest uppercase">OUR LORE · ROUND ${card.round || 1}</span>
           <span class="text-xs text-gray-400 font-mono">${card.exhibitDate || 'October 2024'}</span>
         </div>
-        <span class="px-2 py-0.5 rounded-full bg-amber-gold/15 text-amber-gold text-[10px] font-bold border border-amber-gold/30">
-          📜 GROUP CANON
+        <span class="retro-pixel-badge px-2 py-0.5 rounded-full bg-amber-gold/15 text-amber-gold text-[9px] border border-amber-gold/30 inline-flex items-center gap-1">
+          <span class="material-symbols-outlined text-[12px]">history_edu</span>
+          <span>GROUP CANON</span>
         </span>
       </div>
 
@@ -360,7 +362,10 @@ function renderOurLoreView(card, game, currentUserName) {
         <div class="mb-4 rounded-xl overflow-hidden border border-border/60 h-36 w-full relative">
           <img src="${card.coverImage}" class="w-full h-full object-cover" alt="Exhibit Photo" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
-            <span class="text-[10px] font-mono text-white/90">📸 Verified Squad Exhibit Photo</span>
+            <span class="text-[10px] font-mono text-white/90 inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px] text-mint-green">verified</span>
+              <span>Verified Squad Exhibit Photo</span>
+            </span>
           </div>
         </div>
       ` : ''}
@@ -381,7 +386,10 @@ function renderOurLoreView(card, game, currentUserName) {
       <!-- Lore Reveal & Official Canon Seal -->
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-sunset-coral/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
         <div class="flex items-center gap-2 text-sunset-coral font-bold text-sm mb-2">
-          <span>📜 THE SQUAD HAS SPOKEN:</span>
+          <span class="retro-pixel-badge inline-flex items-center gap-1.5 text-xs text-sunset-coral">
+            <span class="material-symbols-outlined text-sm">auto_stories</span>
+            <span>THE SQUAD HAS SPOKEN:</span>
+          </span>
         </div>
         <div class="p-3 rounded-lg bg-surface border border-border text-xs text-amber-gold font-mono leading-relaxed mb-3">
           ${card.officialCanon || 'Kabir had the key the whole time while the rest of the squad searched the beach with phone torches.'}
@@ -407,8 +415,11 @@ function renderWhoSaidThisView(card, game, currentUserName) {
   return `
     <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="who-said-card">
       <div class="flex items-center justify-between pb-3 border-b border-border/70">
-        <span class="px-2.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold tracking-widest uppercase">WHO SAID THIS? · CHAT EXPOSE</span>
-        <span class="text-xs text-sunset-coral font-bold">UNFILTERED QUOTE 💬</span>
+        <span class="retro-pixel-badge px-2.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold text-[9px] tracking-widest uppercase">WHO SAID THIS? · CHAT EXPOSE</span>
+        <span class="inline-flex items-center gap-1 text-xs text-sunset-coral font-bold font-mono">
+          <span class="material-symbols-outlined text-sm">chat</span>
+          <span>UNFILTERED QUOTE</span>
+        </span>
       </div>
 
       <!-- Chat Bubble Exhibit -->
@@ -461,12 +472,18 @@ function renderReelCourtView(card, game, currentUserName) {
   return `
     <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="reel-court-card">
       <div class="flex items-center justify-between pb-3 border-b border-border/70">
-        <span class="px-2.5 py-0.5 rounded bg-mint-green/20 text-mint-green text-[10px] font-mono font-bold tracking-widest uppercase">THE REEL COURTROOM 🎬</span>
-        <span class="text-xs text-amber-gold font-bold">EXHIBIT A HEARING</span>
+        <span class="retro-pixel-badge px-2.5 py-0.5 rounded bg-mint-green/20 text-mint-green text-[9px] tracking-widest uppercase inline-flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs">movie</span>
+          <span>THE REEL COURTROOM</span>
+        </span>
+        <span class="text-xs text-amber-gold font-bold font-mono">EXHIBIT A HEARING</span>
       </div>
 
       <div class="my-4">
-        <h3 class="font-headline-sm text-base font-bold text-white mb-1">🚨 ${card.caseTitle || 'The 7-Minute Voice Note Felony'}</h3>
+        <h3 class="font-headline-sm text-base font-bold text-white mb-1 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm text-sunset-coral">gavel</span>
+          <span>${card.caseTitle || 'The 7-Minute Voice Note Felony'}</span>
+        </h3>
         <p class="text-xs text-gray-300 font-mono">${card.charge || 'Sending a podcast episode instead of typing “Reach safely”'}</p>
       </div>
 
@@ -477,18 +494,18 @@ function renderReelCourtView(card, game, currentUserName) {
 
       <div class="grid grid-cols-2 gap-3 mb-3">
         <button class="game-opt-btn p-3 rounded-xl border ${game.selectedOption === 'GUILTY' ? 'bg-sunset-coral text-white border-sunset-coral' : 'bg-surface-container-lowest border-border'} font-bold text-xs" data-option="GUILTY" ${game.isAnswerRevealed ? 'disabled' : ''}>
-          <span>⚖️ 100% GUILTY</span>
+          <span class="inline-flex items-center gap-1.5 justify-center"><span class="material-symbols-outlined text-sm">gavel</span><span>100% GUILTY</span></span>
         </button>
         <button class="game-opt-btn p-3 rounded-xl border ${game.selectedOption === 'RELATABLE' ? 'bg-mint-green text-canvas border-mint-green' : 'bg-surface-container-lowest border-border'} font-bold text-xs" data-option="RELATABLE" ${game.isAnswerRevealed ? 'disabled' : ''}>
-          <span>🕊️ RELATABLE (PASS)</span>
+          <span class="inline-flex items-center gap-1.5 justify-center"><span class="material-symbols-outlined text-sm">sentiment_satisfied</span><span>RELATABLE (PASS)</span></span>
         </button>
       </div>
 
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-mint-green/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
-        <div class="text-mint-green font-bold text-sm mb-2">VERDICT: SENTENCE PRONOUNCED!</div>
+        <div class="text-mint-green font-bold text-sm mb-2 font-mono">VERDICT: SENTENCE PRONOUNCED!</div>
         <p class="text-xs text-gray-300 mb-3">${(card.punishments && card.punishments[0]) || 'Must buy cutting chai for the squad.'}</p>
         <div class="flex justify-end">
-          <button id="btn-next-round" class="px-5 py-2 rounded-full bg-mint-green text-canvas font-bold text-xs">Next Case</button>
+          <button id="btn-next-round" class="px-5 py-2 rounded-full bg-mint-green text-canvas font-bold text-xs font-mono">Next Case</button>
         </div>
       </div>
     </div>
@@ -501,13 +518,22 @@ function renderEmojiCinemaView(card, game, currentUserName) {
   return `
     <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="emoji-cinema-card">
       <div class="flex items-center justify-between pb-3 border-b border-border/70">
-        <span class="px-2.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold tracking-widest uppercase">EMOJI CINEMA 🍿</span>
+        <span class="retro-pixel-badge px-2.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold text-[9px] tracking-widest uppercase inline-flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs">theaters</span>
+          <span>CINEMA PUZZLE</span>
+        </span>
         <span class="text-xs text-white font-mono">BOLLYWOOD GUESS</span>
       </div>
 
       <div class="my-6 text-center">
-        <div class="text-4xl sm:text-5xl tracking-widest mb-3 select-none">${card.emojis || '🚂 💨 🏃‍♀️ 👨 🤝 🌻'}</div>
-        <h4 class="font-display text-sm font-bold text-white">${card.prompt || 'Guess the iconic Bollywood film from the emojis:'}</h4>
+        <div class="flex items-center justify-center gap-3 mb-4 flex-wrap">
+          ${(card.icons || ['train', 'air', 'directions_run', 'man', 'handshake', 'local_florist']).map(icon => `
+            <div class="w-11 h-11 rounded-xl bg-surface-container-high border border-amber-gold/40 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl text-amber-gold">${icon}</span>
+            </div>
+          `).join('')}
+        </div>
+        <h4 class="font-display text-sm font-bold text-white">${card.prompt || 'Guess the iconic Bollywood film from the vector clue sequence:'}</h4>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3" id="game-option-grid">
@@ -544,8 +570,8 @@ function renderRedFlagCourtView(card, game, currentUserName) {
           <span class="px-2.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[10px] font-mono font-bold tracking-widest uppercase">${card.caseNumber}</span>
           <span class="text-xs text-gray-400">Supreme Court of Bondfire</span>
         </div>
-        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-gold">
-          <span>⚖️ JURY TRIAL</span>
+        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-gold font-mono">
+          <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-sm text-amber-gold">gavel</span><span>JURY TRIAL</span></span>
         </div>
       </div>
 
@@ -560,14 +586,17 @@ function renderRedFlagCourtView(card, game, currentUserName) {
             <h3 class="font-headline-sm text-lg font-bold text-white">${card.defendant}</h3>
           </div>
         </div>
-        <span class="px-3 py-1 rounded-full bg-surface-container-high text-xs font-bold text-gray-300 border border-border/50">ON TRIAL</span>
+        <span class="retro-pixel-badge px-3 py-1 rounded-full bg-surface-container-high text-[9px] text-gray-300 border border-border/50">ON TRIAL</span>
       </div>
 
       <!-- The Charge -->
       <div class="mb-3">
         <div class="text-[11px] font-mono text-gray-400 uppercase font-bold tracking-wider mb-1">THE CHARGE:</div>
         <div class="p-3.5 rounded-xl bg-sunset-coral/10 border border-sunset-coral/30">
-          <div class="font-headline-sm text-sm sm:text-base font-bold text-white mb-1">🚨 ${card.charge}</div>
+          <div class="font-headline-sm text-sm sm:text-base font-bold text-white mb-1 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-coral-red">warning</span>
+            <span>${card.charge}</span>
+          </div>
           <p class="text-xs text-gray-300 leading-relaxed">${card.details}</p>
         </div>
       </div>
@@ -601,17 +630,17 @@ function renderRedFlagCourtView(card, game, currentUserName) {
       <!-- Interactive Jury Verdict Buttons -->
       <div class="grid grid-cols-2 gap-3 mb-2" id="court-verdict-grid">
         <button class="game-opt-btn p-3.5 rounded-xl flex items-center justify-center gap-2 font-bold text-sm transition-all active:scale-95 border ${isGuiltyChosen ? 'bg-sunset-coral text-white border-sunset-coral shadow-glow-coral' : 'bg-surface-container-high hover:bg-sunset-coral/20 border-border text-white'}" data-option="GUILTY" ${game.isAnswerRevealed ? 'disabled' : ''}>
-          <span>⚖️ GUILTY (ROAST 'EM)</span>
+          <span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-base">gavel</span><span>GUILTY (ROAST 'EM)</span></span>
         </button>
         <button class="game-opt-btn p-3.5 rounded-xl flex items-center justify-center gap-2 font-bold text-sm transition-all active:scale-95 border ${isAcquittedChosen ? 'bg-mint-green text-canvas border-mint-green shadow-sm' : 'bg-surface-container-high hover:bg-mint-green/20 border-border text-white'}" data-option="ACQUITTED" ${game.isAnswerRevealed ? 'disabled' : ''}>
-          <span>🕊️ ACQUITTED (PITY PASS)</span>
+          <span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-base">sentiment_satisfied</span><span>ACQUITTED (PITY PASS)</span></span>
         </button>
       </div>
 
       <!-- Verdict Reveal & Sentencing Roasts -->
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-amber-gold/50 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
-        <div class="flex items-center justify-center gap-2 text-amber-gold font-headline-sm text-base font-bold mb-2">
-          <span>🔨 JURY VERDICT: 100% GUILTY!</span>
+        <div class="flex items-center justify-center gap-2 text-amber-gold font-headline-sm text-base font-bold mb-2 font-arcade">
+          <span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-base">gavel</span><span>JURY VERDICT: 100% GUILTY!</span></span>
         </div>
         <div class="text-xs text-gray-300 text-center mb-3">
           The court sentences <strong>${card.defendant}</strong> to choose one of the following public punishments:
@@ -652,13 +681,16 @@ function renderConfessionVaultView(card, game) {
         </p>
         <div class="mt-3 pt-2 border-t border-amber-gold/20 flex items-center justify-between text-[11px] text-gray-400 font-mono">
           <span>${card.submittedAt}</span>
-          <span class="text-mint-green">Encrypted Vault Drop 🔒</span>
+          <span class="text-mint-green inline-flex items-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">lock</span>
+            <span>Encrypted Vault Drop</span>
+          </span>
         </div>
       </div>
 
       <div class="text-center my-3">
         <h3 class="font-headline-sm text-sm sm:text-base font-bold text-white">Who in this room committed this atrocity?</h3>
-        <p class="text-xs text-gray-400">Lock in your suspect before time expires</p>
+        <p class="text-xs text-gray-400 font-mono">Lock in your suspect before time expires</p>
       </div>
 
       <!-- Suspect Grid -->
@@ -672,7 +704,7 @@ function renderConfessionVaultView(card, game) {
               </div>
               <div class="min-w-0 flex-1">
                 <span class="font-label-lg text-sm text-white block truncate font-bold">${suspect}</span>
-                <span class="text-[10px] text-gray-400 block">${isSelected ? 'LOCKED IN 🔒' : 'SUSPECT'}</span>
+                <span class="text-[10px] text-gray-400 block font-mono">${isSelected ? 'LOCKED IN' : 'SUSPECT'}</span>
               </div>
             </button>
           `;
@@ -681,13 +713,16 @@ function renderConfessionVaultView(card, game) {
 
       <!-- Reveal Result -->
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-tertiary/60 shadow-xl text-center" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
-        <div class="flex items-center justify-center gap-2 text-tertiary font-headline-sm text-base font-bold mb-1">
-          <span>🕵️ CULPRIT REVEALED: ${card.actualAuthor}!</span>
+        <div class="flex items-center justify-center gap-2 text-tertiary font-headline-sm text-base font-bold mb-1 font-arcade">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">visibility</span>
+            <span>CULPRIT REVEALED: ${card.actualAuthor}!</span>
+          </span>
         </div>
-        <p class="text-xs text-gray-300 italic mb-4">
+        <p class="text-xs text-gray-300 italic mb-4 font-mono">
           ${card.confessionContext}
         </p>
-        <button id="btn-next-round" class="px-6 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2">
+        <button id="btn-next-round" class="px-6 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2 font-mono">
           <span>NEXT CONFESSION</span>
           <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </button>
@@ -701,8 +736,8 @@ function renderHotSeatView(card, game) {
   return `
     <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border-2 border-sunset-coral/50 overflow-hidden shadow-glow-coral">
       <div class="flex items-center justify-between pb-3 border-b border-border/70">
-        <span class="px-2.5 py-0.5 rounded bg-duo-rose/20 text-duo-rose text-[10px] font-mono font-bold tracking-widest">${card.theme}</span>
-        <span class="text-xs font-bold text-amber-gold flex items-center gap-1">
+        <span class="retro-pixel-badge px-2.5 py-0.5 rounded bg-duo-rose/20 text-duo-rose text-[9px] tracking-widest">${card.theme}</span>
+        <span class="text-xs font-bold text-amber-gold flex items-center gap-1 font-mono">
           <span class="w-2 h-2 rounded-full bg-sunset-coral animate-ping"></span>
           HOT SEAT ACTIVE
         </span>
@@ -714,7 +749,9 @@ function renderHotSeatView(card, game) {
           <div class="w-14 h-14 rounded-2xl overflow-hidden bg-surface-container-high border-2 border-sunset-coral shadow-lg">
             <img class="w-full h-full object-cover" src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(card.seatTarget)}" alt="${card.seatTarget}" />
           </div>
-          <span class="absolute -top-1.5 -right-1.5 text-base">🔥</span>
+          <span class="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-sunset-coral text-white flex items-center justify-center shadow">
+            <span class="material-symbols-outlined text-xs">local_fire_department</span>
+          </span>
         </div>
         <div>
           <div class="text-[10px] font-mono uppercase text-sunset-coral font-bold">SPOTLIGHT CAMPER</div>
@@ -743,8 +780,8 @@ function renderHotSeatView(card, game) {
           return `
             <button class="game-opt-btn p-2.5 rounded-xl border ${isSelected ? 'bg-primary-container/20 border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest border-border/70'} flex flex-col items-center text-center transition-all active:scale-95 cursor-pointer" data-option="${r.id}" ${game.isAnswerRevealed ? 'disabled' : ''}>
               <span class="material-symbols-outlined text-[20px] text-amber-gold mb-1">${r.icon}</span>
-              <span class="font-bold text-xs text-white leading-tight">${r.label}</span>
-              <span class="text-[10px] text-tertiary font-bold mt-1">+${r.xp} XP</span>
+              <span class="font-bold text-xs text-white leading-tight font-mono">${r.label}</span>
+              <span class="text-[10px] text-tertiary font-bold mt-1 font-mono">+${r.xp} XP</span>
             </button>
           `;
         }).join('')}
@@ -752,11 +789,14 @@ function renderHotSeatView(card, game) {
 
       <!-- Reveal Banner -->
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-mint-green/60 shadow-xl text-center" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
-        <div class="text-mint-green font-headline-sm text-base font-bold mb-1">
-          ✨ VULNERABILITY REWARD GRANTED! (+350 Pod Sparks)
+        <div class="text-mint-green font-headline-sm text-base font-bold mb-1 font-arcade">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-mint-green">auto_awesome</span>
+            <span>VULNERABILITY REWARD GRANTED! (+350 Sparks)</span>
+          </span>
         </div>
-        <p class="text-xs text-gray-300 mb-3">Hot seat truth verified by the squad. Archived in the 2026 Yearbook.</p>
-        <button id="btn-next-round" class="px-6 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2">
+        <p class="text-xs text-gray-300 mb-3 font-mono">Hot seat truth verified by the squad. Archived in the 2026 Yearbook.</p>
+        <button id="btn-next-round" class="px-6 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2 font-mono">
           <span>NEXT HOT SEAT</span>
           <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </button>
@@ -770,22 +810,22 @@ function renderMostLikelyToView(card, game) {
   return `
     <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden">
       <div class="flex items-center justify-between pb-3 border-b border-border/70">
-        <span class="px-2.5 py-0.5 rounded bg-mint-green/20 text-mint-green text-[10px] font-mono font-bold tracking-widest">${card.category}</span>
-        <span class="text-xs font-bold text-sunset-coral flex items-center gap-1">
+        <span class="retro-pixel-badge px-2.5 py-0.5 rounded bg-mint-green/20 text-mint-green text-[9px] tracking-widest">${card.category}</span>
+        <span class="text-xs font-bold text-sunset-coral flex items-center gap-1 font-mono">
           <span class="material-symbols-outlined text-[14px]">bolt</span> RAPID FIRE POINTING
         </span>
       </div>
 
       <!-- The Scenario -->
       <div class="my-5 p-5 rounded-2xl bg-surface-container-lowest border border-border/80 text-center shadow-inner">
-        <span class="text-xs font-mono text-gray-400 uppercase font-bold block mb-2">SCENARIO:</span>
+        <span class="text-xs font-mono text-gray-400 uppercase font-bold block mb-2 font-arcade">SCENARIO:</span>
         <h3 class="font-display text-lg sm:text-xl font-extrabold text-white leading-snug">
           ${card.scenario}
         </h3>
       </div>
 
       <div class="text-center mb-3">
-        <span class="text-xs text-gray-400 font-bold">Everyone vote simultaneously! Who is getting crowned?</span>
+        <span class="text-xs text-gray-400 font-bold font-mono">Everyone vote simultaneously! Who is getting crowned?</span>
       </div>
 
       <!-- Candidate Selection Grid -->
@@ -799,7 +839,7 @@ function renderMostLikelyToView(card, game) {
               </div>
               <div class="min-w-0 flex-1">
                 <span class="font-label-lg text-sm text-white block truncate font-bold">${cand}</span>
-                <span class="text-[10px] text-amber-gold block">${isSelected ? 'POINTED 👉' : 'VOTE'}</span>
+                <span class="text-[10px] text-amber-gold block font-mono">${isSelected ? 'POINTED' : 'VOTE'}</span>
               </div>
             </button>
           `;
@@ -808,11 +848,14 @@ function renderMostLikelyToView(card, game) {
 
       <!-- Reveal Banner -->
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-amber-gold/60 shadow-xl text-center" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
-        <div class="text-amber-gold font-headline-sm text-base font-bold mb-1">
-          👑 CROWN AWARDED: ${card.crownTitle}!
+        <div class="text-amber-gold font-headline-sm text-base font-bold mb-1 font-arcade">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">hotel_class</span>
+            <span>CROWN AWARDED: ${card.crownTitle}!</span>
+          </span>
         </div>
-        <p class="text-xs text-gray-300 mb-3">Majority consensus reached! Badge stamped to player dossier.</p>
-        <button id="btn-next-round" class="px-6 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2">
+        <p class="text-xs text-gray-300 mb-3 font-mono">Majority consensus reached! Badge stamped to player dossier.</p>
+        <button id="btn-next-round" class="px-6 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2 font-mono">
           <span>NEXT SCENARIO</span>
           <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
         </button>
@@ -874,8 +917,8 @@ function renderInsideJokeView(card, game, currentUserName, userAvatar) {
               </div>
               <div class="flex flex-col min-w-0 flex-1">
                 <span class="font-label-lg text-label-lg text-on-surface truncate ${isSelected ? 'font-bold' : ''}">${opt.name}</span>
-                <span class="font-caption text-caption ${isSelected ? 'text-primary font-bold' : 'text-on-surface-variant'} truncate">
-                  ${isSelected ? 'LOCKED 🔒' : opt.role}
+                <span class="font-caption text-caption ${isSelected ? 'text-primary font-bold' : 'text-on-surface-variant'} truncate font-mono">
+                  ${isSelected ? 'LOCKED' : opt.role}
                 </span>
               </div>
             </button>
@@ -903,7 +946,7 @@ function renderInsideJokeView(card, game, currentUserName, userAvatar) {
         <div class="relative max-w-md w-full rounded-2xl bg-surface-container p-5 border border-border shadow-2xl">
           <div class="flex items-center justify-between pb-3 border-b border-border">
             <span class="font-label-md text-caption text-amber-gold uppercase font-bold tracking-wider">Authentic Chat Screenshot</span>
-            <button id="btn-close-lightbox" class="w-8 h-8 rounded-full bg-surface-bright flex items-center justify-center text-white hover:bg-surface-variant">✕</button>
+            <button id="btn-close-lightbox" class="w-8 h-8 rounded-full bg-surface-bright flex items-center justify-center text-white hover:bg-surface-variant"><span class="material-symbols-outlined text-sm">close</span></button>
           </div>
           <div class="my-4 p-4 rounded-xl bg-[#0B141A] border border-[#202C33]">
             <div class="text-[11px] text-[#8696A0] mb-2">${card.timestamp}</div>
@@ -1127,16 +1170,18 @@ export function bindGameEvents() {
       btn.classList.add('bg-primary-container/20');
       setTimeout(() => btn.classList.remove('bg-primary-container/20'), 400);
 
-      // Create floating emoji particle
+      // Create floating vector icon particle
       const floater = document.createElement('div');
-      floater.textContent = btn.dataset.emoji;
+      const icon = btn.dataset.icon || 'sentiment_very_satisfied';
+      const color = btn.dataset.color || '#FFB703';
+      floater.innerHTML = `<span class="material-symbols-outlined text-2xl drop-shadow-[0_0_8px_currentColor]">${icon}</span>`;
       floater.style.position = 'fixed';
       floater.style.left = `${Math.random() * 50 + 25}vw`;
       floater.style.bottom = '140px';
-      floater.style.fontSize = '32px';
+      floater.style.color = color;
       floater.style.zIndex = '999';
       floater.style.pointerEvents = 'none';
-      floater.style.transition = 'all 1.2s ease-out';
+      floater.style.transition = 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
       document.body.appendChild(floater);
 
       requestAnimationFrame(() => {
@@ -1204,7 +1249,7 @@ export function bindGameEvents() {
   if (btnPanic) {
     btnPanic.addEventListener('click', () => {
       audio.playBip();
-      btnPanic.innerHTML = '<span>✅</span><span class="text-mint-green">Softened</span>';
+      btnPanic.innerHTML = '<span class="material-symbols-outlined text-xs text-mint-green">check_circle</span><span class="text-mint-green font-mono">Softened</span>';
       setTimeout(() => {
         const st = store.getState();
         const nextRound = (st.activeGame.roundIndex % (st.activeGame.totalRounds || 4)) + 1;

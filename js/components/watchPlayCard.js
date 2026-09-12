@@ -23,7 +23,7 @@ export function renderWatchPlayCard(card, state = {}) {
           </div>
         </div>
         
-        <span class="px-2.5 py-0.5 rounded-full bg-sunset-coral/15 text-sunset-coral text-[10px] font-mono font-bold border border-sunset-coral/30 uppercase">
+        <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full bg-sunset-coral/15 text-sunset-coral text-[9px] border border-sunset-coral/30">
           ${card.badge}
         </span>
       </div>
@@ -79,9 +79,9 @@ export function renderWatchPlayCard(card, state = {}) {
       <!-- Payoff Reveal Box -->
       ${isVoted ? `
         <div class="p-3.5 rounded-xl bg-[#0B141A] border border-mint-green/40 flex flex-col gap-1.5 animate-fadeIn">
-          <div class="flex items-center gap-2 text-mint-green text-xs font-bold font-mono">
-            <span>${isCorrect ? '🎉 SPOT ON!' : '❌ BUSTED!'}</span>
-            <span>· Payoff Revealed</span>
+          <div class="flex items-center gap-2 text-xs font-bold font-mono">
+            <span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-sm ${isCorrect ? 'text-mint-green' : 'text-sunset-coral'}">${isCorrect ? 'check_circle' : 'cancel'}</span><span class="retro-pixel-badge text-[9px] ${isCorrect ? 'text-mint-green' : 'text-sunset-coral'}">${isCorrect ? 'SPOT ON!' : 'BUSTED!'}</span></span>
+            <span class="text-gray-400">· Payoff Revealed</span>
           </div>
           <p class="text-xs text-gray-300 font-mono leading-relaxed">${card.revealText}</p>
         </div>

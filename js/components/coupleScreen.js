@@ -96,8 +96,8 @@ export function renderCoupleScreen() {
         </div>
 
         <button class="px-3.5 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center gap-2 border border-border transition-colors cursor-pointer shrink-0" id="btn-couple-header-book" type="button">
-          <span class="text-xs text-gray-300 font-bold">Yearbook 📖</span>
-          <span class="text-[11px] text-amber-gold bg-surface-container-lowest px-2 py-0.5 rounded-full font-mono font-bold">Us</span>
+          <span class="flex items-center gap-1 text-xs text-gray-300 font-bold"><span class="material-symbols-outlined text-[15px] text-amber-gold">auto_stories</span><span>Yearbook</span></span>
+          <span class="retro-pixel-badge text-[10px] text-amber-gold bg-surface-container-lowest px-2 py-0.5 rounded-full border border-amber-gold/30">Us</span>
         </button>
       </div>
 
@@ -125,7 +125,7 @@ export function renderCoupleScreen() {
               <h2 class="font-headline-sm text-base sm:text-lg text-white font-bold">Then & Now</h2>
             </div>
           </div>
-          <span class="px-2.5 py-1 rounded-full bg-surface-container-highest text-gray-300 text-[11px] font-bold border border-border/60">Tap to Flip 🔄</span>
+          <span class="retro-pixel-badge px-2.5 py-1 rounded-full bg-surface-container-highest text-gray-300 text-[10px] font-bold border border-border/60 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">flip</span><span>Tap to Flip</span></span>
         </div>
 
         <!-- Polaroids Side-by-Side Comparison Frame with 3D Flip Effects -->
@@ -142,7 +142,7 @@ export function renderCoupleScreen() {
                   </div>
                 </div>
                 <div class="pt-2 pb-0.5 px-0.5 text-center">
-                  <p class="text-[11px] leading-tight text-white truncate font-bold">Our First Date ♡</p>
+                  <p class="text-[11px] leading-tight text-white truncate font-bold flex items-center justify-center gap-1"><span>Our First Date</span><span class="material-symbols-outlined text-[12px] text-rose-glow">favorite</span></p>
                   <span class="text-[10px] text-gray-400 truncate block">Luna Cafe · Chapter 1</span>
                 </div>
               </div>
@@ -151,7 +151,7 @@ export function renderCoupleScreen() {
               <div class="absolute inset-0 bg-surface-container-low border border-amber-gold/60 p-3 rounded-xl shadow-xl flex flex-col justify-between rotate-y-180 backface-hidden text-left">
                 <div>
                   <div class="flex items-center justify-between border-b border-border/60 pb-1.5 mb-2">
-                    <span class="text-[10px] font-bold text-amber-gold uppercase tracking-wider">🎙️ Audio Note</span>
+                    <span class="retro-pixel-badge text-[9.5px] font-bold text-amber-gold flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">mic</span><span>Audio Note</span></span>
                     <span class="text-[10px] font-mono text-gray-400">0:24</span>
                   </div>
                   <p class="text-xs text-gray-200 italic leading-snug">“Remember how lost we got looking for the cafe? Best accidental detour ever.”</p>
@@ -173,7 +173,7 @@ export function renderCoupleScreen() {
                   </div>
                 </div>
                 <div class="pt-2 pb-0.5 px-0.5 text-center">
-                  <p class="text-[11px] leading-tight text-white truncate font-bold">Recent Adventures ♡</p>
+                  <p class="text-[11px] leading-tight text-white truncate font-bold flex items-center justify-center gap-1"><span>Recent Adventures</span><span class="material-symbols-outlined text-[12px] text-rose-glow">favorite</span></p>
                   <span class="text-[10px] text-gray-400 truncate block">Mountain Getaway</span>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export function renderCoupleScreen() {
               <div class="absolute inset-0 bg-surface-container-low border border-mint-green/60 p-3 rounded-xl shadow-xl flex flex-col justify-between rotate-y-180 backface-hidden text-left">
                 <div>
                   <div class="flex items-center justify-between border-b border-border/60 pb-1.5 mb-2">
-                    <span class="text-[10px] font-bold text-mint-green uppercase tracking-wider">🎙️ Voice Note</span>
+                    <span class="retro-pixel-badge text-[9.5px] font-bold text-mint-green flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">mic</span><span>Voice Note</span></span>
                     <span class="text-[10px] font-mono text-gray-400">0:31</span>
                   </div>
                   <p class="text-xs text-gray-200 italic leading-snug">“Three years in and you still let me pick all the road trip music. Here’s to many more.”</p>
@@ -202,7 +202,7 @@ export function renderCoupleScreen() {
         </div>
 
         <div class="pt-1 text-center">
-          <span class="text-xs text-gray-400">Tap either polaroid to reveal the voice note & handwritten memory 🎙️</span>
+          <span class="text-xs text-gray-400 font-mono">Tap either polaroid to reveal the voice note & handwritten memory</span>
         </div>
       </div>
 
@@ -211,14 +211,14 @@ export function renderCoupleScreen() {
         <div class="flex items-center justify-between">
           <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30">
             <span class="material-symbols-outlined text-[16px]">local_fire_department</span>
-            <span class="text-[11px] uppercase tracking-wider font-bold">Round ${currentQuiz.round}/${DATE_NIGHT_QUESTIONS.length} · ${currentQuiz.title}</span>
+            <span class="retro-pixel-badge text-[10px]">Round ${currentQuiz.round}/${DATE_NIGHT_QUESTIONS.length} · ${currentQuiz.title}</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <button type="button" id="btn-quiz-prev" class="p-1 rounded-lg bg-surface hover:bg-surface-bright text-gray-400 hover:text-white border border-border text-xs" title="Previous Question">
-              ◀
+            <button type="button" id="btn-quiz-prev" class="p-1.5 rounded-lg bg-surface hover:bg-surface-bright text-gray-400 hover:text-white border border-border text-xs flex items-center justify-center" title="Previous Question">
+              <span class="material-symbols-outlined text-[14px]">arrow_back</span>
             </button>
-            <button type="button" id="btn-quiz-next" class="p-1 rounded-lg bg-surface hover:bg-surface-bright text-gray-400 hover:text-white border border-border text-xs" title="Next Question">
-              ▶
+            <button type="button" id="btn-quiz-next" class="p-1.5 rounded-lg bg-surface hover:bg-surface-bright text-gray-400 hover:text-white border border-border text-xs flex items-center justify-center" title="Next Question">
+              <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
             </button>
           </div>
         </div>
@@ -320,9 +320,10 @@ export function renderCoupleScreen() {
         <div class="relative w-full max-w-sm bg-surface-container-low border border-sunset-coral/40 rounded-3xl p-5 shadow-2xl flex flex-col gap-3">
           <div class="flex justify-between items-center pb-2 border-b border-border/80">
             <h4 class="text-sm font-bold text-sunset-coral flex items-center gap-1.5">
-              <span>💖</span> Set Partner's Name
+              <span class="material-symbols-outlined text-sunset-coral text-[16px]">favorite</span>
+              <span>Set Partner's Name</span>
             </h4>
-            <button type="button" id="btn-close-partner-modal" class="text-gray-400 hover:text-white text-sm">✕</button>
+            <button type="button" id="btn-close-partner-modal" class="w-7 h-7 rounded-full bg-surface border border-border flex items-center justify-center text-gray-400 hover:text-white"><span class="material-symbols-outlined text-[15px]">close</span></button>
           </div>
           <div>
             <label class="text-[11px] font-bold text-gray-400 block mb-1 uppercase tracking-wider">Partner Name or Nickname</label>
@@ -365,7 +366,7 @@ export function bindCoupleEvents() {
       isFlippedThen = !isFlippedThen;
       polThenCard.classList.toggle('rotate-y-180', isFlippedThen);
       const partnerTwo = getPartnerTwoName();
-      showToast(`🎙️ Playing ${partnerTwo}'s audio note from Luna Cafe...`, 'amber');
+      showToast(`Playing ${partnerTwo}'s audio note from Luna Cafe...`, 'amber');
     });
   }
 
@@ -374,7 +375,7 @@ export function bindCoupleEvents() {
       audio.playChime();
       isFlippedNow = !isFlippedNow;
       polNowCard.classList.toggle('rotate-y-180', isFlippedNow);
-      showToast('🎙️ Playing your anniversary voice note...', 'mint');
+      showToast('Playing your anniversary voice note...', 'mint');
     });
   }
 
@@ -410,7 +411,7 @@ export function bindCoupleEvents() {
         }
         store.setState({ partnerName: newName });
         partnerModal.style.display = 'none';
-        showToast(`Partner name saved as "${newName}"! 💖`, 'mint');
+        showToast(`Partner name saved as "${newName}"!`, 'mint');
         // Re-render
         store.setView('COUPLE');
       }
@@ -432,7 +433,7 @@ export function bindCoupleEvents() {
       if (icon) icon.textContent = 'check_circle';
 
       store.addSparks(50);
-      showToast('💖 Answer Locked! Both awarded +50 Sparks!', 'mint');
+      showToast('Answer Locked! Both awarded +50 Sparks!', 'mint');
     });
   });
 
@@ -464,7 +465,7 @@ export function bindCoupleEvents() {
     sealBtn.addEventListener('click', () => {
       const note = whisperInput.value.trim();
       if (!note) {
-        showToast('Please write your whisper note first 💌', 'amber');
+        showToast('Please write your whisper note first', 'amber');
         return;
       }
 
@@ -487,11 +488,11 @@ export function bindCoupleEvents() {
       const currentMemories = store.getState().vaultMemories || [];
       store.setState({ vaultMemories: [newWhisperMem, ...currentMemories] });
 
-      sealBtn.innerHTML = '<span>Sealed 🔒</span>';
+      sealBtn.innerHTML = '<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-xs">lock</span><span>Sealed</span></span>';
       whisperInput.value = '';
       whisperInput.placeholder = 'Sealed with digital wax stamp! (+30 Sparks)';
       whisperInput.disabled = true;
-      showToast('💌 Secret whisper note sealed into your Vault!', 'mint');
+      showToast('Secret whisper note sealed into your Vault!', 'mint');
     });
   }
 

@@ -15,10 +15,10 @@ export function renderYearbookScreen() {
   const room = state.activeRoom || { id: 'GOA-8842', name: 'The Goa Crew', type: 'SQUAD' };
 
   const awards = [
-    { title: 'MVP Lore Master', winner: 'Harshal', icon: '👑', reason: 'Correctly remembered the 2021 Airbnb code', color: 'text-amber-gold bg-amber-gold/15' },
-    { title: 'The Chaos Agent', winner: 'Priya', icon: '🔥', reason: 'Defended Hawaiian pizza and started a 45-min debate', color: 'text-sunset-coral bg-sunset-coral/15' },
-    { title: 'First Asleep on Couch', winner: 'Sam', icon: '💤', reason: 'Passed out at 10:14 PM with a slice of pizza', color: 'text-duo-rose bg-duo-rose/15' },
-    { title: 'Unforgivable Alibi', winner: 'Marcus', icon: '🚨', reason: 'Voted legally liable by 65% of the room', color: 'text-mint-green bg-mint-green/15' }
+    { title: 'MVP Lore Master', winner: 'Harshal', icon: 'hotel_class', reason: 'Correctly remembered the 2021 Airbnb code', color: 'text-amber-gold bg-amber-gold/15' },
+    { title: 'The Chaos Agent', winner: 'Priya', icon: 'local_fire_department', reason: 'Defended Hawaiian pizza and started a 45-min debate', color: 'text-sunset-coral bg-sunset-coral/15' },
+    { title: 'First Asleep on Couch', winner: 'Sam', icon: 'bedtime', reason: 'Passed out at 10:14 PM with a slice of pizza', color: 'text-duo-rose bg-duo-rose/15' },
+    { title: 'Unforgivable Alibi', winner: 'Marcus', icon: 'notifications_active', reason: 'Voted legally liable by 65% of the room', color: 'text-mint-green bg-mint-green/15' }
   ];
 
   return `
@@ -120,13 +120,13 @@ export function renderYearbookScreen() {
               <div class="space-y-3 mb-6">
                 ${awards.map(award => `
                   <div class="p-3.5 rounded-2xl bg-[#121522] border border-[#262B40] hover:border-amber-gold/40 transition-all flex items-center gap-3.5 shadow-sm">
-                    <div class="w-10 h-10 rounded-xl ${award.color} flex items-center justify-center text-xl shrink-0">
-                      ${award.icon}
+                    <div class="w-10 h-10 rounded-xl ${award.color} flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-[20px]">${award.icon}</span>
                     </div>
                     <div class="min-w-0 flex-1">
                       <div class="flex items-center justify-between">
                         <h4 class="font-display font-bold text-white text-sm truncate">${award.winner}</h4>
-                        <span class="text-[10px] font-mono font-bold text-amber-gold uppercase tracking-wider">${award.title}</span>
+                        <span class="retro-pixel-badge text-[9.5px] text-amber-gold">${award.title}</span>
                       </div>
                       <p class="text-xs text-gray-400 font-sans truncate mt-0.5">${award.reason}</p>
                     </div>
@@ -172,8 +172,9 @@ export function renderYearbookScreen() {
 
           <div>
             <span class="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-wider block mb-2">FOIL STAMPING</span>
-            <span class="px-3 py-1 rounded-full bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-mono font-bold">
-              ✨ Real 24k Gold Foil Deboss
+            <span class="px-3 py-1 rounded-full bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-mono font-bold inline-flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+              <span>Real 24k Gold Foil Deboss</span>
             </span>
           </div>
         </div>

@@ -305,7 +305,7 @@ export function renderVaultScreen() {
               <span class="material-symbols-outlined text-primary text-[24px]">format_quote</span>
               <h3 class="font-headline-sm text-headline-sm text-white font-bold">Record Inside Joke</h3>
             </div>
-            <button type="button" class="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-variant flex items-center justify-center text-white" id="btn-close-joke-modal">✕</button>
+            <button type="button" class="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-variant flex items-center justify-center text-white" id="btn-close-joke-modal"><span class="material-symbols-outlined text-sm">close</span></button>
           </div>
 
           <p class="text-xs text-on-surface-variant mb-4">
@@ -346,7 +346,7 @@ export function renderVaultScreen() {
                 <p class="text-[11px] text-on-surface-variant">WhatsApp (.txt) or Discord (.json) Export</p>
               </div>
             </div>
-            <button type="button" class="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-variant flex items-center justify-center text-white" id="btn-close-chat-modal">✕</button>
+            <button type="button" class="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-variant flex items-center justify-center text-white" id="btn-close-chat-modal"><span class="material-symbols-outlined text-sm">close</span></button>
           </div>
 
           <div class="p-3 rounded-xl bg-surface-container-low border border-border/60 text-xs text-on-surface-variant mb-4 flex items-center gap-2">
@@ -699,7 +699,7 @@ export function bindVaultEvents() {
       ];
       const pick = quotes[Math.floor(Math.random() * quotes.length)];
       MemoryGraphService.addNode(pick.cat, pick.title, pick.snip);
-      btnWeeklyMission.innerHTML = '<span>✅</span><span>Mission Complete!</span>';
+      btnWeeklyMission.innerHTML = '<span class="material-symbols-outlined text-sm text-mint-green">check_circle</span><span>Mission Complete!</span>';
       setTimeout(() => {
         store.setView('MEMORIES');
       }, 600);
