@@ -1,9 +1,9 @@
 // ==============================================================================
-// BONDFIRE SERVICE WORKER (v6)
+// BONDFIRE SERVICE WORKER (v7)
 // Network-first for dynamic code and navigation, with resilient offline fallback
 // ==============================================================================
 
-const CACHE_NAME = 'bondfire-v6';
+const CACHE_NAME = 'bondfire-v7';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',

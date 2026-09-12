@@ -10,7 +10,8 @@ import { ConfettiEngine } from '../visuals/confetti.js';
 let confettiInstance = null;
 
 export function renderHero() {
-  const user = store.getState().currentUser;
+  const state = store.getState();
+  const user = state.currentUser;
   const userName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'You';
   const userBadge = userName.substring(0, 2).toUpperCase();
 
