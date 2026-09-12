@@ -13,14 +13,20 @@ import { audio } from '../visuals/audioSynth.js';
 import { ConfettiEngine } from '../visuals/confetti.js';
 import { GAME_MODES, getDeckForMode } from '../data/partyGameDecks.js';
 import { initKineticWordReveal, initLiveVoteBars, init3DCardFlip } from './cardRevealInteraction.js';
+import { generateDynamicGameDeck } from '../services/geminiService.js';
 
 let timerInterval = null;
 let confettiInstance = null;
 
 function resolveActiveDeck(state, selectedModeId) {
+  // Prioritize Gemini AI dynamic synthesized deck if present
+  if (state.activeGame?.dynamicDeck && state.activeGame.dynamicDeck.length > 0) {
+    return state.activeGame.dynamicDeck;
+  }
+
   const defaultDeck = getDeckForMode(selectedModeId);
   const customList = state.customGameDeck || [];
-  const roomCampers = state.activeRoom?.campers || [];
+  const roomCampers = state.activeRoom?.players || state.activeRoom?.campers || [];
   const camperNames = roomCampers.map((c) => c.name).filter(Boolean);
   const currentUserName = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'You';
 
@@ -158,11 +164,17 @@ export function renderGameScreen() {
       <!-- Category & Game Mode Switcher Pill & Host Soundboard Suite -->
       <div class="flex flex-wrap items-center justify-center gap-2 my-1.5">
         <button id="btn-game-switch-mode" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-low border border-sunset-coral/40 shadow-[0_0_12px_rgba(255,90,95,0.18)] hover:brightness-110 active:scale-95 transition-all cursor-pointer">
-          <span class="text-base">${modeMeta.emoji}</span>
+          <span class="material-symbols-outlined text-base text-amber-gold">${modeMeta.icon || 'videogame_asset'}</span>
           <span class="font-label-md text-label-md tracking-wider text-primary-container uppercase font-bold">${modeMeta.name}</span>
           <span class="text-surface-variant text-[10px]">•</span>
           <span class="font-label-md text-caption uppercase tracking-wider text-amber-gold font-bold">Switch Mode</span>
           <span class="material-symbols-outlined text-[14px] text-amber-gold">tune</span>
+        </button>
+
+        <!-- Gemini AI Dynamic Synthesis Pill -->
+        <button id="btn-gemini-ai-refresh" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-amber-gold/50 text-amber-gold text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm hover:bg-amber-gold/20" title="Synthesize Brand New Cards with Gemini AI">
+          <span class="material-symbols-outlined text-[15px] text-amber-gold">auto_awesome</span>
+          <span>AI Remix Deck</span>
         </button>
 
         <!-- TV Presentation Mode Cast Button -->
@@ -1241,6 +1253,42 @@ export function bindGameEvents() {
     castTvBtn.addEventListener('click', () => {
       audio.playChime();
       store.setView('TV_MODE');
+    });
+  }
+
+  // Gemini AI Remix Deck Button
+  const btnAiRefresh = document.getElementById('btn-gemini-ai-refresh');
+  if (btnAiRefresh) {
+    btnAiRefresh.addEventListener('click', async () => {
+      audio.playChime();
+      const st = store.getState();
+      const players = st.activeRoom?.players || st.activeRoom?.campers || [];
+      const playerNames = players.map((p) => p.name).filter(Boolean);
+      btnAiRefresh.disabled = true;
+      btnAiRefresh.innerHTML = '<span class="material-symbols-outlined text-xs animate-spin">sync</span><span>Remixing...</span>';
+
+      try {
+        const freshDeck = await generateDynamicGameDeck(selectedModeId, playerNames);
+        if (freshDeck && freshDeck.length > 0) {
+          store.setState({
+            activeGame: {
+              ...st.activeGame,
+              dynamicDeck: freshDeck,
+              roundIndex: 1,
+              totalRounds: freshDeck.length,
+              selectedOption: null,
+              isAnswerRevealed: false,
+              timeRemaining: 20,
+            },
+          });
+          store.setView('GAME');
+          return;
+        }
+      } catch (err) {
+        console.warn('Remix error:', err);
+      }
+      btnAiRefresh.disabled = false;
+      btnAiRefresh.innerHTML = '<span class="material-symbols-outlined text-[15px] text-amber-gold">auto_awesome</span><span>AI Remix Deck</span>';
     });
   }
 

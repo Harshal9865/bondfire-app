@@ -7,6 +7,7 @@ import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { GAME_MODES } from '../data/partyGameDecks.js';
 import { OUR_LORE_DECK } from '../data/indianCultureDecks.js';
+import { generateDynamicGameDeck } from '../services/geminiService.js';
 
 export const ROOM_TEMPLATES = [
   {
@@ -353,10 +354,43 @@ export function bindLobbyEvents() {
   const modalInvite = document.getElementById('invite-modal');
   const btnCloseInvite = document.getElementById('btn-close-invite-modal');
 
-  // Start Show Runner -> transitions to #GAME
+  // Start Show Runner -> synthesizes Gemini AI deck and transitions to #GAME
   if (btnStart) {
-    btnStart.addEventListener('click', () => {
+    btnStart.addEventListener('click', async () => {
       audio.playChime();
+      const state = store.getState();
+      const players = state.activeRoom?.players || state.activeRoom?.campers || [];
+      const playerNames = players.map((p) => p.name).filter(Boolean);
+      const selectedMode = state.activeRoom?.selectedGameMode || 'OUR_LORE';
+
+      btnStart.disabled = true;
+      btnStart.innerHTML = `
+        <span class="material-symbols-outlined text-base animate-spin">sync</span>
+        <span class="retro-pixel-badge text-xs">AI SYNTHESIZING CUSTOM DECK...</span>
+      `;
+
+      try {
+        const dynamicDeck = await generateDynamicGameDeck(selectedMode, playerNames);
+        if (dynamicDeck && dynamicDeck.length > 0) {
+          store.setState({
+            activeGame: {
+              ...state.activeGame,
+              roundIndex: 1,
+              totalRounds: dynamicDeck.length,
+              dynamicDeck: dynamicDeck,
+              selectedOption: null,
+              isAnswerRevealed: false,
+              timeRemaining: 20,
+            },
+            currentView: 'GAME',
+          });
+          window.location.hash = '#/GAME';
+          return;
+        }
+      } catch (err) {
+        console.warn('AI generation note, using standard deck:', err);
+      }
+
       store.setState({ currentView: 'GAME' });
       window.location.hash = '#/GAME';
     });

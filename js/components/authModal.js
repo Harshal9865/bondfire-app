@@ -6,6 +6,7 @@
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { GoogleAuthService } from '../services/googleAuth.js';
+import { signInWithGoogle, getSupabase } from '../services/supabaseClient.js';
 
 let currentAuthReason = 'Save your squad memories & unlock cloud vault';
 
@@ -198,7 +199,7 @@ function bindAuthModalEvents() {
 
   const googleBtn = document.getElementById('btn-google-auth-trigger');
   if (googleBtn) {
-    googleBtn.addEventListener('click', () => {
+    googleBtn.addEventListener('click', async () => {
       audio.playChime();
       const signedInUser = GoogleAuthService.promptSignIn();
       if (signedInUser) {
@@ -206,7 +207,7 @@ function bindAuthModalEvents() {
         closeAuthModal();
         store.setView('PROFILE');
       } else {
-        closeAuthModal();
+        await signInWithGoogle();
       }
     });
   }
@@ -235,14 +236,34 @@ function bindAuthModalEvents() {
     });
   }
 
-  // Form Submit
+  // Form Submit (Supabase Email / Password)
   const authForm = document.getElementById('auth-form');
   if (authForm) {
-    authForm.addEventListener('submit', (e) => {
+    authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       audio.playCorrect();
       const email = document.getElementById('auth-email-input').value.trim();
       const name = document.getElementById('auth-name-input')?.value.trim() || email.split('@')[0];
+      const pass = document.getElementById('auth-pass-input')?.value;
+
+      // Authenticate via Supabase if available
+      const sb = getSupabase();
+      if (sb && pass) {
+        try {
+          const isSignUp = !nameContainer?.classList.contains('hidden');
+          if (isSignUp) {
+            await sb.auth.signUp({
+              email,
+              password: pass,
+              options: { data: { full_name: name } },
+            });
+          } else {
+            await sb.auth.signInWithPassword({ email, password: pass });
+          }
+        } catch (err) {
+          console.warn('Supabase Auth note:', err.message);
+        }
+      }
 
       store.updateUserProfile({
         isLoggedIn: true,

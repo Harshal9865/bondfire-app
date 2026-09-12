@@ -6,6 +6,7 @@
 import { store } from './state/store.js';
 import { FluidCanvas } from './visuals/fluidCanvas.js';
 import { GoogleAuthService } from './services/googleAuth.js';
+import { getAuthUser } from './services/supabaseClient.js';
 import { socketService } from './services/socket.js';
 
 // Components
@@ -43,6 +44,19 @@ class BondfireApp {
 
     // 2. Initialize Google Identity Services
     GoogleAuthService.init();
+
+    // 2b. Check & restore live Supabase Cloud Session
+    getAuthUser().then((cloudUser) => {
+      if (cloudUser) {
+        console.log('✅ Supabase Auth user restored:', cloudUser.name);
+        store.updateUserProfile({
+          isLoggedIn: true,
+          displayName: cloudUser.name,
+          email: cloudUser.email,
+          avatarUrl: cloudUser.avatarUrl,
+        });
+      }
+    });
 
     // 3. Connect Real-time WebSocket Service
     socketService.connect();
