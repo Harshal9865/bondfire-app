@@ -167,6 +167,21 @@ export function bindSpotifyEvents() {
     });
   });
 
+  if (customForm && customInput && iframe) {
+    customForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rawVal = customInput.value.trim();
+      if (!rawVal) return;
+
+      audio.playChime();
+      const embedTarget = resolveSpotifyQuery(rawVal);
+      currentEmbedUrl = embedTarget;
+      iframe.src = embedTarget;
+      customInput.value = '';
+    });
+  }
+}
+
 export function resolveSpotifyQuery(queryOrUrl) {
   if (!queryOrUrl || typeof queryOrUrl !== 'string') return SPOTIFY_PRESETS[0].embedUrl;
   const q = queryOrUrl.trim().toLowerCase();
@@ -193,21 +208,6 @@ export function resolveSpotifyQuery(queryOrUrl) {
   }
 
   return SPOTIFY_PRESETS[0].embedUrl; // Antakshari & Bollywood
-}
-
-  if (customForm && customInput && iframe) {
-    customForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const rawVal = customInput.value.trim();
-      if (!rawVal) return;
-
-      audio.playChime();
-      const embedTarget = resolveSpotifyQuery(rawVal);
-      currentEmbedUrl = embedTarget;
-      iframe.src = embedTarget;
-      customInput.value = '';
-    });
-  }
 }
 
 export function playSongOnSpotify(queryOrUrl) {
