@@ -87,7 +87,27 @@ class BondfireApp {
   }
 
   handleHashChange() {
-    const hash = window.location.hash.replace('#/', '').toUpperCase();
+    let roomCodeFromUrl = null;
+
+    // 1. Check query params in search (?code=XXXX)
+    if (typeof window !== 'undefined' && window.location.search) {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('code')) {
+        roomCodeFromUrl = urlParams.get('code').trim().toUpperCase();
+      }
+    }
+
+    // 2. Check query params in hash (#/ROOMS?code=XXXX)
+    const rawHash = window.location.hash.replace('#/', '');
+    const [hashPath, hashQuery] = rawHash.split('?');
+    if (!roomCodeFromUrl && hashQuery) {
+      const hashParams = new URLSearchParams(hashQuery);
+      if (hashParams.get('code')) {
+        roomCodeFromUrl = hashParams.get('code').trim().toUpperCase();
+      }
+    }
+
+    const hash = (hashPath || '').toUpperCase();
     const aliasMap = {
       'VAULT': 'MEMORIES',
       'PHOTOBOOK': 'YEARBOOK',
@@ -100,7 +120,13 @@ class BondfireApp {
     };
     const resolvedHash = aliasMap[hash] || hash;
     const validViews = ['HOME', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE'];
-    const targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
+    let targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
+
+    // If an invite code was present, automatically join that room and land in LOBBY!
+    if (roomCodeFromUrl && roomCodeFromUrl.length >= 3) {
+      targetView = 'LOBBY';
+      store.joinRoomWithCode(roomCodeFromUrl);
+    }
 
     if (store.getState().currentView !== targetView) {
       store.setState({ currentView: targetView });

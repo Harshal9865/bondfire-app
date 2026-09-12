@@ -16,6 +16,7 @@ import { initKineticWordReveal, initLiveVoteBars, init3DCardFlip } from './cardR
 import { generateDynamicGameDeck } from '../services/geminiService.js';
 import { p2pMesh } from '../services/webrtcService.js';
 import { renderSpotifyJukebox, bindSpotifyEvents, playSongOnSpotify } from './spotifyPlayer.js';
+import { broadcastRoomAction, syncRealtimeRoom } from '../services/supabaseClient.js';
 
 let timerInterval = null;
 let confettiInstance = null;
@@ -1061,6 +1062,7 @@ export function bindGameEvents() {
     store.setState({
       activeGame: { ...store.getState().activeGame, selectedOption: chosen },
     });
+    broadcastRoomAction('SELECT_OPTION', { option: chosen, isAnswerRevealed: false });
     store.setView('GAME');
   };
 
@@ -1098,6 +1100,8 @@ export function bindGameEvents() {
         isAnswerRevealed: true,
       },
     });
+
+    broadcastRoomAction('SELECT_OPTION', { option: currentGame.selectedOption, isAnswerRevealed: true });
 
     const revealBanner = document.getElementById('game-reveal-banner');
     if (revealBanner) {
@@ -1138,12 +1142,15 @@ export function bindGameEvents() {
       const totalRounds = activeDeck.length;
 
       if (currentGame.roundIndex >= totalRounds) {
+        broadcastRoomAction('START_GAME', { gameMode: 'YEARBOOK' });
         store.setView('YEARBOOK');
       } else {
+        const nextRound = currentGame.roundIndex + 1;
+        broadcastRoomAction('NEXT_ROUND', { roundIndex: nextRound });
         store.setState({
           activeGame: {
             ...currentGame,
-            roundIndex: currentGame.roundIndex + 1,
+            roundIndex: nextRound,
             selectedOption: null,
             isAnswerRevealed: false,
             timeRemaining: 20,

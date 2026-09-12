@@ -10,6 +10,7 @@ import { OUR_LORE_DECK } from '../data/indianCultureDecks.js';
 import { generateDynamicGameDeck } from '../services/geminiService.js';
 import { p2pMesh } from '../services/webrtcService.js';
 import { renderSpotifyJukebox, bindSpotifyEvents } from './spotifyPlayer.js';
+import { syncRealtimeRoom, broadcastRoomAction } from '../services/supabaseClient.js';
 
 export const ROOM_TEMPLATES = [
   {
@@ -115,7 +116,7 @@ export function renderLobby() {
 
       <!-- Quick Social Sharing: 1-Tap WhatsApp & QR -->
       <div class="grid grid-cols-2 gap-3 mb-4">
-        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Join our private Bondfire Adda tonight! Room Code: ${room.roomCode} -> http://localhost:3000/#/ROOMS`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
+        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Join our private Bondfire Adda tonight! Room Code: ${room.roomCode} -> ${typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''}#/ROOMS?code=${room.roomCode}`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
           <span class="material-symbols-outlined text-[18px]">chat</span>
           <span>1-Tap WhatsApp Invite</span>
         </a>
@@ -331,7 +332,7 @@ export function renderLobby() {
             <button id="btn-close-invite-modal" class="text-gray-400 hover:text-white flex items-center justify-center p-1"><span class="material-symbols-outlined text-lg">close</span></button>
           </div>
           <div class="p-4 bg-white rounded-xl mb-4 flex items-center justify-center">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`http://localhost:3000/#/ROOMS?code=${room.roomCode}`)}" class="w-44 h-44" alt="Room QR Code" />
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`${typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''}#/ROOMS?code=${room.roomCode}`)}" class="w-44 h-44" alt="Room QR Code" />
           </div>
           <p class="text-xs text-gray-400 font-mono mb-2">Scan with camera to jump in without login</p>
           <span class="font-mono text-2xl font-black text-amber-gold tracking-widest">${room.roomCode}</span>
@@ -419,6 +420,7 @@ export function bindLobbyEvents() {
             },
             currentView: 'GAME',
           });
+          broadcastRoomAction('START_GAME', { gameMode: store.getState().activeRoom.selectedGameMode });
           window.location.hash = '#/GAME';
           return;
         }
@@ -427,21 +429,28 @@ export function bindLobbyEvents() {
       }
 
       store.setState({ currentView: 'GAME' });
+      broadcastRoomAction('START_GAME', { gameMode: store.getState().activeRoom.selectedGameMode });
       window.location.hash = '#/GAME';
     });
   }
 
-  // Copy Room Code
+  // Copy Room Code & Link
   if (btnCopy) {
     btnCopy.addEventListener('click', () => {
       const code = store.getState().activeRoom.roomCode;
-      navigator.clipboard.writeText(code);
+      const shareUrl = `${window.location.origin}${window.location.pathname}#/ROOMS?code=${code}`;
+      navigator.clipboard.writeText(shareUrl);
       audio.playBip();
       const codeText = btnCopy.querySelector('.font-mono');
       if (codeText) {
         const orig = codeText.innerText;
-        codeText.innerText = 'COPIED!';
+        codeText.innerText = 'LINK COPIED!';
         setTimeout(() => (codeText.innerText = orig), 1500);
+      }
+      const toastMount = document.getElementById('toast-mount');
+      if (toastMount) {
+        toastMount.innerHTML = `<div class="toast toast-mint show"><span class="material-symbols-outlined text-sm mr-1 text-mint-green">link</span><span>Room invite link copied! Open on laptop to join immediately.</span></div>`;
+        setTimeout(() => (toastMount.innerHTML = ''), 3500);
       }
     });
   }
@@ -673,4 +682,16 @@ export function bindLobbyEvents() {
 
   // --- SPOTIFY SQUAD JUKEBOX EVENTS ---
   bindSpotifyEvents();
+
+  // --- SUPABASE REALTIME SYNC (Mobile + Laptop Presence) ---
+  const currRoom = store.getState().activeRoom;
+  const currUser = store.getState().currentUser;
+  if (currRoom && currRoom.roomCode) {
+    syncRealtimeRoom(currRoom.roomCode, {
+      id: currUser?.id,
+      name: currUser?.displayName ? currUser.displayName.split(' ')[0] : 'Camper',
+      avatar: currUser?.avatarUrl,
+      isHost: currRoom.isHost,
+    });
+  }
 }

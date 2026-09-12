@@ -3,6 +3,7 @@
 // ==============================================================================
 
 import { CONFIG } from '../config.js';
+import { store } from '../state/store.js';
 
 let supabaseInstance = null;
 
@@ -253,5 +254,162 @@ export async function uploadCloudMedia(fileOrBlob, bucketName = 'vault-media', c
     };
     reader.readAsDataURL(fileOrBlob);
   });
+}
+
+// ==============================================================================
+// SUPABASE REALTIME PRESENCE & MULTIPLAYER BROADCAST ENGINE
+// Syncs real players across Mobile, Laptop & Tablets in real-time
+// ==============================================================================
+
+let activeRoomChannel = null;
+
+export function syncRealtimeRoom(roomCode, playerInfo = {}) {
+  const sb = getSupabase();
+  if (!sb || !roomCode) {
+    console.warn('Supabase not initialized for realtime room channel');
+    return null;
+  }
+
+  const cleanCode = roomCode.toUpperCase();
+  const channelName = `bondfire_room_${cleanCode}`;
+
+  // If already subscribed to this exact channel, update presence
+  if (activeRoomChannel && activeRoomChannel.topic === `realtime:${channelName}`) {
+    if (playerInfo.id || playerInfo.name) {
+      activeRoomChannel.track(playerInfo).catch(() => {});
+    }
+    return activeRoomChannel;
+  }
+
+  // Unsubscribe from previous room channel if switching rooms
+  if (activeRoomChannel) {
+    try {
+      activeRoomChannel.unsubscribe();
+    } catch {}
+    activeRoomChannel = null;
+  }
+
+  const user = playerInfo.id ? playerInfo : (store ? store.getState().currentUser : {});
+  const userId = user.id || `usr_${Date.now()}`;
+  const userName = user.name || (user.displayName ? user.displayName.split(' ')[0] : 'Camper');
+  const userAvatar = user.avatar || user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(userName)}`;
+
+  activeRoomChannel = sb.channel(channelName, {
+    config: {
+      presence: { key: userId },
+      broadcast: { ack: true },
+    },
+  });
+
+  // 1. PRESENCE SYNC: Real campers joining from Mobile, Laptop, etc.
+  activeRoomChannel
+    .on('presence', { event: 'sync' }, () => {
+      const state = activeRoomChannel.presenceState();
+      console.log('⚡ [Supabase Realtime Sync] Active Campers in Room:', state);
+
+      const livePlayers = [];
+      Object.values(state).forEach((presences) => {
+        if (Array.isArray(presences)) {
+          presences.forEach((p) => {
+            if (p && (p.name || p.displayName)) {
+              const pName = p.name || p.displayName;
+              livePlayers.push({
+                id: p.id || `usr_${pName}`,
+                name: pName,
+                avatar: p.avatar || p.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(pName)}`,
+                role: p.isHost ? 'HOST' : 'Player',
+                isReady: true,
+              });
+            }
+          });
+        }
+      });
+
+      if (livePlayers.length > 0 && store) {
+        // Unique players by normalized name
+        const unique = Array.from(new Map(livePlayers.map((p) => [p.name.toLowerCase(), p])).values());
+        const currentRoom = store.getState().activeRoom;
+        store.setState({
+          activeRoom: {
+            ...currentRoom,
+            players: unique,
+          },
+        });
+      }
+    })
+    // 2. BROADCAST SYNC: Start game, card turns, and votes across all devices
+    .on('broadcast', { event: 'BONDFIRE_ROOM_EVENT' }, ({ payload }) => {
+      console.log('⚡ [Supabase Broadcast Received]', payload);
+      if (!payload || !store) return;
+
+      if (payload.action === 'START_GAME') {
+        const currentRoom = store.getState().activeRoom;
+        store.setState({
+          currentView: 'GAME',
+          activeRoom: {
+            ...currentRoom,
+            selectedGameMode: payload.gameMode || currentRoom.selectedGameMode,
+          },
+          activeGame: {
+            ...store.getState().activeGame,
+            roundIndex: payload.roundIndex || 1,
+            selectedOption: null,
+            isAnswerRevealed: false,
+          },
+        });
+        window.location.hash = '#/GAME';
+      } else if (payload.action === 'SELECT_OPTION') {
+        const activeGame = store.getState().activeGame;
+        store.setState({
+          activeGame: {
+            ...activeGame,
+            selectedOption: payload.option,
+            isAnswerRevealed: payload.isAnswerRevealed ?? true,
+          },
+        });
+      } else if (payload.action === 'NEXT_ROUND') {
+        const activeGame = store.getState().activeGame;
+        store.setState({
+          activeGame: {
+            ...activeGame,
+            roundIndex: payload.roundIndex,
+            selectedOption: null,
+            isAnswerRevealed: false,
+          },
+        });
+      } else if (payload.action === 'SYNC_STREAM' && payload.url) {
+        window.dispatchEvent(new CustomEvent('bondfire:sync-stream', { detail: { url: payload.url } }));
+      }
+    })
+    .subscribe(async (status) => {
+      console.log(`⚡ Supabase Realtime channel [${channelName}] status:`, status);
+      if (status === 'SUBSCRIBED') {
+        await activeRoomChannel.track({
+          id: userId,
+          name: userName,
+          avatar: userAvatar,
+          isHost: playerInfo.isHost ?? (store ? store.getState().activeRoom?.isHost : false),
+          joinedAt: Date.now(),
+        }).catch((err) => console.warn('Realtime track notice:', err));
+      }
+    });
+
+  return activeRoomChannel;
+}
+
+export function broadcastRoomAction(action, payload = {}) {
+  if (activeRoomChannel) {
+    try {
+      activeRoomChannel.send({
+        type: 'broadcast',
+        event: 'BONDFIRE_ROOM_EVENT',
+        payload: { action, ...payload, timestamp: Date.now() },
+      });
+      return true;
+    } catch (err) {
+      console.warn('Realtime broadcast notice:', err);
+    }
+  }
+  return false;
 }
 

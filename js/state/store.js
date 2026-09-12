@@ -309,6 +309,58 @@ class ReactiveStore {
     this.setState({ activeRoom });
   }
 
+  setRoomPlayers(players) {
+    if (!Array.isArray(players)) return;
+    const activeRoom = { ...this.state.activeRoom, players };
+    this.setState({ activeRoom });
+  }
+
+  joinRoomWithCode(roomCode) {
+    if (!roomCode) return this.state.activeRoom;
+    const cleanCode = roomCode.trim().toUpperCase();
+    const user = this.state.currentUser;
+    const isAlreadyHost = this.state.activeRoom?.isHost && this.state.activeRoom?.roomCode === cleanCode;
+
+    const myId = user?.id || `usr_${Date.now()}`;
+    const myName = (user && user.displayName) ? user.displayName.split(' ')[0] : 'Camper';
+    const myAvatar = user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(myName)}`;
+
+    const currentPlayers = this.state.activeRoom?.players || [];
+    let updatedPlayers = [...currentPlayers];
+    const exists = updatedPlayers.some((p) => p.name.toLowerCase() === myName.toLowerCase());
+    if (!exists) {
+      updatedPlayers.push({
+        id: myId,
+        name: myName,
+        role: isAlreadyHost ? 'HOST' : 'Player',
+        isReady: true,
+        avatar: myAvatar,
+      });
+    }
+
+    const activeRoom = {
+      ...this.state.activeRoom,
+      roomCode: cleanCode,
+      isHost: isAlreadyHost,
+      players: updatedPlayers,
+    };
+    this.setState({ activeRoom });
+
+    // Sync with Supabase Realtime across devices
+    if (typeof window !== 'undefined') {
+      import('../services/supabaseClient.js').then(({ syncRealtimeRoom }) => {
+        syncRealtimeRoom(cleanCode, {
+          id: myId,
+          name: myName,
+          avatar: myAvatar,
+          isHost: isAlreadyHost,
+        });
+      }).catch((err) => console.warn('Realtime sync notice:', err));
+    }
+
+    return activeRoom;
+  }
+
   createNewRoom(podName) {
     const roomCode = generateRoomCode();
     const user = this.state.currentUser;
@@ -324,6 +376,19 @@ class ReactiveStore {
       ],
     };
     this.setState({ activeRoom });
+
+    // Sync newly created room with Supabase Realtime
+    if (typeof window !== 'undefined') {
+      import('../services/supabaseClient.js').then(({ syncRealtimeRoom }) => {
+        syncRealtimeRoom(roomCode, {
+          id: user?.id || 'usr_host',
+          name: hostName,
+          avatar: hostAvatar,
+          isHost: true,
+        });
+      }).catch((err) => console.warn('Realtime sync notice:', err));
+    }
+
     return activeRoom;
   }
 
