@@ -5,6 +5,7 @@
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+import { uploadCloudMedia, saveCloudMemory } from '../services/supabaseClient.js';
 
 export function renderVaultUpload() {
   return `
@@ -20,7 +21,7 @@ export function renderVaultUpload() {
         
         <h3 class="font-display text-xl font-bold text-white mb-2 relative z-10">Drop Screenshots & Photos</h3>
         <p class="text-sm text-gray-400 max-w-sm relative z-10">
-          Upload group chats or photos. Our AI will automatically parse the context and generate roast cards for tonight's show.
+          Upload group chats or photos. Stored securely in your Squad Cloud Vault and automatically parsed into game roast cards.
         </p>
         
         <div class="mt-6 flex gap-3 relative z-10">
@@ -43,13 +44,16 @@ export function renderVaultUpload() {
             <!-- Scanning Laser Line -->
             <div class="absolute top-0 left-0 w-full h-0.5 bg-sunset-coral shadow-[0_0_15px_rgba(255,90,95,1)] animate-scan z-20"></div>
           </div>
-          <span class="mt-6 font-mono text-xs text-sunset-coral font-bold uppercase tracking-widest animate-pulse" id="scan-status-text">Extracting Memory Data...</span>
+          <span class="mt-6 font-mono text-xs text-sunset-coral font-bold uppercase tracking-widest animate-pulse" id="scan-status-text">Uploading to Cloud Storage...</span>
         </div>
       </div>
       
       <!-- Recent Uploads Preview Gallery -->
       <div class="mt-8 hidden" id="vault-recent-uploads">
-        <h4 class="font-display text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Ready for the Show</h4>
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-display text-sm font-bold text-gray-400 uppercase tracking-widest">Saved in Cloud Vault</h4>
+          <span class="text-[11px] text-mint-green font-mono flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">cloud_done</span> Supabase Storage Sync</span>
+        </div>
         <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar" id="vault-gallery-track">
           <!-- Populated dynamically -->
         </div>
@@ -70,8 +74,7 @@ export function bindVaultUploadEvents() {
 
   // Browse click
   dropZone.addEventListener('click', (e) => {
-    // Prevent triggering if clicking inside a child button (it will bubble anyway, but just in case)
-    if (scanOverlay.style.opacity === '1') return; // Don't allow click while scanning
+    if (scanOverlay.style.opacity === '1') return;
     fileInput.click();
   });
 
@@ -100,47 +103,62 @@ export function bindVaultUploadEvents() {
     }
   });
 
-  function handleFiles(files) {
+  async function handleFiles(files) {
     audio.playClick();
     
     // UI: Show Scanning
     scanOverlay.style.opacity = '1';
-    scanStatus.textContent = 'Extracting text and context...';
+    scanStatus.textContent = 'Uploading to Cloud Media Storage...';
     
-    // Simulate AI parsing delay
-    setTimeout(() => {
-      audio.playTick();
-      scanStatus.textContent = 'Generating roast prompts...';
-      
-      setTimeout(() => {
-        audio.playCorrect();
-        scanOverlay.style.opacity = '0';
+    const fileList = Array.from(files);
+    for (const file of fileList) {
+      try {
+        scanStatus.textContent = `Uploading ${file.name}...`;
+        const uploadResult = await uploadCloudMedia(file, 'vault-media', 'squad_photos');
         
-        // Add mock files to gallery
-        addFilesToGallery(files);
-      }, 1500);
-    }, 1500);
+        // Save into reactive store and cloud database
+        const state = store.getState();
+        const userName = state.currentUser?.displayName || 'Camper';
+        const newMemory = {
+          type: 'PHOTO',
+          title: file.name.split('.')[0] || 'Squad Photo',
+          quote: `Photo uploaded by ${userName}`,
+          author: userName,
+          imageUrl: uploadResult.url,
+          source: uploadResult.source,
+          timestamp: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        };
+
+        store.addCustomMemory(newMemory);
+        saveCloudMemory({
+          podId: state.activeRoom?.roomCode,
+          title: newMemory.title,
+          rawText: newMemory.quote,
+          structuredData: { imageUrl: uploadResult.url, source: uploadResult.source },
+        });
+
+        addFileToGallery(file, uploadResult.url);
+      } catch (err) {
+        console.warn('Error processing upload:', err);
+      }
+    }
+
+    audio.playCorrect();
+    scanOverlay.style.opacity = '0';
   }
 
-  function addFilesToGallery(files) {
+  function addFileToGallery(file, uploadedUrl) {
     recentUploads.classList.remove('hidden');
     
-    Array.from(files).forEach((file, idx) => {
-      // Mock object URL for images
-      let src = '';
-      if (file.type.startsWith('image/')) {
-        src = URL.createObjectURL(file);
-      }
-      
-      const el = document.createElement('div');
-      el.className = "w-32 h-40 shrink-0 bg-surface rounded-xl border border-border overflow-hidden relative group";
-      el.innerHTML = `
-        ${src ? `<img src="${src}" class="w-full h-full object-cover filter blur-[2px] group-hover:blur-none transition-all duration-300" />` : `<div class="w-full h-full flex flex-col items-center justify-center bg-surface-bright"><span class="material-symbols-outlined text-[24px] text-gray-500 mb-2">description</span><span class="text-[10px] text-gray-400 px-2 truncate w-full text-center">${file.name}</span></div>`}
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3">
-          <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-mint-green">check_circle</span><span class="retro-pixel-badge text-[8px] text-mint-green">Parsed</span></span>
-        </div>
-      `;
-      galleryTrack.prepend(el);
-    });
+    const src = uploadedUrl || (file.type.startsWith('image/') ? URL.createObjectURL(file) : '');
+    const el = document.createElement('div');
+    el.className = "w-32 h-40 shrink-0 bg-surface rounded-xl border border-border overflow-hidden relative group shadow-md";
+    el.innerHTML = `
+      ${src ? `<img src="${src}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-300" />` : `<div class="w-full h-full flex flex-col items-center justify-center bg-surface-bright"><span class="material-symbols-outlined text-[24px] text-gray-500 mb-2">description</span><span class="text-[10px] text-gray-400 px-2 truncate w-full text-center">${file.name}</span></div>`}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-2.5">
+        <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-mint-green">cloud_done</span><span class="retro-pixel-badge text-[8px] text-mint-green">Stored</span></span>
+      </div>
+    `;
+    galleryTrack.prepend(el);
   }
 }

@@ -8,6 +8,8 @@ import { audio } from '../visuals/audioSynth.js';
 import { GAME_MODES } from '../data/partyGameDecks.js';
 import { OUR_LORE_DECK } from '../data/indianCultureDecks.js';
 import { generateDynamicGameDeck } from '../services/geminiService.js';
+import { p2pMesh } from '../services/webrtcService.js';
+import { renderSpotifyJukebox, bindSpotifyEvents } from './spotifyPlayer.js';
 
 export const ROOM_TEMPLATES = [
   {
@@ -224,6 +226,36 @@ export function renderLobby() {
         </div>
       </div>
 
+      <!-- Squad Live Voice Lounge Bar (WebRTC) -->
+      <div class="mb-6 p-4 rounded-2xl bg-surface-container-low border border-[#06D6A0]/30 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#06D6A0]/10 border border-[#06D6A0]/30 flex items-center justify-center text-[#06D6A0] shrink-0">
+            <span class="material-symbols-outlined text-[20px]">graphic_eq</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-white uppercase font-mono">Squad Voice Lounge</span>
+              <span id="voice-connection-badge" class="px-2 py-0.5 rounded-full bg-white/10 text-gray-300 text-[9px] font-mono font-bold">READY TO CONNECT</span>
+            </div>
+            <p class="text-[11px] text-gray-400 font-mono mt-0.5" id="voice-status-desc">Zero-latency live squad mic powered by WebRTC</p>
+          </div>
+        </div>
+
+        <!-- Voice Action Buttons -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btn-toggle-voice-connect" class="px-3.5 py-1.5 rounded-full bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-black text-xs font-bold font-mono transition-all active:scale-95 flex items-center gap-1.5 shadow-glow-mint">
+            <span class="material-symbols-outlined text-sm">mic</span>
+            <span id="btn-voice-connect-label">Connect Mic</span>
+          </button>
+          <button id="btn-toggle-mic-mute" class="p-2 rounded-full bg-surface-bright border border-border text-gray-300 hover:text-white transition-colors" title="Mute Microphone" style="display: none;">
+            <span class="material-symbols-outlined text-sm" id="icon-mic-mute">mic</span>
+          </button>
+          <button id="btn-toggle-deafen" class="p-2 rounded-full bg-surface-bright border border-border text-gray-300 hover:text-white transition-colors" title="Deafen Squad Audio" style="display: none;">
+            <span class="material-symbols-outlined text-sm" id="icon-deafen">volume_up</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Campers Joined (Audience Grid) -->
       <div class="mb-6">
         <div class="flex justify-between items-center mb-3">
@@ -341,6 +373,9 @@ export function renderLobby() {
           </button>
         </div>
       </div>
+
+      <!-- Floating Squad Spotify Jukebox -->
+      ${renderSpotifyJukebox()}
 
     </div>
   `;
@@ -555,4 +590,87 @@ export function bindLobbyEvents() {
       store.notify();
     });
   }
+
+  // --- SQUAD LIVE VOICE LOUNGE (WebRTC) ---
+  const btnVoiceConnect = document.getElementById('btn-toggle-voice-connect');
+  const btnVoiceLabel = document.getElementById('btn-voice-connect-label');
+  const btnMicMute = document.getElementById('btn-toggle-mic-mute');
+  const btnDeafen = document.getElementById('btn-toggle-deafen');
+  const voiceBadge = document.getElementById('voice-connection-badge');
+  const voiceDesc = document.getElementById('voice-status-desc');
+  const iconMicMute = document.getElementById('icon-mic-mute');
+  const iconDeafen = document.getElementById('icon-deafen');
+
+  if (btnVoiceConnect) {
+    btnVoiceConnect.addEventListener('click', async () => {
+      audio.playClick();
+      if (!p2pMesh.isVoiceActive) {
+        btnVoiceLabel.textContent = 'Connecting...';
+        const ok = await p2pMesh.startVoiceStream();
+        if (ok) {
+          audio.playCorrect();
+          btnVoiceLabel.textContent = 'Disconnect';
+          btnVoiceConnect.className = 'px-3.5 py-1.5 rounded-full bg-sunset-coral hover:bg-sunset-coral/90 text-white text-xs font-bold font-mono transition-all active:scale-95 flex items-center gap-1.5';
+          if (voiceBadge) {
+            voiceBadge.textContent = 'LIVE TALKING';
+            voiceBadge.className = 'px-2 py-0.5 rounded-full bg-mint-green/20 text-mint-green text-[9px] font-mono font-bold animate-pulse';
+          }
+          if (voiceDesc) voiceDesc.textContent = 'Open mic active • Speaking campers glow green';
+          if (btnMicMute) btnMicMute.style.display = 'inline-flex';
+          if (btnDeafen) btnDeafen.style.display = 'inline-flex';
+        } else {
+          btnVoiceLabel.textContent = 'Mic Blocked';
+          if (voiceDesc) voiceDesc.textContent = 'Please allow microphone access in your browser settings';
+        }
+      } else {
+        p2pMesh.stopVoiceStream();
+        btnVoiceLabel.textContent = 'Connect Mic';
+        btnVoiceConnect.className = 'px-3.5 py-1.5 rounded-full bg-[#06D6A0] hover:bg-[#06D6A0]/90 text-black text-xs font-bold font-mono transition-all active:scale-95 flex items-center gap-1.5 shadow-glow-mint';
+        if (voiceBadge) {
+          voiceBadge.textContent = 'DISCONNECTED';
+          voiceBadge.className = 'px-2 py-0.5 rounded-full bg-white/10 text-gray-400 text-[9px] font-mono font-bold';
+        }
+        if (voiceDesc) voiceDesc.textContent = 'Zero-latency live squad mic powered by WebRTC';
+        if (btnMicMute) btnMicMute.style.display = 'none';
+        if (btnDeafen) btnDeafen.style.display = 'none';
+      }
+    });
+  }
+
+  if (btnMicMute) {
+    btnMicMute.addEventListener('click', () => {
+      audio.playClick();
+      const isMuted = p2pMesh.toggleMute();
+      if (iconMicMute) {
+        iconMicMute.textContent = isMuted ? 'mic_off' : 'mic';
+        btnMicMute.className = `p-2 rounded-full border transition-colors ${isMuted ? 'bg-sunset-coral/20 border-sunset-coral text-sunset-coral' : 'bg-surface-bright border-border text-gray-300'}`;
+      }
+    });
+  }
+
+  if (btnDeafen) {
+    btnDeafen.addEventListener('click', () => {
+      audio.playClick();
+      const isDeafened = p2pMesh.toggleDeafen();
+      if (iconDeafen) {
+        iconDeafen.textContent = isDeafened ? 'volume_off' : 'volume_up';
+        btnDeafen.className = `p-2 rounded-full border transition-colors ${isDeafened ? 'bg-amber-gold/20 border-amber-gold text-amber-gold' : 'bg-surface-bright border-border text-gray-300'}`;
+      }
+    });
+  }
+
+  // Live speaking listener for avatar glow
+  p2pMesh.onSpeaking(({ userId, isSpeaking }) => {
+    const avatarEl = document.querySelector(`[data-player-id="${userId}"]`) || document.querySelector('#lobby-player-grid .relative');
+    if (avatarEl) {
+      if (isSpeaking) {
+        avatarEl.classList.add('ring-2', 'ring-mint-green', 'shadow-glow-mint');
+      } else {
+        avatarEl.classList.remove('ring-2', 'ring-mint-green', 'shadow-glow-mint');
+      }
+    }
+  });
+
+  // --- SPOTIFY SQUAD JUKEBOX EVENTS ---
+  bindSpotifyEvents();
 }

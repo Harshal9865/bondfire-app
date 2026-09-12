@@ -196,3 +196,62 @@ export async function fetchCloudMemories(podId) {
     return [];
   }
 }
+
+/**
+ * Upload an image, video, or audio blob to Supabase Cloud Storage
+ * with automatic fallback to base64 Data URL if bucket is unconfigured
+ */
+export async function uploadCloudMedia(fileOrBlob, bucketName = 'vault-media', customFolder = 'uploads') {
+  const sb = getSupabase();
+  const fileExt = fileOrBlob.name ? fileOrBlob.name.split('.').pop() : (fileOrBlob.type?.includes('audio') ? 'webm' : 'jpg');
+  const fileName = `${customFolder}/${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+  // Try Supabase Storage upload
+  if (sb && sb.storage) {
+    try {
+      const { data, error } = await sb.storage
+        .from(bucketName)
+        .upload(fileName, fileOrBlob, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: fileOrBlob.type || 'application/octet-stream',
+        });
+
+      if (!error && data) {
+        const { data: publicUrlData } = sb.storage.from(bucketName).getPublicUrl(fileName);
+        if (publicUrlData && publicUrlData.publicUrl) {
+          return {
+            url: publicUrlData.publicUrl,
+            storagePath: fileName,
+            source: 'SUPABASE_STORAGE',
+          };
+        }
+      } else if (error) {
+        console.warn('Supabase storage upload notice:', error.message);
+      }
+    } catch (err) {
+      console.warn('Supabase storage upload exception:', err);
+    }
+  }
+
+  // Graceful fallback: Convert to Data URL (base64) so user upload never breaks
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve({
+        url: reader.result,
+        storagePath: fileName,
+        source: 'CLIENT_BASE64_FALLBACK',
+      });
+    };
+    reader.onerror = () => {
+      resolve({
+        url: URL.createObjectURL(fileOrBlob),
+        storagePath: fileName,
+        source: 'OBJECT_URL_FALLBACK',
+      });
+    };
+    reader.readAsDataURL(fileOrBlob);
+  });
+}
+

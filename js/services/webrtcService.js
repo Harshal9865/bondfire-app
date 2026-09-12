@@ -20,6 +20,18 @@ export class P2PWebRTCService {
     this.isInitiator = false;
     this.isConnected = false;
     this.onMessageCallback = null;
+
+    // Live Squad Voice Mesh State
+    this.localAudioStream = null;
+    this.isVoiceActive = false;
+    this.isMuted = false;
+    this.isDeafened = false;
+    this.remoteAudioElements = new Map();
+    this.speakingListeners = new Set();
+    this.voiceStateListeners = new Set();
+    this.audioContext = null;
+    this.analyser = null;
+    this.vadInterval = null;
   }
 
   // Initialize P2P connection
@@ -45,6 +57,21 @@ export class P2PWebRTCService {
           this.dataChannel = event.channel;
           this.setupDataChannel(this.dataChannel);
         };
+      }
+
+      // Handle incoming remote audio stream from peer campers
+      this.peerConnection.ontrack = (event) => {
+        console.log('🎙️ Incoming squad peer audio track received!');
+        if (event.streams && event.streams[0]) {
+          this.attachRemoteAudioStream(event.streams[0]);
+        }
+      };
+
+      // Add existing local microphone track if voice was already activated
+      if (this.localAudioStream) {
+        this.localAudioStream.getAudioTracks().forEach((track) => {
+          this.peerConnection.addTrack(track, this.localAudioStream);
+        });
       }
 
       this.peerConnection.oniceconnectionstatechange = () => {
@@ -131,6 +158,195 @@ export class P2PWebRTCService {
           score: (game.score || 0) + (data.points || 150),
         },
       });
+    } else if (data.type === 'P2P_VOICE_SPEAKING') {
+      this.notifySpeaking(data.userId, data.userName, data.isSpeaking);
+    } else if (data.type === 'P2P_VOICE_MUTE') {
+      console.log(`🎙️ [P2P Voice] Camper ${data.userName} mute status: ${data.isMuted}`);
+    }
+  }
+
+  // Voice Controls & Activity Detection
+  async startVoiceStream() {
+    if (this.isVoiceActive) return true;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        this.localAudioStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+          video: false,
+        });
+
+        this.isVoiceActive = true;
+        this.isMuted = false;
+
+        // If peer connection exists, add tracks
+        if (this.peerConnection) {
+          this.localAudioStream.getAudioTracks().forEach((track) => {
+            this.peerConnection.addTrack(track, this.localAudioStream);
+          });
+        }
+
+        this.setupVoiceActivityDetection();
+        this.notifyVoiceState();
+        return true;
+      }
+    } catch (err) {
+      console.warn('Microphone permission denied or unavailable:', err);
+      return false;
+    }
+    return false;
+  }
+
+  stopVoiceStream() {
+    if (this.localAudioStream) {
+      this.localAudioStream.getTracks().forEach((t) => t.stop());
+      this.localAudioStream = null;
+    }
+    if (this.vadInterval) {
+      clearInterval(this.vadInterval);
+      this.vadInterval = null;
+    }
+    if (this.audioContext) {
+      try { this.audioContext.close(); } catch {}
+      this.audioContext = null;
+    }
+    this.isVoiceActive = false;
+    this.notifyVoiceState();
+  }
+
+  toggleMute() {
+    if (!this.localAudioStream) return false;
+    this.isMuted = !this.isMuted;
+    this.localAudioStream.getAudioTracks().forEach((track) => {
+      track.enabled = !this.isMuted;
+    });
+
+    const user = store.getState().currentUser;
+    this.send({
+      type: 'P2P_VOICE_MUTE',
+      userId: user?.id,
+      userName: user?.displayName || 'Camper',
+      isMuted: this.isMuted,
+    });
+
+    this.notifyVoiceState();
+    return this.isMuted;
+  }
+
+  toggleDeafen() {
+    this.isDeafened = !this.isDeafened;
+    this.remoteAudioElements.forEach((audioEl) => {
+      audioEl.muted = this.isDeafened;
+    });
+    this.notifyVoiceState();
+    return this.isDeafened;
+  }
+
+  setupVoiceActivityDetection() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass || !this.localAudioStream) return;
+
+      this.audioContext = new AudioContextClass();
+      const source = this.audioContext.createMediaStreamSource(this.localAudioStream);
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 256;
+      source.connect(this.analyser);
+
+      const bufferLength = this.analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      let wasSpeaking = false;
+
+      this.vadInterval = setInterval(() => {
+        if (!this.isVoiceActive || this.isMuted) {
+          if (wasSpeaking) {
+            wasSpeaking = false;
+            this.broadcastSpeaking(false);
+          }
+          return;
+        }
+
+        this.analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          sum += dataArray[i];
+        }
+        const average = sum / bufferLength;
+        const isSpeakingNow = average > 25;
+
+        if (isSpeakingNow !== wasSpeaking) {
+          wasSpeaking = isSpeakingNow;
+          this.broadcastSpeaking(wasSpeaking);
+        }
+      }, 120);
+    } catch (err) {
+      console.warn('Voice Activity Detection notice:', err);
+    }
+  }
+
+  broadcastSpeaking(isSpeaking) {
+    const user = store.getState().currentUser;
+    const userName = user?.displayName || 'You';
+    const userId = user?.id || 'usr_self';
+
+    this.notifySpeaking(userId, userName, isSpeaking);
+
+    this.send({
+      type: 'P2P_VOICE_SPEAKING',
+      userId,
+      userName,
+      isSpeaking,
+    });
+  }
+
+  attachRemoteAudioStream(stream) {
+    let audioEl = document.getElementById('webrtc-remote-audio');
+    if (!audioEl) {
+      audioEl = document.createElement('audio');
+      audioEl.id = 'webrtc-remote-audio';
+      audioEl.autoplay = true;
+      audioEl.style.display = 'none';
+      document.body.appendChild(audioEl);
+    }
+    audioEl.srcObject = stream;
+    audioEl.muted = this.isDeafened;
+    audioEl.play().catch((err) => console.warn('Autoplay audio allowed after user gesture:', err));
+  }
+
+  onSpeaking(listener) {
+    this.speakingListeners.add(listener);
+    return () => this.speakingListeners.delete(listener);
+  }
+
+  notifySpeaking(userId, userName, isSpeaking) {
+    for (const listener of this.speakingListeners) {
+      try {
+        listener({ userId, userName, isSpeaking });
+      } catch (err) {
+        console.error('Error in speaking listener:', err);
+      }
+    }
+  }
+
+  onVoiceState(listener) {
+    this.voiceStateListeners.add(listener);
+    return () => this.voiceStateListeners.delete(listener);
+  }
+
+  notifyVoiceState() {
+    for (const listener of this.voiceStateListeners) {
+      try {
+        listener({
+          isVoiceActive: this.isVoiceActive,
+          isMuted: this.isMuted,
+          isDeafened: this.isDeafened,
+        });
+      } catch (err) {
+        console.error('Error in voice state listener:', err);
+      }
     }
   }
 
@@ -139,6 +355,7 @@ export class P2PWebRTCService {
   }
 
   close() {
+    this.stopVoiceStream();
     if (this.dataChannel) this.dataChannel.close();
     if (this.peerConnection) this.peerConnection.close();
     this.isConnected = false;

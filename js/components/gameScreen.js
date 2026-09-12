@@ -14,6 +14,8 @@ import { ConfettiEngine } from '../visuals/confetti.js';
 import { GAME_MODES, getDeckForMode } from '../data/partyGameDecks.js';
 import { initKineticWordReveal, initLiveVoteBars, init3DCardFlip } from './cardRevealInteraction.js';
 import { generateDynamicGameDeck } from '../services/geminiService.js';
+import { p2pMesh } from '../services/webrtcService.js';
+import { renderSpotifyJukebox, bindSpotifyEvents, playSongOnSpotify } from './spotifyPlayer.js';
 
 let timerInterval = null;
 let confettiInstance = null;
@@ -190,6 +192,18 @@ export function renderGameScreen() {
           <span class="material-symbols-outlined text-[15px]">volume_up</span>
           <span>FX Soundboard</span>
         </button>
+
+        <!-- Squad Live Voice Chat Mic Toggle -->
+        <button id="btn-game-voice-mic" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-border hover:border-mint-green/60 text-gray-300 text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm" title="Toggle Squad Live Mic">
+          <span class="material-symbols-outlined text-[15px] text-mint-green" id="game-voice-mic-icon">mic_off</span>
+          <span id="game-voice-mic-text">Squad Mic</span>
+        </button>
+
+        <!-- Spotify Squad Jukebox Toggle -->
+        <button id="btn-game-open-spotify" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-border hover:border-[#1DB954]/60 text-[#1DB954] text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm" title="Spotify Squad Jukebox">
+          <span class="material-symbols-outlined text-[15px]">graphic_eq</span>
+          <span>Jukebox</span>
+        </button>
       </div>
 
       <!-- Host Soundboard Drawer (Collapsible) -->
@@ -311,6 +325,9 @@ export function renderGameScreen() {
           </div>
         </div>
       </div>
+
+      <!-- Floating Spotify Squad Jukebox -->
+      ${renderSpotifyJukebox()}
     </div>
   `;
 }
@@ -565,7 +582,11 @@ function renderEmojiCinemaView(card, game, currentUserName) {
       <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-amber-gold/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
         <div class="text-amber-gold font-bold text-sm mb-1.5">BOLLYWOOD CANON: ${options[card.correctIndex || 0]}!</div>
         <p class="text-xs text-gray-300 italic font-serif mb-3">${card.iconicDialogue || '“Ja Simran ja, jee le apni zindagi!”'}</p>
-        <div class="flex justify-end">
+        <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-border/50">
+          <button class="btn-play-cinema-spotify inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1DB954]/20 border border-[#1DB954]/60 text-[#1DB954] font-bold text-xs hover:bg-[#1DB954]/30 transition-all cursor-pointer" data-movie="${options[card.correctIndex || 0]}">
+            <span class="material-symbols-outlined text-sm">queue_music</span>
+            <span>Listen on Spotify</span>
+          </button>
           <button id="btn-next-round" class="px-5 py-2 rounded-full bg-amber-gold text-canvas font-bold text-xs">Next Scene</button>
         </div>
       </div>
@@ -1317,4 +1338,69 @@ export function bindGameEvents() {
       }, 400);
     });
   }
+
+  // Squad Live Voice Mic in Game
+  const btnGameVoiceMic = document.getElementById('btn-game-voice-mic');
+  const gameMicIcon = document.getElementById('game-voice-mic-icon');
+  const gameMicText = document.getElementById('game-voice-mic-text');
+
+  function updateGameMicUi() {
+    if (!btnGameVoiceMic || !gameMicIcon || !gameMicText) return;
+    if (!p2pMesh.isVoiceActive()) {
+      gameMicIcon.textContent = 'mic_off';
+      gameMicIcon.className = 'material-symbols-outlined text-[15px] text-gray-400';
+      gameMicText.textContent = 'Squad Mic';
+      btnGameVoiceMic.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-border hover:border-mint-green/60 text-gray-300 text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm';
+    } else if (p2pMesh.isMuted) {
+      gameMicIcon.textContent = 'mic_off';
+      gameMicIcon.className = 'material-symbols-outlined text-[15px] text-red-400';
+      gameMicText.textContent = 'Muted';
+      btnGameVoiceMic.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-950/40 border border-red-500/50 text-red-300 text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm';
+    } else {
+      gameMicIcon.textContent = 'mic';
+      gameMicIcon.className = 'material-symbols-outlined text-[15px] text-mint-green animate-pulse';
+      gameMicText.textContent = 'Live Mic';
+      btnGameVoiceMic.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mint-green/10 border border-mint-green/60 text-mint-green text-caption font-bold tracking-wide transition-all active:scale-95 cursor-pointer shadow-sm shadow-mint-green/20';
+    }
+  }
+
+  updateGameMicUi();
+
+  if (btnGameVoiceMic) {
+    btnGameVoiceMic.addEventListener('click', async () => {
+      audio.playClick();
+      if (!p2pMesh.isVoiceActive()) {
+        btnGameVoiceMic.classList.add('animate-pulse');
+        await p2pMesh.startVoiceStream();
+      } else {
+        p2pMesh.toggleMute();
+      }
+      updateGameMicUi();
+    });
+  }
+
+  // Spotify Squad Jukebox Toggle in Game
+  const btnGameOpenSpotify = document.getElementById('btn-game-open-spotify');
+  if (btnGameOpenSpotify) {
+    btnGameOpenSpotify.addEventListener('click', () => {
+      audio.playClick();
+      const popup = document.getElementById('spotify-jukebox-modal');
+      if (popup) {
+        popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+      }
+    });
+  }
+
+  // Cinema Bollywood Spotify button
+  const cinemaSpotifyBtns = document.querySelectorAll('.btn-play-cinema-spotify');
+  cinemaSpotifyBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      audio.playChime();
+      const movie = btn.dataset.movie || 'Bollywood Classics';
+      playSongOnSpotify(`${movie} bollywood songs`);
+    });
+  });
+
+  // Bind Spotify Jukebox events
+  bindSpotifyEvents();
 }
