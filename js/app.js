@@ -136,21 +136,22 @@ class BondfireApp {
   }
 
   render(state) {
-    // 1. Render Global Header
-    if (this.headerMount && state.currentView !== 'TV_MODE' && state.currentView !== 'GAME') {
-      this.headerMount.innerHTML = renderHeader();
-      bindHeaderEvents();
-    } else if (this.headerMount) {
-      this.headerMount.innerHTML = '';
-    }
+    try {
+      // 1. Render Global Header
+      if (this.headerMount && state.currentView !== 'TV_MODE' && state.currentView !== 'GAME') {
+        this.headerMount.innerHTML = renderHeader();
+        bindHeaderEvents();
+      } else if (this.headerMount) {
+        this.headerMount.innerHTML = '';
+      }
 
-    // 2. Render Active View
-    if (!this.appMount) return;
+      // 2. Render Active View
+      if (!this.appMount) return;
 
-    // Apply global dark mode class for the new aesthetic
-    document.body.classList.add('dark');
+      // Apply global dark mode class for the new aesthetic
+      document.body.classList.add('dark');
 
-    switch (state.currentView) {
+      switch (state.currentView) {
       case 'ARCADE':
         this.appMount.innerHTML = renderArcadeScreen();
         bindArcadeEvents();
@@ -239,19 +240,41 @@ class BondfireApp {
         break;
     }
 
-    // 3. Render Global Footer
-    if (this.footerMount) {
-      this.footerMount.innerHTML = renderFooter();
-      bindFooterEvents();
-    }
+      // 3. Render Global Footer
+      if (this.footerMount) {
+        this.footerMount.innerHTML = renderFooter();
+        bindFooterEvents();
+      }
 
-    // Scroll to top on view transition
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Scroll to top on view transition
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('⚠️ Critical view render caught error:', err);
+      if (this.appMount) {
+        this.appMount.innerHTML = renderHero();
+        try { bindHeroEvents(); } catch {}
+      }
+    }
   }
 }
 
 // Bootstrap Application when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  const app = new BondfireApp();
-  app.init();
-});
+function bootstrapApp() {
+  try {
+    const app = new BondfireApp();
+    app.init();
+  } catch (err) {
+    console.error('Bondfire initialization error:', err);
+    const mount = document.getElementById('app-mount');
+    if (mount && mount.innerHTML.trim() === '') {
+      mount.innerHTML = renderHero();
+      try { bindHeroEvents(); } catch {}
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapApp);
+} else {
+  bootstrapApp();
+}

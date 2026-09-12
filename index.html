@@ -159,10 +159,19 @@
 
   <!-- Automatic PWA Cache Invalidation for New Releases -->
   <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let reg of registrations) {
+          reg.update();
+        }
+      });
+    }
     if ('caches' in window) {
       caches.keys().then(function(keys) {
         keys.forEach(function(key) {
-          if (key !== 'bondfire-v4') caches.delete(key);
+          if (key !== 'bondfire-v6') {
+            caches.delete(key);
+          }
         });
       });
     }

@@ -1,14 +1,9 @@
 // ==============================================================================
-// BONDFIRE SERVICE WORKER
-// Caches core application assets for instant load and offline resilience
+// BONDFIRE SERVICE WORKER (v6)
+// Network-first for dynamic code and navigation, with resilient offline fallback
 // ==============================================================================
 
-// ==============================================================================
-// BONDFIRE SERVICE WORKER
-// Caches core application assets for instant load and offline resilience
-// ==============================================================================
-
-const CACHE_NAME = 'bondfire-v4';
+const CACHE_NAME = 'bondfire-v6';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -31,8 +26,8 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('⚡ Pre-caching Bondfire v3 offline assets');
-      return cache.addAll(PRECACHE_ASSETS);
+      console.log('⚡ Pre-caching Bondfire v6 offline assets');
+      return cache.addAll(PRECACHE_ASSETS).catch((err) => console.warn('Pre-cache notice:', err));
     })
   );
   self.skipWaiting();
@@ -56,12 +51,19 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   // Pass through non-GET requests or WebSocket connections
-  if (event.request.method !== 'GET' || event.request.url.includes('/ws')) {
+  if (event.request.method !== 'GET' || event.request.url.includes('/ws') || event.request.url.includes('supabase.co')) {
     return;
   }
 
-  // Network-first strategy for HTML pages / navigation requests to prevent stale cached HTML
-  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+  // Network-first strategy for HTML pages, navigation requests, and JavaScript files
+  // This guarantees users always receive the latest live updates without black-screen cache bugs
+  const isCodeOrDocument =
+    event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    event.request.destination === 'script' ||
+    event.request.url.endsWith('.js');
+
+  if (isCodeOrDocument) {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
@@ -76,7 +78,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-while-revalidate for static assets
+  // Stale-while-revalidate for images, fonts, and stylesheets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
