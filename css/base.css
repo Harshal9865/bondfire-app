@@ -159,9 +159,9 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
   }
 }
 
-/* Clear mobile bottom docking bar */
+/* Clear mobile bottom docking bar with generous margin */
 #app-mount {
-  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 1024px) {
@@ -172,11 +172,31 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
 
 /* Mobile Elevated Floating Center Play Button */
 .bottom-nav-center-btn {
-  transform: translateY(-14px);
-  box-shadow: 0 0 25px rgba(255, 90, 95, 0.45), 0 8px 20px rgba(0, 0, 0, 0.6);
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  box-shadow: 0 0 22px rgba(255, 90, 95, 0.5), 0 6px 18px rgba(0, 0, 0, 0.7);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
 }
 .bottom-nav-center-btn:active {
-  transform: translateY(-10px) scale(0.95);
+  transform: scale(0.92) !important;
+}
+
+/* Mobile Bottom Nav Hidden / Minimized State */
+#mobile-bottom-nav {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease !important;
+  will-change: transform, opacity;
+}
+
+#mobile-bottom-nav.nav-hidden {
+  transform: translateY(calc(100% + 24px)) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Mobile Slide-up Bottom Sheet */

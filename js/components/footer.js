@@ -11,7 +11,7 @@ import { openLegalModal } from './legalModal.js';
 
 export function renderFooter() {
   return `
-    <footer class="site-footer bg-[#070910] border-t border-[#1F2436] pt-14 pb-28 lg:pb-14 select-none relative z-20">
+    <footer class="site-footer bg-[#070910] border-t border-[#1F2436] pt-14 pb-36 lg:pb-14 select-none relative z-20">
       <!-- Ambient Backlight Gradient -->
       <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sunset-coral/40 to-transparent"></div>
       

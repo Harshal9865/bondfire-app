@@ -94,8 +94,8 @@ export function renderHeader() {
             </button>
           </div>
 
-          <!-- Primary CTA Button (Desktop & Tablet) -->
-          <button class="hidden sm:flex relative group overflow-hidden px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0" id="btn-header-create-room">
+          <!-- Primary CTA Button (Desktop Only) -->
+          <button class="hidden lg:flex relative group overflow-hidden px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0" id="btn-header-create-room">
             <span class="relative z-10 flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[16px]">add</span>
               <span>Create Room</span>
@@ -163,61 +163,63 @@ export function renderHeader() {
       </div>
     </header>
 
-    <!-- Floating Action Button (FAB) for 1-Tap Quick Room Creation on Mobile -->
-    <button id="mobile-fab-action" class="lg:hidden fixed bottom-22 right-4 z-40 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs shadow-glow-coral active:scale-95 flex items-center gap-1.5 border border-white/20 transition-all duration-300 transform hover:scale-105" title="Instant Room Creation">
-      <span class="material-symbols-outlined text-[18px]">add_circle</span>
-      <span class="tracking-wide">Create Room</span>
-    </button>
+    <!-- Mobile Bottom Command Dock with Hide/Show Capability -->
+    <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/95 backdrop-blur-2xl border-t border-[#262B40] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-1 px-3">
+      <!-- Top header bar on dock with Title + Hide/Collapse button -->
+      <div class="flex items-center justify-between px-2 pb-1 border-b border-white/5 mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-pulse"></span>
+          <span class="text-[9.5px] font-mono font-bold uppercase tracking-wider text-gray-400">Navigation</span>
+        </div>
+        <!-- Hide / Minimize Button -->
+        <button id="btn-hide-bottom-nav" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface hover:bg-surface-bright border border-border/80 text-[10px] font-medium text-gray-300 hover:text-white transition-all active:scale-95 cursor-pointer" title="Hide Navigation Bar">
+          <span>Hide</span>
+          <span class="material-symbols-outlined text-[14px]">expand_more</span>
+        </button>
+      </div>
 
-      <!-- Mobile Bottom Command Dock -->
-    <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/92 backdrop-blur-2xl border-t border-[#262B40]/80 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] select-none transition-transform duration-300 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-1 px-3">
-      <div class="max-w-md mx-auto grid grid-cols-5 items-end justify-around gap-1">
-        
+      <div class="max-w-md mx-auto grid grid-cols-5 items-center justify-around gap-1 text-center">
         <!-- Tab 1: Home -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'HOME' ? 'text-white font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="HOME">
-          <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'HOME' ? 'text-white scale-110' : ''}">home</span>
-          </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Home</span>
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all duration-200 active:scale-90 ${currentView === 'HOME' ? 'text-sunset-coral font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="HOME">
+          <span class="material-symbols-outlined text-[22px] ${currentView === 'HOME' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">home</span>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Home</span>
         </button>
 
         <!-- Tab 2: Memories -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'MEMORIES' ? 'text-amber-gold font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="MEMORIES">
-          <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'MEMORIES' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">inventory_2</span>
-            ${currentView === 'MEMORIES' ? '<span class="w-1 h-1 rounded-full bg-amber-gold absolute -bottom-1"></span>' : ''}
-          </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Memories</span>
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all duration-200 active:scale-90 ${currentView === 'MEMORIES' ? 'text-amber-gold font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="MEMORIES">
+          <span class="material-symbols-outlined text-[22px] ${currentView === 'MEMORIES' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">inventory_2</span>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Memories</span>
         </button>
 
         <!-- Tab 3: CENTER HERO FLAME (ROOMS) -->
-        <div class="flex flex-col items-center justify-center -mt-5">
-          <button class="mobile-bottom-tab bottom-nav-center-btn w-13 h-13 rounded-full bg-gradient-to-tr from-sunset-coral via-[#FF7064] to-amber-gold p-[2px] flex items-center justify-center shadow-lg transition-transform duration-200 group active:scale-90" data-view="ROOMS">
-            <div class="w-full h-full rounded-full bg-canvas/40 backdrop-blur-sm flex items-center justify-center text-white">
-              <span class="material-symbols-outlined text-[26px] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">campfire</span>
+        <div class="flex flex-col items-center justify-center -mt-3">
+          <button class="mobile-bottom-tab bottom-nav-center-btn w-12 h-12 min-w-[48px] min-h-[48px] max-w-[48px] max-h-[48px] rounded-full bg-gradient-to-tr from-sunset-coral via-[#FF7064] to-amber-gold p-[2px] flex items-center justify-center shadow-lg transition-transform duration-200 group active:scale-90" data-view="ROOMS" title="Party Rooms">
+            <div class="w-full h-full rounded-full bg-[#0B0E17] flex items-center justify-center text-white">
+              <span class="material-symbols-outlined text-[24px] text-sunset-coral drop-shadow-[0_0_10px_rgba(255,90,95,0.8)]">local_fire_department</span>
             </div>
           </button>
-          <span class="text-[10px] tracking-tight -mt-2 font-bold ${currentView === 'ROOMS' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral' : 'text-gray-300'}">Rooms</span>
+          <span class="text-[10px] tracking-tight mt-0.5 font-bold ${currentView === 'ROOMS' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral' : 'text-gray-300'}">Rooms</span>
         </div>
 
         <!-- Tab 4: Shows -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'SHOWS' ? 'text-tertiary font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="SHOWS">
-          <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'SHOWS' ? 'text-tertiary scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">play_circle</span>
-            ${currentView === 'SHOWS' ? '<span class="w-1 h-1 rounded-full bg-tertiary absolute -bottom-1"></span>' : ''}
-          </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Shows</span>
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all duration-200 active:scale-90 ${currentView === 'SHOWS' ? 'text-mint-green font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="SHOWS">
+          <span class="material-symbols-outlined text-[22px] ${currentView === 'SHOWS' ? 'text-mint-green scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">play_circle</span>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Shows</span>
         </button>
 
         <!-- Tab 5: Profile -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'PROFILE' ? 'text-white font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="PROFILE">
-          <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'PROFILE' ? 'text-white scale-110' : ''}">person</span>
-          </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Profile</span>
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all duration-200 active:scale-90 ${currentView === 'PROFILE' ? 'text-white font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="PROFILE">
+          <span class="material-symbols-outlined text-[22px] ${currentView === 'PROFILE' ? 'text-white scale-110' : ''}">person</span>
+          <span class="text-[10px] tracking-tight mt-0.5 font-medium">Profile</span>
         </button>
       </div>
     </nav>
+
+    <!-- Floating Re-open Nav Pill (Shown when user has hidden the bottom nav) -->
+    <button id="btn-restore-bottom-nav" class="lg:hidden fixed bottom-4 right-4 z-40 hidden px-3.5 py-2 rounded-full bg-[#0B0E17]/95 border border-sunset-coral/50 text-white text-xs font-bold shadow-glow-coral backdrop-blur-md flex items-center gap-1.5 transition-all duration-300 active:scale-95 cursor-pointer" title="Show Navigation Menu">
+      <span class="material-symbols-outlined text-[16px] text-sunset-coral">local_fire_department</span>
+      <span>Menu</span>
+    </button>
 
     <!-- Mobile Slide-up Command Hub Sheet (Bottom Drawer with Modes, Arcade, TV Mode, Soundboard & Profile) -->
     <div id="mobile-explore-sheet-backdrop" class="bottom-sheet-backdrop fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end lg:hidden select-none">
@@ -229,7 +231,7 @@ export function renderHeader() {
         <!-- Sheet Header -->
         <div class="flex items-center justify-between pb-3 border-b border-border/70 mb-4">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-sunset-coral text-[20px]">campfire</span>
+            <span class="material-symbols-outlined text-sunset-coral text-[20px]">local_fire_department</span>
             <h3 class="font-bold text-white text-base tracking-tight">Bondfire Command Hub</h3>
           </div>
           <button id="btn-close-explore-sheet" class="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-gray-400 hover:text-white transition-colors">
@@ -590,13 +592,67 @@ export function bindHeaderEvents() {
     });
   });
 
-  // Mobile Floating Action Button (FAB) - 1-Tap Quick Party Room Launch
-  const fabBtn = document.getElementById('mobile-fab-action');
-  if (fabBtn) {
-    fabBtn.addEventListener('click', () => {
-      audio.playChime();
-      store.createNewRoom();
-      store.setView('LOBBY');
+  // Mobile Bottom Navigation Hide / Restore & Scroll Behavior
+  const bottomNav = document.getElementById('mobile-bottom-nav');
+  const hideNavBtn = document.getElementById('btn-hide-bottom-nav');
+  const restoreNavBtn = document.getElementById('btn-restore-bottom-nav');
+
+  const hideBottomNav = () => {
+    if (!bottomNav) return;
+    bottomNav.classList.add('nav-hidden');
+    if (restoreNavBtn) {
+      restoreNavBtn.classList.remove('hidden');
+      restoreNavBtn.classList.add('flex');
+    }
+  };
+
+  const showBottomNav = () => {
+    if (!bottomNav) return;
+    bottomNav.classList.remove('nav-hidden');
+    if (restoreNavBtn) {
+      restoreNavBtn.classList.add('hidden');
+      restoreNavBtn.classList.remove('flex');
+    }
+  };
+
+  if (hideNavBtn) {
+    hideNavBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      hideBottomNav();
     });
   }
+
+  if (restoreNavBtn) {
+    restoreNavBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      showBottomNav();
+    });
+  }
+
+  // Smart Auto-Hide on Scroll Down / Reveal on Scroll Up for maximum screen real-estate
+  let lastScrollY = window.scrollY;
+  let scrollTicking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) {
+      window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrollDelta = currentScrollY - lastScrollY;
+
+        // Auto-hide when user actively scrolls down more than 18px past header
+        if (scrollDelta > 18 && currentScrollY > 120) {
+          hideBottomNav();
+        } else if (scrollDelta < -12 || (window.innerHeight + currentScrollY) >= (document.body.offsetHeight - 60)) {
+          // Reveal when scrolling up or reaching the bottom of the page
+          showBottomNav();
+        }
+
+        lastScrollY = Math.max(0, currentScrollY);
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  }, { passive: true });
 }
