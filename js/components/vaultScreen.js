@@ -6,6 +6,9 @@
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { MediaProcessor } from '../services/mediaProcessor.js';
+import { renderVaultUpload, bindVaultUploadEvents } from './uploadVaultInteraction.js';
+import { renderMemoryGraphNode, bindMemoryGraphEvents } from './memoryGraphCard.js';
+import { MemoryGraphService } from '../services/memoryGraphService.js';
 
 export function renderVaultScreen() {
   const state = store.getState();
@@ -19,73 +22,97 @@ export function renderVaultScreen() {
       <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-48 bg-primary-container/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
       <!-- Header & Title Area -->
-      <div class="flex flex-col gap-3 mb-6 relative">
-        <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-4 mb-6 relative">
+        <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2">
-            <span class="px-2.5 py-1 rounded-full bg-surface-container font-label-md text-caption text-on-surface-variant tracking-wider uppercase font-bold">Pod Archive</span>
-            <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-tertiary font-label-md text-caption font-bold">
-              <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-              Mesh Ingest Sync
+            <span class="px-3 py-1 rounded-full bg-surface-bright font-mono text-[11px] text-amber-gold border border-amber-gold/30 tracking-wider uppercase font-bold">
+              SQUAD VAULT
+            </span>
+            <span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface text-mint-green font-mono text-[11px] font-bold border border-mint-green/30">
+              <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
+              Private to Room
             </span>
           </div>
-          <div class="font-room-code text-label-lg text-secondary font-bold">ID: #GOA-8842</div>
+          <div class="font-mono text-xs text-sunset-coral font-bold bg-surface px-3 py-1 rounded-full border border-sunset-coral/30">
+            Room: #AHM-8842
+          </div>
         </div>
 
         <div class="flex items-baseline justify-between gap-4">
-          <h1 class="font-headline-lg text-headline-lg text-on-surface flex items-center gap-2 font-bold tracking-tight">
-            The Goa Crew Vault 🗄️ <span class="font-headline-sm text-headline-sm text-on-surface-variant">(${memories.length + 144} Memories)</span>
+          <h1 class="font-display text-3xl sm:text-4xl text-white flex items-center gap-2.5 font-extrabold tracking-tight">
+            <span>Our Squad Vault</span>
+            <span class="text-sm sm:text-base font-mono font-bold text-amber-gold px-2.5 py-0.5 rounded-full bg-amber-gold/15 border border-amber-gold/30">
+              ${memories.length + (state.memoryGraphNodes || []).length} Memories
+            </span>
           </h1>
-          <button class="shrink-0 p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors border border-border" title="Vault Settings" id="btn-vault-settings">
-            <span class="material-symbols-outlined text-[20px]">settings</span>
+          <button class="shrink-0 p-2.5 rounded-xl bg-surface hover:bg-surface-bright text-gray-400 hover:text-white transition-colors border border-border" title="Vault Settings" id="btn-vault-settings">
+            <span class="material-symbols-outlined text-[20px]">tune</span>
           </button>
         </div>
 
-        <!-- Privacy Shield Banner -->
-        <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-surface-container-low border border-border text-tertiary shadow-sm">
-          <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0">verified_user</span>
-          <p class="font-caption text-caption text-tertiary-fixed font-medium truncate">
-            Zero-AI-Training Guaranteed • End-to-End Encrypted • Only your Pod can view this media.
+        <!-- Privacy Friendly Banner -->
+        <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-surface border border-border text-gray-300 shadow-inner">
+          <span class="material-symbols-outlined text-[18px] text-mint-green shrink-0">lock</span>
+          <p class="font-sans text-xs text-gray-300 font-medium truncate">
+            100% Private • Only friends in your room can see these photos, chats, and jokes.
           </p>
-          <span class="ml-auto material-symbols-outlined text-[16px] text-tertiary-fixed-dim">lock</span>
+          <span class="ml-auto material-symbols-outlined text-[16px] text-gray-500">verified_user</span>
         </div>
       </div>
 
       <!-- Multi-Format Ingestion Zone -->
-      <div class="mb-8 rounded-2xl bg-surface-container-low p-5 shadow-lg border border-border relative group" id="vault-dropzone">
-        <div class="flex flex-col items-center justify-center text-center p-6 rounded-xl bg-surface-container border border-border/80">
-          <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mb-3 text-primary border border-border">
-            <span class="material-symbols-outlined text-[24px]">cloud_upload</span>
-          </div>
-          <p class="font-headline-sm text-headline-sm text-on-surface mb-1 font-bold">Feed the Memory Engine</p>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mb-5">
-            Drag & drop files or forward screenshots to your private Pod WhatsApp bot.
-          </p>
+      ${renderVaultUpload()}
 
-          <!-- Quick Action Buttons -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full">
-            <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-browse">
-              <span class="material-symbols-outlined text-primary text-[22px] group-hover/btn:scale-110 transition-transform">add_photo_alternate</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold">Photos & Memes</span>
-            </button>
-            <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-chat-import">
-              <span class="material-symbols-outlined text-mint-green text-[22px] group-hover/btn:scale-110 transition-transform">chat</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold">Import Chat (.txt/.json)</span>
-            </button>
-            <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-ocr">
-              <span class="material-symbols-outlined text-secondary text-[22px] group-hover/btn:scale-110 transition-transform">document_scanner</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold">Screenshots</span>
-            </button>
-            <button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-border group/btn" id="btn-vault-quote">
-              <span class="material-symbols-outlined text-primary-fixed text-[22px] group-hover/btn:scale-110 transition-transform">format_quote</span>
-              <span class="font-label-md text-label-md text-on-surface font-semibold">Inside Joke</span>
-            </button>
+      <!-- WEEKLY MEMORY MISSION BENTO -->
+      <div class="my-6 p-5 rounded-2xl bg-gradient-to-r from-amber-gold/15 via-surface to-sunset-coral/15 border border-amber-gold/40 shadow-xl relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold uppercase border border-amber-gold/30">
+                WEEK 42 MISSION
+              </span>
+              <span class="text-xs text-mint-green font-mono font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-mint-green animate-pulse"></span>
+                Friday Game Unlocked
+              </span>
+            </div>
+            <h3 class="font-display text-base sm:text-lg font-bold text-white tracking-tight">Drop 1 photo or screenshot from this weekend</h3>
+            <p class="text-xs text-gray-300 mt-0.5">Bondfire turns it into custom "Who Said This?" and "Our Lore" cards automatically.</p>
           </div>
 
-          <div class="flex items-center gap-3 mt-4 text-outline font-caption text-caption">
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">smartphone</span> WhatsApp: +1 (555) 462-8321</span>
-            <span>•</span>
-            <span>Max Ingestion Payload 100MB</span>
+          <button id="btn-submit-weekly-mission" class="shrink-0 px-5 py-2.5 rounded-full bg-sunset-coral text-white font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">upload_file</span>
+            <span>+ Quick Drop</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- THE BONDFIRE MEMORY GRAPH (HUMAN MEANING ORGANIZER) -->
+      <div class="mb-8" id="memory-graph-section">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h2 class="font-display text-xl text-white font-bold flex items-center gap-2">
+              <span>The Squad Memory Graph</span>
+              <span class="text-xs font-mono font-bold text-mint-green px-2 py-0.5 rounded-full bg-mint-green/15 border border-mint-green/30">
+                ${(state.memoryGraphNodes || []).length} Structured Nodes
+              </span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Human meaning, not raw files. Review and approve before game rounds.</p>
           </div>
+
+          <!-- Category Filter Pills -->
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1" id="graph-filter-container">
+            ${['ALL', 'QUOTES', 'FOOD', 'RUNNING_JOKES', 'PLACES', 'SONGS'].map((cat, idx) => `
+              <button class="btn-graph-filter px-3 py-1 rounded-full text-[10px] font-bold border transition-all ${idx === 0 ? 'bg-amber-gold/20 text-amber-gold border-amber-gold' : 'bg-surface-bright border-border text-gray-400 hover:text-white'}" data-category="${cat}">
+                ${cat.replace('_', ' ')}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Memory Graph Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="memory-graph-grid">
+          ${(state.memoryGraphNodes || []).map((node) => renderMemoryGraphNode(node)).join('')}
         </div>
       </div>
 
@@ -306,6 +333,8 @@ export function renderVaultScreen() {
               <span>Deposit to Vault & Trivia Deck</span>
             </button>
           </form>
+        </div>
+      </div>
       <!-- Real WhatsApp / Discord Chat Importer Modal -->
       <div id="chat-importer-modal" class="fixed inset-0 bg-canvas/85 backdrop-blur-2xl z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="max-w-lg w-full rounded-2xl bg-surface-container p-6 border border-border shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -350,9 +379,8 @@ export function renderVaultScreen() {
 }
 
 export function bindVaultEvents() {
-  const browseBtn = document.getElementById('btn-vault-browse');
-  const ocrBtn = document.getElementById('btn-vault-ocr');
-  const quoteBtn = document.getElementById('btn-vault-quote');
+  bindVaultUploadEvents();
+
   const jokeModal = document.getElementById('inside-joke-modal');
   const closeJokeModalBtn = document.getElementById('btn-close-joke-modal');
   const jokeForm = document.getElementById('form-inside-joke');
@@ -382,12 +410,6 @@ export function bindVaultEvents() {
       }, 1500);
     }
   };
-
-  if (browseBtn) {
-    browseBtn.addEventListener('click', () => {
-      addSimulatedMemory('PHOTO', 'Anjuna Beach Sunset Party', 'The evening we watched the sun dip into the Arabian Sea.');
-    });
-  }
 
   // Real Chat Log Importer (WhatsApp / Discord)
   const chatImportBtn = document.getElementById('btn-vault-chat-import');
@@ -495,12 +517,7 @@ export function bindVaultEvents() {
     });
   }
 
-  if (ocrBtn) {
-    ocrBtn.addEventListener('click', () => {
-      addSimulatedMemory('CHAT_SCREENSHOT', 'WhatsApp Group Chat', '“If anyone orders Hawaiian pizza again I’m revoking Netflix.”');
-    });
-  }
-
+  const quoteBtn = document.getElementById('btn-vault-quote');
   if (quoteBtn && jokeModal) {
     quoteBtn.addEventListener('click', () => {
       audio.playClick();
@@ -641,6 +658,51 @@ export function bindVaultEvents() {
     previewCardsBtn.addEventListener('click', () => {
       audio.playChime();
       store.setView('LOBBY');
+    });
+  }
+
+  // Bind Memory Graph Interactive Events (Approve, Hide, Delete)
+  const graphSection = document.getElementById('memory-graph-section');
+  if (graphSection) {
+    bindMemoryGraphEvents(graphSection);
+
+    // Filter by Category
+    const filterBtns = graphSection.querySelectorAll('.btn-graph-filter');
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cat = btn.getAttribute('data-category');
+        audio.playClick();
+        filterBtns.forEach((b) => {
+          b.className = 'btn-graph-filter px-3 py-1 rounded-full text-[10px] font-bold border transition-all bg-surface-bright border-border text-gray-400 hover:text-white';
+        });
+        btn.className = 'btn-graph-filter px-3 py-1 rounded-full text-[10px] font-bold border transition-all bg-amber-gold/20 text-amber-gold border-amber-gold';
+
+        const filtered = MemoryGraphService.getNodesByCategory(cat);
+        const grid = document.getElementById('memory-graph-grid');
+        if (grid) {
+          grid.innerHTML = filtered.map((n) => renderMemoryGraphNode(n)).join('');
+          bindMemoryGraphEvents(graphSection);
+        }
+      });
+    });
+  }
+
+  // Weekly Mission Submit Drop
+  const btnWeeklyMission = document.getElementById('btn-submit-weekly-mission');
+  if (btnWeeklyMission) {
+    btnWeeklyMission.addEventListener('click', () => {
+      audio.playChime();
+      const quotes = [
+        { cat: 'QUOTES', title: '“Bas 5 minute mein aa raha hoon!”', snip: 'Standing in towel scrolling Reels' },
+        { cat: 'FOOD', title: 'Midnight Maggi with Cheese Slice', snip: 'Room 304 secret recipe at 2:30 AM' },
+        { cat: 'RUNNING_JOKES', title: 'The Great Uber Cancellation War', snip: '4 drivers cancelled back to back' }
+      ];
+      const pick = quotes[Math.floor(Math.random() * quotes.length)];
+      MemoryGraphService.addNode(pick.cat, pick.title, pick.snip);
+      btnWeeklyMission.innerHTML = '<span>✅</span><span>Mission Complete!</span>';
+      setTimeout(() => {
+        store.setView('MEMORIES');
+      }, 600);
     });
   }
 }

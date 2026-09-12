@@ -40,6 +40,11 @@
   --mode-accent: var(--accent-coral);
   --mode-glow: var(--accent-coral-glow);
 
+  /* Scroll-Triggered Theme (GSAP Color Shift Support) */
+  --theme-bg: var(--bg-canvas);
+  --theme-text: var(--text-primary);
+  --theme-surface: var(--bg-surface-1);
+
   /* Typography Scale */
   --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

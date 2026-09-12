@@ -401,110 +401,118 @@ export function renderHero() {
           <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-sunset-coral/15 rounded-full blur-[120px] pointer-events-none"></div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
-            <!-- Left Column: Copy & Details -->
+            <!-- Left Column: Copy & Details (Matching Image 1) -->
             <div class="lg:col-span-5 space-y-6">
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-gold/10 border border-amber-gold/30 text-amber-gold text-xs font-bold uppercase tracking-wider">
-                <span>🖨️ Physical Keepsakes & Books</span>
+                <span>📖 PHYSICAL KEEPSAKE</span>
               </div>
-              <h2 class="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-                Turn a year of digital chaos into a museum-grade book.
+              <h2 class="font-display text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+                Turn game night into a physical keepsake.
               </h2>
               <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
-                At the end of every season, Bondfire automatically synthesizes your pod’s photos, hilarious wrong answers, MVP awards, and greatest chat quotes into an archival hardcover coffee table book.
+                Every memorable round, tribunal verdict, and inside joke quote is automatically compiled into a gorgeous, archival-grade physical photobook.
               </p>
-              <ul class="space-y-3 text-sm text-gray-300">
+              <ul class="space-y-4 text-sm text-gray-300">
                 <li class="flex items-start gap-3">
-                  <div class="w-5 h-5 rounded-full bg-mint-green/20 text-mint-green flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div class="w-5 h-5 rounded-full bg-sunset-coral/20 text-sunset-coral flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span class="material-symbols-outlined text-[14px]">check</span>
                   </div>
-                  <span><strong>No manual scrapbooking:</strong> Auto-curated from your highest-rated game rounds.</span>
+                  <span><strong>Museum-Grade Layflat Binding:</strong> Ultra-thick 240gsm luster pages that open completely flat without gutter loss.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-5 h-5 rounded-full bg-amber-gold/20 text-amber-gold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="material-symbols-outlined text-[14px]">check</span>
+                  </div>
+                  <span><strong>Real Hot Foil Stamping:</strong> Custom debossed metallic gold titles featuring your pod's official secret name.</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <div class="w-5 h-5 rounded-full bg-mint-green/20 text-mint-green flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span class="material-symbols-outlined text-[14px]">check</span>
                   </div>
-                  <span><strong>Foil-stamped hardcover:</strong> 180gsm archival paper, Smyth-sewn layflat binding.</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <div class="w-5 h-5 rounded-full bg-mint-green/20 text-mint-green flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span class="material-symbols-outlined text-[14px]">check</span>
-                  </div>
-                  <span><strong>1-Click Pod Split:</strong> Ship copies to all group members with address collection links.</span>
+                  <span><strong>1-Click Pod Cost Split:</strong> Easily split the printing cost across all pod members with one shareable link.</span>
                 </li>
               </ul>
               <div class="pt-2 flex items-center gap-4 flex-wrap">
-                <button id="btn-hero-preview-yearbook" class="px-6 py-3 rounded-full bg-amber-gold hover:bg-amber-gold/90 text-canvas font-bold text-sm shadow-glow-amber transition-all active:scale-95">
-                  Preview Sample Yearbook (PDF)
+                <button id="btn-hero-preview-yearbook" class="px-6 py-3 rounded-full bg-amber-gold hover:bg-amber-gold/90 text-canvas font-bold text-sm shadow-glow-amber transition-all active:scale-95 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">menu_book</span>
+                  <span>Explore Photobook</span>
                 </button>
-                <span class="text-xs text-gray-400 font-mono">From $38 / copy</span>
+                <span class="text-xs text-gray-400 font-mono">Hardcover ($38) & Softcover ($24)</span>
               </div>
             </div>
 
-            <!-- Right Column: Visual 3D Preview of Open Hardcover Book -->
+            <!-- Right Column: 3D Tilted Card Preview (Matching Image 1 Exact Replica with Hover Straighten) -->
             <div class="lg:col-span-7 flex justify-center py-4">
-              <div class="relative w-full max-w-xl book-spine-3d transition-transform duration-500 hover:rotate-0">
-                <div class="bg-[#121522] rounded-2xl border-4 border-[#2A3048] p-4 sm:p-6 shadow-2xl relative">
-                  <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-8 bg-gradient-to-r from-black/40 via-black/80 to-black/40 pointer-events-none z-20"></div>
-                  <!-- Open Two-Page Spread -->
-                  <div class="grid grid-cols-2 gap-4 relative z-10 bg-[#0C0E17] rounded-xl p-4 border border-border text-left">
-                    <!-- Left Page: The Funniest Bluffs & Photos -->
-                    <div class="space-y-3 pr-2">
-                      <div class="flex items-center justify-between border-b border-border pb-1.5">
-                        <span class="text-[9px] font-mono uppercase text-sunset-coral font-bold tracking-widest">CH 4: THE CABIN TRIP</span>
-                        <span class="text-[9px] text-gray-500 font-mono">p. 42</span>
-                      </div>
-                      <div class="rounded-lg overflow-hidden border border-border relative aspect-video bg-surface-container flex items-center justify-center">
-                        <img alt="Cabin Trip" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmTvkxTpmNJFJSFINhAeLGm8sUBPCJkNY2tvuprYLpPtmpoZGndhi9Y8iVIN8gzZUXAug0Hrygmir0VhptFCHbHiqbt-Fex-S19G0c04ZLgJeDlK2yqcf46pVxEj5y4zJDYSxjc_1ZTHm1cq-b44hlgJTQDrgAV7SgJD7lw-2lIM2_odAZ4394Hxx_Ai5YmMbghI34_YJ4zCvNTdL1r0XI7en4Sy6nFawO7B3U8BovJmj26dnk879lPA" />
-                        <div class="absolute bottom-1 left-1 bg-black/80 text-[8px] font-mono px-1.5 py-0.5 rounded text-amber-gold">
-                          3:15 AM · Power Outage
+              <div class="hero-3d-card-stage">
+                <div id="hero-keepsake-3d-card" class="hero-3d-tilted-card relative w-full max-w-xl rounded-3xl bg-[#111422]/95 border-2 border-[#262B40] p-6 shadow-2xl overflow-hidden cursor-pointer group">
+                  
+                  <!-- Subtle Constellation Mesh Background (Matching Image 1) -->
+                  <div class="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl opacity-35">
+                    <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <line x1="18%" y1="18%" x2="48%" y2="28%" stroke="#FFAE33" stroke-width="1" stroke-opacity="0.35" stroke-dasharray="3 3"/>
+                      <line x1="48%" y1="28%" x2="82%" y2="22%" stroke="#FFAE33" stroke-width="1" stroke-opacity="0.35"/>
+                      <line x1="48%" y1="28%" x2="42%" y2="65%" stroke="#FF5A5F" stroke-width="1" stroke-opacity="0.3"/>
+                      <line x1="42%" y1="65%" x2="72%" y2="78%" stroke="#FFAE33" stroke-width="1" stroke-opacity="0.25"/>
+                      <line x1="18%" y1="72%" x2="42%" y2="65%" stroke="#FFAE33" stroke-width="1" stroke-opacity="0.35"/>
+                      
+                      <circle cx="18%" cy="18%" r="3.5" fill="#FFAE33" opacity="0.7"/>
+                      <circle cx="48%" cy="28%" r="4.5" fill="#FFAE33" opacity="0.85"/>
+                      <circle cx="82%" cy="22%" r="3.5" fill="#FFAE33" opacity="0.6"/>
+                      <circle cx="42%" cy="65%" r="4" fill="#FF5A5F" opacity="0.75"/>
+                      <circle cx="72%" cy="78%" r="3" fill="#FFAE33" opacity="0.5"/>
+                      <circle cx="18%" cy="72%" r="3.5" fill="#FFAE33" opacity="0.65"/>
+                    </svg>
+                  </div>
+
+                  <!-- Card Header (Matching Image 1) -->
+                  <div class="relative z-10 flex items-center justify-between pb-4 border-b border-[#262B40]">
+                    <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">
+                      CABIN TRIP 2025 // POD ARCHIVE
+                    </span>
+                    <span class="text-[11px] font-mono text-gray-400">48 PAGES • HARDCOVER</span>
+                  </div>
+
+                  <!-- Layflat Book Spread Preview -->
+                  <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+                    <!-- Left Page -->
+                    <div class="bg-[#161928] rounded-2xl p-4 border border-[#262B40] flex flex-col justify-between shadow-inner min-h-[220px]">
+                      <div class="w-full h-32 rounded-xl overflow-hidden border border-[#202538] relative bg-[#0D101A] shadow-inner group-hover:border-amber-gold/40 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=600&auto=format&fit=crop&q=80" alt="Cabin Deck Campfire" class="w-full h-full object-cover" />
+                        <div class="absolute bottom-1.5 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-mono px-2 py-0.5 rounded text-amber-gold border border-amber-gold/30">
+                          3:15 AM · Cabin Deck Fire
                         </div>
                       </div>
-                      <div class="p-2 rounded-lg bg-surface border border-border/70 text-[10px] space-y-0.5">
-                        <div class="text-amber-gold font-bold">“Voted Worst Bluff”</div>
-                        <div class="text-gray-300 italic">“Marcus tried to convince everyone he played college polo.”</div>
-                        <div class="text-gray-500 text-[8px] text-right">— 100% Callout</div>
+                      <div class="text-[11px] text-gray-300 italic my-2">
+                        "Priya claimed she could start a fire with two sticks... burnt the marshmallows in 4 seconds."
                       </div>
+                      <div class="text-[9px] font-mono text-sunset-coral font-bold uppercase">MVP CHAOS AGENT: PRIYA</div>
                     </div>
 
-                    <!-- Right Page: Pod Superlatives & Season Recap -->
-                    <div class="space-y-3 pl-2">
-                      <div class="flex items-center justify-between border-b border-border pb-1.5">
-                        <span class="text-[9px] font-mono uppercase text-amber-gold font-bold tracking-widest">POD AWARDS 2025</span>
-                        <span class="text-[9px] text-gray-500 font-mono">p. 43</span>
-                      </div>
-                      <div class="space-y-1.5">
-                        <div class="p-1.5 rounded-lg bg-surface border border-border flex items-center gap-2">
-                          <span class="text-xs">👑</span>
-                          <div>
-                            <div class="text-[9px] font-bold text-white leading-none">MVP Trivia Legend</div>
-                            <div class="text-[8px] text-sunset-coral">Sarah K. (94%)</div>
-                          </div>
-                        </div>
-                        <div class="p-1.5 rounded-lg bg-surface border border-border flex items-center gap-2">
-                          <span class="text-xs">🌪️</span>
-                          <div>
-                            <div class="text-[9px] font-bold text-white leading-none">The Chaos Agent</div>
-                            <div class="text-[8px] text-amber-gold">Devon (Most wild)</div>
-                          </div>
-                        </div>
-                        <div class="p-1.5 rounded-lg bg-surface border border-border flex items-center gap-2">
-                          <span class="text-xs">💤</span>
-                          <div>
-                            <div class="text-[9px] font-bold text-white leading-none">First Asleep On Couch</div>
-                            <div class="text-[8px] text-duo-rose">Alex (Every Friday)</div>
-                          </div>
+                    <!-- Right Page -->
+                    <div class="bg-[#161928] rounded-2xl p-4 border border-[#262B40] flex flex-col justify-between shadow-inner min-h-[220px]">
+                      <div>
+                        <div class="text-xs font-bold text-white mb-2 font-mono uppercase">POD AWARDS 2025</div>
+                        <div class="space-y-2 text-[11px] text-gray-400">
+                          <div class="flex justify-between py-0.5 border-b border-white/5"><span>👑 Lore Master</span><span class="text-white font-bold">Harshal</span></div>
+                          <div class="flex justify-between py-0.5 border-b border-white/5"><span>🍕 Hawaiian Pizza Ally</span><span class="text-white font-bold">Marcus</span></div>
+                          <div class="flex justify-between py-0.5 border-b border-white/5"><span>💤 First Asleep on Couch</span><span class="text-white font-bold">Sam</span></div>
                         </div>
                       </div>
-                      <div class="pt-1.5 border-t border-border flex items-center justify-between text-[8px] text-gray-500 font-mono">
-                        <span>POD: GOA CREW</span>
-                        <span class="text-mint-green">PRINTED ARCHIVE</span>
+                      <div class="w-full py-2 rounded-xl bg-amber-gold/20 text-amber-gold text-[10px] font-bold text-center border border-amber-gold/30 hover:bg-amber-gold/30 transition-colors uppercase tracking-wider font-mono mt-2">
+                        ARCHIVED FOREVER
                       </div>
                     </div>
                   </div>
-                  <div class="mt-3 flex items-center justify-between text-[11px] text-gray-400 font-mono px-2">
-                    <span class="text-amber-gold font-semibold">✨ Smyth-Sewn Matte Finish • Volume I</span>
-                    <span class="text-gray-500">120 Pages • Hardcover</span>
+
+                  <!-- Book Footer Action -->
+                  <div class="relative z-10 pt-3 border-t border-[#262B40] flex items-center justify-between">
+                    <span class="text-xs text-gray-400">Italian Obsidian Bookcloth</span>
+                    <button class="text-xs font-bold text-amber-gold hover:text-white flex items-center gap-1 transition-colors" id="btn-preview-book-modal">
+                      <span>Interactive 3D Preview</span>
+                      <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                    </button>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -692,13 +700,24 @@ export function bindHeroEvents() {
     });
   }
 
-  // Preview Yearbook CTAs
+  // Preview Yearbook / Photobook CTAs
   const previewYearbookBtn = document.getElementById('btn-hero-preview-yearbook');
+  const previewBookModalBtn = document.getElementById('btn-preview-book-modal');
+  const keepsakeCard = document.getElementById('hero-keepsake-3d-card');
   const yearbookBadge = document.getElementById('hero-yearbook-badge');
+
   const goToYearbook = () => {
     audio.playClick();
+    confettiInstance.burst(30);
     store.setView('YEARBOOK');
+    window.location.hash = '#/YEARBOOK';
   };
+
   if (previewYearbookBtn) previewYearbookBtn.addEventListener('click', goToYearbook);
+  if (previewBookModalBtn) previewBookModalBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    goToYearbook();
+  });
+  if (keepsakeCard) keepsakeCard.addEventListener('click', goToYearbook);
   if (yearbookBadge) yearbookBadge.addEventListener('click', goToYearbook);
 }

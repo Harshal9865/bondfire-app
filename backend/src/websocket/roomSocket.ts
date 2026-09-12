@@ -130,6 +130,67 @@ export class RoomSocketManager {
             });
             break;
           }
+
+          // 2.0 SHOW RUNNER ADVANCE
+          case 'CLIENT_SHOW_RUNNER_ADVANCE': {
+            if (!currentClient) return;
+            const { sessionId, nextStep } = msg.payload;
+            this.broadcastToRoom(currentClient.roomCode, {
+              type: 'SERVER_SHOW_RUNNER_STEP',
+              payload: { sessionId, step: nextStep },
+              timestamp: Date.now(),
+            });
+            break;
+          }
+
+          // 2.0 PRIVATE PANIC BUTTON TRIGGER (ANONYMOUS PROMPT REPLACEMENT)
+          case 'CLIENT_TRIGGER_PANIC_BUTTON': {
+            if (!currentClient) return;
+            const { roomSessionId, flagType, promptId, tone } = msg.payload;
+            const { HumorEngineService } = await import('../services/humorEngine');
+            const result = HumorEngineService.flagPrompt(
+              roomSessionId,
+              currentClient.userId,
+              flagType || 'TOO_PERSONAL',
+              promptId,
+              tone
+            );
+
+            // Broadcast replacement prompt to room anonymously (never reveals who flagged it)
+            this.broadcastToRoom(currentClient.roomCode, {
+              type: 'SERVER_PROMPT_SWAPPED',
+              payload: {
+                reason: 'A camper requested a softer card',
+                substitutePrompt: result.substitutePrompt,
+              },
+              timestamp: Date.now(),
+            });
+            break;
+          }
+
+          // 2.0 LIVE SOUNDBOARD BLAST
+          case 'CLIENT_SOUNDBOARD_TRIGGER': {
+            if (!currentClient) return;
+            const { soundCue } = msg.payload; // 'buzzer' | 'fanfare' | 'drumroll' | 'crickets'
+            this.broadcastToRoom(currentClient.roomCode, {
+              type: 'SERVER_SOUNDBOARD_PLAY',
+              payload: { soundCue, triggeredBy: currentClient.displayName },
+              timestamp: Date.now(),
+            });
+            break;
+          }
+
+          // 2.0 WATCH-AND-PLAY SYNCHRONIZED PAUSE
+          case 'CLIENT_WATCH_PLAY_SYNC': {
+            if (!currentClient) return;
+            const { cardId, currentTime, isPaused } = msg.payload;
+            this.broadcastToRoom(currentClient.roomCode, {
+              type: 'SERVER_WATCH_PLAY_SYNCED',
+              payload: { cardId, currentTime, isPaused },
+              timestamp: Date.now(),
+            });
+            break;
+          }
         }
       } catch (err) {
         console.error('WebSocket message parsing error:', err);

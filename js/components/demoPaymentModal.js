@@ -11,7 +11,7 @@ let currentOrder = null;
 
 export function openPaymentModal(options = {}) {
   currentOrder = {
-    item: options.item || 'Pod Pro Membership (1 Year)',
+    item: options.item || options.name || 'Pod Pro Membership (1 Year)',
     price: options.price !== undefined ? options.price : 45.00,
     originalPrice: options.originalPrice || (options.price ? options.price * 1.25 : 60.00),
     discountText: options.discountText || 'Special 25% Squad Discount Applied',
@@ -27,12 +27,16 @@ export function openPaymentModal(options = {}) {
   audio.playChime();
 }
 
+export const openDemoPaymentModal = openPaymentModal;
+
 export function closePaymentModal() {
   const modalMount = document.getElementById('modal-mount');
   if (modalMount) {
     modalMount.innerHTML = '';
   }
 }
+
+export const closeDemoPaymentModal = closePaymentModal;
 
 export function renderPaymentModal() {
   // Exported for testing harness

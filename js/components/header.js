@@ -19,12 +19,11 @@ export function renderHeader() {
       <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-10 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Left: Brand Identity -->
-        <div class="flex items-center gap-2 sm:gap-3 cursor-pointer group shrink-0" id="nav-brand-logo">
-          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-sunset-coral via-amber-gold to-duo-rose p-[1.5px] shadow-glow-coral flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
-            <div class="w-full h-full bg-canvas rounded-[10px] flex items-center justify-center">
-              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-gold" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C12 2 13.8 6.2 16 8.5C18.2 10.8 21 12 21 12C21 12 18.2 13.2 16 15.5C13.8 17.8 12 22 12 22C12 22 10.2 17.8 8 15.5C5.8 13.2 3 12 3 12C3 12 5.8 10.8 8 8.5C10.2 6.2 12 2 12 2Z"></path>
-                <circle class="text-sunset-coral" cx="12" cy="12" fill="currentColor" r="2.5"></circle>
+        <div class="flex items-center gap-3 sm:gap-4 cursor-pointer group shrink-0" id="nav-brand-logo">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-gold via-sunset-coral to-duo-rose p-[1.5px] shadow-glow-coral flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
+            <div class="w-full h-full bg-[#0B0E17] rounded-[10px] flex items-center justify-center">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-gold drop-shadow-[0_0_8px_rgba(255,183,3,0.8)]" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path>
               </svg>
             </div>
           </div>
@@ -37,46 +36,41 @@ export function renderHeader() {
           </div>
         </div>
 
-        <!-- Center: Curated Single-Deck Navigation Capsule (Desktop & Tablets >= 768px) -->
-        <nav class="hidden md:flex items-center p-1 rounded-full glass-pill border border-border/80 shadow-lg shadow-black/40 shrink-0 select-none">
-          <!-- Mode Switcher Segment -->
-          <div class="flex items-center gap-1 p-0.5 bg-surface-dark/60 rounded-full border border-border/60 shrink-0" id="header-mode-switcher">
-            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'SOLO' ? 'bg-surface-bright text-white shadow-sm border border-amber-gold/40' : 'text-gray-400 hover:text-white'} transition-all" data-mode="SOLO">
-              <span class="material-symbols-outlined text-[15px] ${currentMode === 'SOLO' ? 'text-amber-gold' : ''}">person</span>
-              <span class="whitespace-nowrap">Solo</span>
-            </button>
-            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'US' ? 'bg-surface-bright text-white shadow-sm border border-duo-rose/40' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-mode="US">
-              <span class="material-symbols-outlined text-[15px] ${currentMode === 'US' ? 'text-duo-rose' : ''}">favorite</span>
-              <span class="whitespace-nowrap">Us Mode</span>
-            </button>
-            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${currentMode === 'PODS' ? 'bg-surface-bright text-white shadow-sm border border-sunset-coral/40' : 'text-gray-400 hover:text-white'} relative transition-all" data-mode="PODS">
-              ${currentMode === 'PODS' ? '<span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-ping absolute -top-0.5 -right-0.5"></span>' : ''}
-              <span class="material-symbols-outlined text-[15px] ${currentMode === 'PODS' ? 'text-sunset-coral' : ''}">groups</span>
-              <span class="whitespace-nowrap">Pods</span>
-            </button>
-          </div>
+        <!-- Mode Switcher Pill (Desktop) -->
+        <div class="hidden xl:flex items-center p-1 rounded-full bg-[#10131C] border border-[#262B40] shadow-inner shrink-0" id="header-mode-switcher">
+          <button class="mode-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'bg-[#202538] text-white font-bold border border-amber-gold/40' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo
+          </button>
+          <button class="mode-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${currentMode === 'US' || currentView === 'COUPLE' ? 'bg-[#202538] text-white font-bold border border-duo-rose/40' : 'text-gray-400 hover:text-white'}" data-mode="US">
+            Us Mode
+          </button>
+          <button class="mode-btn px-3 py-1 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${currentMode === 'PODS' || ['ROOMS', 'LOBBY', 'GAME', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="PODS">
+            <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-pulse"></span>
+            <span>Pods</span>
+          </button>
+        </div>
 
-          <!-- Extended Direct Experience Links (Expanded on Large Desktops >= 1200px) -->
-          <div class="hidden xl:flex items-center gap-1 pr-1 pl-1 shrink-0" id="header-links">
-            <div class="w-[1px] h-4 bg-border/80 mx-1.5 shrink-0"></div>
-            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'VAULT' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="VAULT">
-              <span class="material-symbols-outlined text-[15px] text-tertiary">folder</span>
+        <!-- Center: 5-Pillar Navigation Capsule (Desktop & Tablets >= 768px) -->
+        <nav class="hidden md:flex items-center p-1 rounded-full glass-pill border border-border/80 shadow-lg shadow-black/40 shrink-0 select-none">
+          <div class="flex items-center gap-1 pr-1 pl-1 shrink-0" id="header-links">
+            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'MEMORIES' || currentView === 'VAULT' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold' : 'text-gray-400 hover:text-amber-gold'} transition-all" data-view="MEMORIES">
+              <span class="material-symbols-outlined text-[15px]">inventory_2</span>
               <span class="whitespace-nowrap">Vault</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'YEARBOOK' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="YEARBOOK">
-              <span class="material-symbols-outlined text-[15px] text-amber-gold">auto_stories</span>
+            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'YEARBOOK' || currentView === 'PHOTOBOOK' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="YEARBOOK">
+              <span class="material-symbols-outlined text-[15px]">auto_stories</span>
               <span class="whitespace-nowrap">Photobook</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'FRIENDS' ? 'text-sunset-coral bg-sunset-coral/10 border border-sunset-coral/30 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="FRIENDS">
-              <span class="material-symbols-outlined text-[15px] text-sunset-coral">diversity_3</span>
-              <span>Friends</span>
+            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'FRIENDS' ? 'bg-tertiary/20 text-tertiary border border-tertiary/40 font-bold' : 'text-gray-400 hover:text-tertiary'} transition-all" data-view="FRIENDS">
+              <span class="material-symbols-outlined text-[15px]">group</span>
+              <span class="whitespace-nowrap">Friends</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'GLADE' ? 'text-mint-green bg-mint-green/10 border border-mint-green/30 font-bold' : 'text-gray-400 hover:text-mint-green'} transition-all" data-view="GLADE">
-              <span class="material-symbols-outlined text-[15px] text-mint-green">stadia_controller</span>
+            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${['ARCADE', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-view="ARCADE">
+              <span class="material-symbols-outlined text-[15px]">sports_esports</span>
               <span class="whitespace-nowrap">Arcade</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'STORE' ? 'text-white bg-surface-bright/80 font-bold' : 'text-gray-400 hover:text-gray-200'} transition-all" data-view="STORE">
-              <span class="material-symbols-outlined text-[15px] text-secondary">shopping_bag</span>
+            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'STORE' || currentView === 'EMPORIUM' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold' : 'text-gray-400 hover:text-secondary'} transition-all" data-view="STORE">
+              <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
               <span class="whitespace-nowrap">Emporium</span>
             </button>
           </div>
@@ -109,9 +103,9 @@ export function renderHeader() {
             <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           </button>
 
-          <!-- User Profile / Auth Trigger -->
+          <!-- Official Google Sign-In Button or User Profile -->
           ${user.isLoggedIn && user.email ? `
-            <div class="relative group cursor-pointer shrink-0" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
+            <div class="relative group cursor-pointer shrink-0 flex items-center gap-2" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
               <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white" style="width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 9999px;">
                 ${user.avatarUrl ? `
                   <img src="${user.avatarUrl}" alt="${user.displayName || 'User'}" class="w-full h-full object-cover" style="width: 100%; height: 100%; object-fit: cover; border-radius: 9999px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -120,17 +114,17 @@ export function renderHeader() {
                   <span class="w-full h-full flex items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
                 `}
               </div>
-              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-mint-green border-2 border-canvas absolute -bottom-0.5 -right-0.5" title="Verified Online"></span>
+              <span class="hidden xl:inline text-xs font-bold text-gray-200">${(user.displayName || 'User').split(' ')[0]}</span>
             </div>
           ` : `
-            <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-border/80 hover:border-sunset-coral/70 text-xs font-bold text-gray-200 hover:text-white transition-all active:scale-95 shadow-sm shrink-0" id="header-user-profile" title="Sign In with Google">
+            <button class="btn-google-sign-in" id="btn-google-auth-header" title="Sign In with Google">
               <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
-              <span>Sign In</span>
+              <span class="hidden sm:inline">Sign In</span>
             </button>
           `}
         </div>
@@ -138,34 +132,33 @@ export function renderHeader() {
 
       <!-- Horizontal Scrolling Category & Mode Tabs (Mobile & Tablet < 1024px) -->
       <div class="lg:hidden w-full overflow-x-auto no-scrollbar border-t border-[#262B40]/60 px-3 py-2 bg-[#0E121E]/75 backdrop-blur-md flex items-center gap-2 scroll-smooth">
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentMode === 'SOLO' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-mode="SOLO" data-view="SOLO">
-          <span class="material-symbols-outlined text-[14px] text-amber-gold">person</span>
-          <span>Solo</span>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'MEMORIES' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="MEMORIES">
+          <span class="material-symbols-outlined text-[14px] text-amber-gold">inventory_2</span>
+          <span>Vault</span>
         </button>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentMode === 'US' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-mode="US" data-view="COUPLE">
-          <span class="material-symbols-outlined text-[14px] text-duo-rose">favorite</span>
-          <span>Us Mode</span>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'YEARBOOK' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="YEARBOOK">
+          <span class="material-symbols-outlined text-[14px] text-sunset-coral">auto_stories</span>
+          <span>Photobook</span>
         </button>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentMode === 'PODS' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-mode="PODS" data-view="LOBBY">
-          <span class="material-symbols-outlined text-[14px] text-sunset-coral">groups</span>
-          <span>Pods Squad</span>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'FRIENDS' ? 'bg-tertiary/20 text-tertiary border border-tertiary/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="FRIENDS">
+          <span class="material-symbols-outlined text-[14px] text-tertiary">group</span>
+          <span>Friends</span>
         </button>
-        <div class="w-[1px] h-4 bg-border/80 shrink-0 mx-0.5"></div>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'GLADE' ? 'bg-mint-green/20 text-mint-green border border-mint-green/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="GLADE">
-          <span class="material-symbols-outlined text-[14px] text-mint-green">stadia_controller</span>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${['ARCADE', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="ARCADE">
+          <span class="material-symbols-outlined text-[14px] text-duo-rose">sports_esports</span>
           <span>Arcade</span>
-        </button>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'TV_MODE' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="TV_MODE">
-          <span class="material-symbols-outlined text-[14px] text-sunset-coral">tv</span>
-          <span>TV Cast</span>
         </button>
         <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'STORE' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="STORE">
           <span class="material-symbols-outlined text-[14px] text-secondary">shopping_bag</span>
           <span>Emporium</span>
         </button>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'PRICING' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="PRICING">
-          <span class="material-symbols-outlined text-[14px] text-amber-gold">stars</span>
-          <span>Pricing</span>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'SOLO' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="SOLO">
+          <span class="material-symbols-outlined text-[14px] text-amber-gold">person</span>
+          <span>Solo</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'COUPLE' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="COUPLE">
+          <span class="material-symbols-outlined text-[14px] text-duo-rose">favorite</span>
+          <span>Us Mode</span>
         </button>
       </div>
     </header>
@@ -176,56 +169,53 @@ export function renderHeader() {
       <span class="tracking-wide">Create Room</span>
     </button>
 
-    <!-- Mobile Bottom Command Dock (Fixed thumb-friendly docking bar with elevated center flame button) -->
+      <!-- Mobile Bottom Command Dock -->
     <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/92 backdrop-blur-2xl border-t border-[#262B40]/80 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] select-none transition-transform duration-300 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-1 px-3">
       <div class="max-w-md mx-auto grid grid-cols-5 items-end justify-around gap-1">
         
-        <!-- Tab 1: Vault (Memories & Chat Imports) -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'VAULT' ? 'text-tertiary font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="VAULT">
+        <!-- Tab 1: Home -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'HOME' ? 'text-white font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="HOME">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'VAULT' ? 'text-tertiary scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">inventory_2</span>
-            ${currentView === 'VAULT' ? '<span class="w-1 h-1 rounded-full bg-tertiary absolute -bottom-1"></span>' : ''}
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'HOME' ? 'text-white scale-110' : ''}">home</span>
           </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Vault</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Home</span>
         </button>
 
-        <!-- Tab 2: Photobook (Yearbook & Keepsake) -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'YEARBOOK' ? 'text-amber-gold font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="YEARBOOK">
+        <!-- Tab 2: Memories -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'MEMORIES' ? 'text-amber-gold font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="MEMORIES">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'YEARBOOK' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">auto_stories</span>
-            ${currentView === 'YEARBOOK' ? '<span class="w-1 h-1 rounded-full bg-amber-gold absolute -bottom-1"></span>' : ''}
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'MEMORIES' ? 'text-amber-gold scale-110 drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]' : ''}">inventory_2</span>
+            ${currentView === 'MEMORIES' ? '<span class="w-1 h-1 rounded-full bg-amber-gold absolute -bottom-1"></span>' : ''}
           </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Book</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Memories</span>
         </button>
 
-        <!-- Tab 3: CENTER HERO FLAME (Home / Play / Campfire Room) -->
+        <!-- Tab 3: CENTER HERO FLAME (ROOMS) -->
         <div class="flex flex-col items-center justify-center -mt-5">
-          <button id="btn-bottom-center-home" class="bottom-nav-center-btn w-13 h-13 rounded-full bg-gradient-to-tr from-sunset-coral via-[#FF7064] to-amber-gold p-[2px] flex items-center justify-center shadow-lg transition-transform duration-200 group active:scale-90" title="Campfire Play Hub">
+          <button class="mobile-bottom-tab bottom-nav-center-btn w-13 h-13 rounded-full bg-gradient-to-tr from-sunset-coral via-[#FF7064] to-amber-gold p-[2px] flex items-center justify-center shadow-lg transition-transform duration-200 group active:scale-90" data-view="ROOMS">
             <div class="w-full h-full rounded-full bg-canvas/40 backdrop-blur-sm flex items-center justify-center text-white">
-              <span class="material-symbols-outlined text-[26px] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">local_fire_department</span>
+              <span class="material-symbols-outlined text-[26px] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">campfire</span>
             </div>
           </button>
-          <span class="text-[10px] tracking-tight -mt-2 font-bold ${currentView === 'HERO' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral' : 'text-gray-300'}">Play</span>
+          <span class="text-[10px] tracking-tight -mt-2 font-bold ${currentView === 'ROOMS' || currentView === 'LOBBY' || currentView === 'GAME' ? 'text-sunset-coral' : 'text-gray-300'}">Rooms</span>
         </div>
 
-        <!-- Tab 4: Friends & Squads -->
-        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'FRIENDS' ? 'text-sunset-coral font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="FRIENDS">
+        <!-- Tab 4: Shows -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'SHOWS' ? 'text-tertiary font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="SHOWS">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'FRIENDS' ? 'text-sunset-coral scale-110 drop-shadow-[0_0_8px_rgba(255,90,95,0.6)]' : ''}">diversity_3</span>
-            ${currentView === 'FRIENDS' ? '<span class="w-1 h-1 rounded-full bg-sunset-coral absolute -bottom-1"></span>' : ''}
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'SHOWS' ? 'text-tertiary scale-110 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}">play_circle</span>
+            ${currentView === 'SHOWS' ? '<span class="w-1 h-1 rounded-full bg-tertiary absolute -bottom-1"></span>' : ''}
           </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Friends</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Shows</span>
         </button>
 
-        <!-- Tab 5: Command Hub Sheet Trigger -->
-        <button id="btn-bottom-open-sheet" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'GLADE' || currentView === 'STORE' || currentView === 'PROFILE' || currentView === 'PRICING' ? 'text-duo-rose font-bold' : 'text-gray-400 hover:text-gray-200'}">
+        <!-- Tab 5: Profile -->
+        <button class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-90 ${currentView === 'PROFILE' ? 'text-white font-bold' : 'text-gray-400 hover:text-gray-200'}" data-view="PROFILE">
           <div class="relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-[21px] ${currentView === 'GLADE' || currentView === 'STORE' || currentView === 'PROFILE' ? 'text-duo-rose scale-110 drop-shadow-[0_0_8px_rgba(247,37,133,0.6)]' : ''}">widgets</span>
-            ${currentView === 'GLADE' || currentView === 'STORE' || currentView === 'PROFILE' ? '<span class="w-1 h-1 rounded-full bg-duo-rose absolute -bottom-1"></span>' : ''}
+            <span class="material-symbols-outlined text-[21px] ${currentView === 'PROFILE' ? 'text-white scale-110' : ''}">person</span>
           </div>
-          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Explore</span>
+          <span class="text-[9.5px] tracking-tight mt-0.5 font-medium">Profile</span>
         </button>
-
       </div>
     </nav>
 
@@ -397,6 +387,7 @@ export function bindHeaderEvents() {
         store.setMode(mode);
         if (mode === 'SOLO') store.setView('SOLO');
         else if (mode === 'US') store.setView('COUPLE');
+        else if (mode === 'PODS') store.setView('ROOMS');
         else store.setView('HERO');
       }
     });
@@ -479,6 +470,16 @@ export function bindHeaderEvents() {
     });
   }
 
+  // Google Sign-In Direct Header Button
+  const googleAuthBtn = document.getElementById('btn-google-auth-header');
+  if (googleAuthBtn) {
+    googleAuthBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      GoogleAuthService.promptSignIn();
+    });
+  }
+
   // Mobile Bottom Navigation Tabs Click
   const bottomTabs = document.querySelectorAll('.mobile-bottom-tab');
   bottomTabs.forEach((tab) => {
@@ -544,6 +545,7 @@ export function bindHeaderEvents() {
         store.setMode(mode);
         if (mode === 'SOLO') store.setView('SOLO');
         else if (mode === 'US') store.setView('COUPLE');
+        else if (mode === 'PODS') store.setView('ROOMS');
         else store.setView('HERO');
       }
       closeSheet();

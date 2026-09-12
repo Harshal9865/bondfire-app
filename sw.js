@@ -8,7 +8,7 @@
 // Caches core application assets for instant load and offline resilience
 // ==============================================================================
 
-const CACHE_NAME = 'bondfire-v3';
+const CACHE_NAME = 'bondfire-v4';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',

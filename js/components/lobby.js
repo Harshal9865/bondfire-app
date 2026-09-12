@@ -1,509 +1,516 @@
 // ==============================================================================
-// ROOM LOBBY COMPONENT (Screen 1)
-// Active Lobby Room matching Google Stitch Warm Analog Cyber design
+// BONDFIRE ROOM OS: ROOM LOBBY (js/components/lobby.js)
+// Fixed Room Templates, Humor Consent Settings, 1-Tap WhatsApp Invite & Audience Grid
 // ==============================================================================
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { GAME_MODES } from '../data/partyGameDecks.js';
+import { OUR_LORE_DECK } from '../data/indianCultureDecks.js';
+
+export const ROOM_TEMPLATES = [
+  {
+    id: 'SQUAD_NIGHT',
+    name: 'Squad Night 🔥',
+    tagline: 'Friends, roasts, inside jokes & questionable decisions',
+    defaultGame: 'OUR_LORE',
+    defaultTone: 'FRIENDLY_ROAST',
+    duration: '20 mins',
+    badge: 'MOST POPULAR'
+  },
+  {
+    id: 'COUPLE_DATE',
+    name: 'Couple Date Night 💖',
+    tagline: 'Our firsts, reaction predictions & gentle intimacy',
+    defaultGame: 'OUR_LORE',
+    defaultTone: 'ROMANTIC',
+    duration: '15 mins',
+    badge: 'INTIMATE'
+  },
+  {
+    id: 'FAMILY_ADDA',
+    name: 'Family Adda ☕',
+    tagline: 'Wholesome Antakshari, festival memories & relative trivia',
+    defaultGame: 'EMOJI_CINEMA',
+    defaultTone: 'FAMILY_SAFE',
+    duration: '25 mins',
+    badge: '100% SAFE'
+  },
+  {
+    id: 'COLLEGE_HOSTEL',
+    name: 'Hostel Night 🍕',
+    tagline: 'Maggi incidents, 3 AM philosophy & roommate exposes',
+    defaultGame: 'WHO_SAID_THIS',
+    defaultTone: 'SAVAGE_ROAST',
+    duration: '20 mins',
+    badge: 'CHAOTIC'
+  },
+  {
+    id: 'WEDDING_HOUSE',
+    name: 'Wedding House 🥁',
+    tagline: 'Sangeet choreography, gossip & cousin rivalries',
+    defaultGame: 'MOST_LIKELY_TO',
+    defaultTone: 'LIGHT_TEASING',
+    duration: '30 mins',
+    badge: 'CELEBRATION'
+  },
+  {
+    id: 'WATCH_PARTY',
+    name: 'Watch & Play 🎬',
+    tagline: 'Interactive 20s Reels with pause-and-predict rounds',
+    defaultGame: 'REEL_COURT',
+    defaultTone: 'FRIENDLY_ROAST',
+    duration: '15 mins',
+    badge: 'INTERACTIVE'
+  }
+];
 
 export function renderLobby() {
   const state = store.getState();
   const room = state.activeRoom;
   const user = state.currentUser;
   const hostName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'Host';
+  const currentTemplate = ROOM_TEMPLATES.find((t) => t.id === (room.roomTemplate || 'SQUAD_NIGHT')) || ROOM_TEMPLATES[0];
 
   return `
-    <div class="flex flex-col w-full max-w-[620px] mx-auto px-4 pt-6 pb-28 relative select-none">
-      <!-- Ambient Ember Glow Backdrops -->
-      <div class="absolute top-8 left-1/2 -translate-x-1/2 w-72 h-44 bg-primary-container/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
-      <div class="absolute top-80 right-2 w-48 h-48 bg-secondary-container/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="flex flex-col w-full max-w-[680px] mx-auto px-4 pt-6 pb-32 relative select-none z-20">
+      
+      <!-- Ambient Glows -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-sunset-coral/5 rounded-full blur-[110px] pointer-events-none -z-10"></div>
+      <div class="absolute top-80 right-0 w-80 h-80 bg-amber-gold/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
-      <!-- Room Quick Bar -->
-      <section class="pt-1 pb-3 flex items-center justify-between gap-2">
-        <!-- Tap to Copy Room Code Pill -->
-        <button class="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full shadow-md active:scale-95 transition-all text-left group border border-border/60" id="copy-code-btn" type="button">
-          <span class="material-symbols-outlined text-secondary text-[18px] transition-transform group-hover:rotate-12" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
-          <div class="flex flex-col">
-            <span class="font-label-md text-caption text-secondary-fixed uppercase tracking-wider font-bold">Room Code</span>
-            <div class="flex items-center gap-1">
-              <span class="font-room-code text-headline-sm text-on-surface tracking-widest leading-none">${room.roomCode}</span>
-              <span class="material-symbols-outlined text-secondary text-[16px] ml-1" id="copy-icon">content_copy</span>
-            </div>
+      <!-- Header & Room Code Bar (Editable Room Name) -->
+      <div class="flex items-center justify-between p-5 rounded-2xl bg-surface border border-border shadow-xl mb-6">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
+            <span class="text-[11px] font-mono font-bold text-mint-green uppercase tracking-wider">Bondfire Room OS Live</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-display text-2xl font-bold text-white tracking-tight" id="display-room-name">${room.podName || "The Ahmedabad Squad"}</h2>
+            <button id="btn-rename-room" class="p-1 rounded text-gray-400 hover:text-amber-gold transition-colors" title="Rename Room">
+              <span class="material-symbols-outlined text-[16px]">edit</span>
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">Host: <span class="text-white font-bold">${hostName}</span> · ${room.players.length} Campers in Adda</p>
+        </div>
+        
+        <button id="btn-copy-code" class="group flex flex-col items-end cursor-pointer bg-surface-bright/70 hover:bg-surface-bright p-2.5 rounded-xl border border-border/80 transition-all">
+          <span class="text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">Room Passcode</span>
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xl font-black text-amber-gold tracking-widest">${room.roomCode}</span>
+            <span class="material-symbols-outlined text-[16px] text-gray-400 group-hover:text-sunset-coral">content_copy</span>
           </div>
         </button>
+      </div>
 
-        <!-- Leave Room Pill -->
-        <button class="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container border border-border/50 px-3.5 py-2 rounded-full transition-colors active:scale-95 text-on-surface-variant" id="btn-leave-lobby" type="button">
-          <span class="material-symbols-outlined text-[16px]">logout</span>
-          <span class="font-label-md text-label-md">Leave</span>
+      <!-- Quick Social Sharing: 1-Tap WhatsApp & QR -->
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`🔥 Join our private Bondfire Adda tonight! Room Code: ${room.roomCode} -> http://localhost:3000/#/ROOMS`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">chat</span>
+          <span>1-Tap WhatsApp Invite</span>
+        </a>
+
+        <button id="slot-invite-player" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-surface border border-border hover:border-sunset-coral text-gray-200 font-bold text-xs transition-all active:scale-95 shadow-sm">
+          <span class="material-symbols-outlined text-[18px] text-sunset-coral">qr_code_scanner</span>
+          <span>Show Room QR Code</span>
         </button>
-      </section>
+      </div>
 
-      <!-- Pod Identity Hero Bento Slab -->
-      <section class="mb-5">
-        <div class="relative overflow-hidden bg-surface-container rounded-2xl p-5 shadow-xl border border-border/80">
-          <div class="absolute -right-8 -top-8 w-36 h-36 bg-gradient-to-bl from-primary-container/20 to-transparent rounded-full blur-xl pointer-events-none"></div>
-          <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ff5a5f_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none"></div>
-
-          <div class="relative flex flex-col gap-2">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1.5 bg-surface-container-high px-3 py-1 rounded-full border border-border/60">
-                <span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
-                <span class="font-caption text-caption text-tertiary-fixed-dim uppercase tracking-wider font-bold">Host: ${hostName} · ${room.players.length} Players</span>
-              </div>
-              <span class="font-caption text-caption text-secondary-fixed flex items-center gap-1 bg-secondary/10 px-2.5 py-1 rounded-full border border-secondary/20">
-                <span class="material-symbols-outlined text-[14px]">lock_open</span> Pod Public
-              </span>
+      <!-- ARCADE MULTIPLAYER: SPIN THE BOTTLE HERO BANNER -->
+      <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-sunset-coral/20 via-surface to-amber-gold/20 border border-sunset-coral/40 shadow-xl flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-sunset-coral/20 border border-sunset-coral/40 flex items-center justify-center text-2xl shrink-0 shadow-sm">
+            🍾
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-sunset-coral/30 text-sunset-coral">Arcade Multiplayer</span>
+              <span class="text-xs text-mint-green font-mono font-bold">5 Players Ready</span>
             </div>
-
-            <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight mt-1">
-              ${room.podName} 🏖️
-            </h2>
-
-            <div class="flex items-center justify-between bg-surface-container-lowest/80 rounded-xl p-2.5 mt-1 border border-border/60 hover:border-sunset-coral/50 transition-colors cursor-pointer" id="btn-active-deck-trigger">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="text-xl flex-shrink-0">${(GAME_MODES.find((m) => m.id === (room.selectedGameMode || 'RED_FLAG_COURT')) || GAME_MODES[0]).emoji}</span>
-                <div class="truncate">
-                  <div class="flex items-center gap-1.5">
-                    <span class="font-caption text-caption text-on-surface-variant uppercase font-bold">Active Game Mode</span>
-                    <span class="px-1.5 py-0.2 rounded bg-sunset-coral/20 text-sunset-coral text-[9px] font-bold font-mono uppercase">${(GAME_MODES.find((m) => m.id === (room.selectedGameMode || 'RED_FLAG_COURT')) || GAME_MODES[0]).badgeText}</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-on-surface truncate block font-bold">${(GAME_MODES.find((m) => m.id === (room.selectedGameMode || 'RED_FLAG_COURT')) || GAME_MODES[0]).name}</span>
-                </div>
-              </div>
-              <button class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-surface-bright flex items-center gap-1 text-xs text-on-surface font-semibold hover:text-amber-gold transition-colors" title="Customize Game Mode" id="btn-tune-deck">
-                <span class="material-symbols-outlined text-[15px]">tune</span>
-                <span>Change</span>
-              </button>
-            </div>
+            <h4 class="font-display text-sm sm:text-base font-bold text-white mt-0.5">Spin the Bottle (Truth or Dare)</h4>
+            <p class="text-[11px] text-gray-300">Realistic physics bottle spinner pointing at real players in the room.</p>
           </div>
         </div>
-      </section>
 
-      <!-- Player Roster Grid -->
-      <section class="mb-5">
-        <div class="flex items-center justify-between mb-2 px-1">
-          <div class="flex items-center gap-1.5">
-            <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Campers</h3>
-            <span class="font-caption text-caption bg-surface-container px-2.5 py-0.5 rounded-full text-secondary font-mono">${room.players.length} / 8</span>
+        <button id="btn-launch-spin-bottle" class="shrink-0 px-4 py-2.5 rounded-full bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-xs shadow-glow-coral transition-all active:scale-95 flex items-center gap-1.5">
+          <span>Play</span>
+          <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+        </button>
+      </div>
+
+      <!-- Room OS Template Selector (Fixed Templates) -->
+      <div class="mb-6 p-5 rounded-2xl bg-surface border border-border shadow-lg">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <span class="text-[10px] font-mono font-bold text-sunset-coral uppercase tracking-wider">Step 1 · Room Template</span>
+            <h3 class="font-display text-base font-bold text-white">Choose Your Adda Format</h3>
           </div>
-          <span class="font-caption text-caption text-tertiary flex items-center gap-1.5 font-bold">
-            <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Ready to Fire
-          </span>
+          <span class="text-xs text-amber-gold font-bold font-mono">${currentTemplate.duration}</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-2" id="lobby-player-grid">
-          ${room.players.map((p, index) => {
-            const isHost = p.role === 'HOST';
-            const isCurrentUser = isHost || p.name === 'Host (You)';
-            const displayName = isCurrentUser ? (user && user.isLoggedIn && user.displayName ? `${user.displayName.split(' ')[0]} (Host)` : 'You (Host)') : p.name;
-            const avatar = isCurrentUser && user && user.avatarUrl ? user.avatarUrl : (p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(displayName)}`);
-
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5" id="template-picker-grid">
+          ${ROOM_TEMPLATES.map((tmpl) => {
+            const isSelected = tmpl.id === (room.roomTemplate || 'SQUAD_NIGHT');
             return `
-              <div class="bg-surface-container rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden shadow-md border border-border/80 group">
-                <div class="flex items-center justify-between">
-                  ${isHost ? `
-                    <span class="inline-flex items-center gap-1 bg-secondary/15 text-secondary px-1.5 py-0.5 rounded font-caption text-caption font-semibold">
-                      <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">crown</span> HOST
-                    </span>
-                  ` : `
-                    <div class="flex items-center gap-1.5">
-                      <span class="inline-flex items-center gap-1 bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded font-caption text-caption">#0${index + 1}</span>
-                      ${p.isBot ? '<span class="text-[9px] px-1 rounded bg-amber-gold/20 text-amber-gold font-bold">AI</span>' : ''}
-                    </div>
-                  `}
-                  <div class="flex items-center gap-1.5">
-                    ${(!isHost && room.isHost) ? `
-                      <button type="button" class="btn-kick-camper w-5 h-5 rounded-full bg-surface-bright hover:bg-sunset-coral hover:text-white flex items-center justify-center text-gray-400 text-xs transition-colors" data-player-id="${p.id}" title="Remove Camper">✕</button>
-                    ` : ''}
-                    <span class="w-2 h-2 rounded-full ${p.isReady ? 'bg-tertiary' : 'bg-secondary animate-pulse'}"></span>
-                  </div>
+              <button class="btn-select-template p-3 rounded-xl border text-left transition-all relative overflow-hidden ${isSelected ? 'bg-sunset-coral/15 border-sunset-coral shadow-glow-coral' : 'bg-surface-bright/50 border-border/70 hover:border-gray-500'}" data-template="${tmpl.id}">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-xs text-white truncate">${tmpl.name}</span>
+                  ${isSelected ? `<span class="w-2 h-2 rounded-full bg-sunset-coral"></span>` : ''}
                 </div>
-                <div class="flex items-center gap-2.5">
-                  <div class="w-11 h-11 rounded-xl overflow-hidden bg-surface-container-high flex-shrink-0 shadow-inner flex items-center justify-center">
-                    <img class="w-full h-full object-cover" alt="${displayName}" src="${avatar}" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(displayName)}'" />
-                  </div>
-                  <div class="min-w-0">
-                    <span class="font-label-lg text-label-lg text-on-surface block truncate font-bold">${displayName}</span>
-                    <span class="font-caption text-caption ${p.isReady ? 'text-tertiary' : 'text-secondary'} block font-bold">${p.isReady ? 'READY ✨' : 'SYNCING...'}</span>
-                  </div>
+                <p class="text-[10px] text-gray-400 line-clamp-2 leading-relaxed">${tmpl.tagline}</p>
+                <div class="mt-2 flex items-center gap-1">
+                  <span class="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-white/10 text-gray-300 uppercase">${tmpl.badge}</span>
                 </div>
-              </div>
+              </button>
             `;
           }).join('')}
-
-          <!-- Slot: Invite Real Camper -->
-          <button class="bg-surface-container-low hover:bg-surface-container rounded-xl p-3 flex flex-col items-center justify-center gap-2 text-center min-h-[92px] transition-colors active:scale-95 group border border-dashed border-border cursor-pointer" id="slot-invite-player" type="button">
-            <div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-              <span class="material-symbols-outlined text-[20px]">person_add</span>
-            </div>
-            <span class="font-label-md text-label-md text-on-surface-variant font-semibold">Invite Camper</span>
-          </button>
-
-          <!-- Slot: Optional Add AI Camper -->
-          ${room.players.length < 8 ? `
-            <button class="bg-surface-container-low hover:bg-surface-container rounded-xl p-3 flex flex-col items-center justify-center gap-2 text-center min-h-[92px] transition-colors active:scale-95 group border border-dashed border-border cursor-pointer" id="slot-add-ai-camper" type="button" title="Add an AI player to test mechanics">
-              <div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-amber-gold group-hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-[20px]">smart_toy</span>
-              </div>
-              <span class="font-label-md text-label-md text-on-surface-variant font-semibold">+ AI Camper</span>
-            </button>
-          ` : ''}
-        </div>
-
-        ${room.players.length === 1 ? `
-          <div class="mt-3 p-3 rounded-xl bg-surface-container-lowest border border-border/70 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-gold text-[18px]">cell_tower</span>
-              <span class="text-xs text-gray-300">Room is ready! Waiting for friends to join with code <strong class="text-white font-mono">#${room.roomCode}</strong></span>
-            </div>
-            <button type="button" id="btn-quick-copy-lobby" class="px-2.5 py-1 rounded-lg bg-surface-bright hover:bg-sunset-coral hover:text-white text-xs font-bold text-gray-200 transition-colors shrink-0">Copy Code</button>
-          </div>
-        ` : ''}
-      </section>
-
-      <!-- Drop a Memory Micro-Uploader Bento Slab -->
-      <section class="mb-5">
-        <div class="bg-surface-container rounded-2xl p-5 relative overflow-hidden shadow-lg border border-border/80">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary-container flex-shrink-0 mt-0.5">
-              <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">add_photo_alternate</span>
-            </div>
-            <div class="flex flex-col min-w-0 flex-1">
-              <h4 class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">
-                Secret Memory Drop
-              </h4>
-              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                Drop 1 screenshot or photo to roast or test someone tonight. Sealed until round 2!
-              </p>
-            </div>
-          </div>
-
-          <!-- Polaroid Upload Preview Slab -->
-          <div class="mt-4 bg-surface-container-lowest rounded-xl p-2 flex items-center justify-between gap-3 border border-border/60">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-14 h-14 rounded-lg overflow-hidden bg-surface-container-high relative flex-shrink-0 shadow">
-                <img class="w-full h-full object-cover filter blur-[2px]" alt="Sealed memory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwqep1yJ8phmXEVa2tFNOjpjX3GDmGGCBwmpIgD9r36e79eJRKiSgUDoLZOTR1G_TAyyBTiKz19DIxiSoB9uzUbCJiWkv4tf3agGw1Qh0lNTUBXyk0F-s1dQZ5HvW4JPCeXxxBgCiuy31OSwZd2P4wEgqZcYG1qwB_7gTxBpZp-mh4P24LuSlYmEvUQPL6OhxFA0aZcJ76vy-ug49xaOm0Qh8I9Hv87Ob7rLOj66bzGHM-_HHlY477Kw" />
-                <div class="absolute inset-0 bg-surface-container-lowest/40 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">lock</span>
-                </div>
-              </div>
-              <div class="min-w-0">
-                <span class="font-label-md text-label-md text-secondary-fixed block truncate font-bold">1 Memory Sealed 🔒</span>
-                <span class="font-caption text-caption text-tertiary block mt-0.5">Encrypted to this session</span>
-              </div>
-            </div>
-            <button class="bg-surface-container hover:bg-surface-container-high text-on-surface px-3 py-1.5 rounded-lg font-label-md text-label-md transition-colors active:scale-95 flex-shrink-0 border border-border/70" id="btn-lobby-upload" type="button">
-              Swap
-            </button>
-          </div>
-
-          <div class="flex items-center justify-between mt-3 pt-2 text-xs">
-            <span class="font-caption text-caption text-on-surface-variant flex items-center gap-1">
-              <span class="material-symbols-outlined text-[14px]">shield</span> Private to Goa Pod
-            </span>
-            <span class="font-caption text-caption text-secondary font-semibold">Ready for ignition</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Fixed Bottom Command Bar -->
-      <aside class="fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/90 backdrop-blur-xl px-4 pt-3 pb-6 shadow-2xl border-t border-border/80">
-        <div class="flex flex-col gap-1.5 max-w-[620px] mx-auto">
-          <div class="flex items-center justify-between px-1 text-xs">
-            <span class="font-caption text-caption text-on-surface-variant flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ${hostName} controls countdown
-            </span>
-            <span class="font-caption text-caption text-secondary font-bold">${room.players.length}/${room.players.length} CAMPERS READY</span>
-          </div>
-          <button class="w-full bg-primary-container text-on-primary-container py-3.5 px-6 rounded-full font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-[0px_8px_24px_-4px_rgba(255,90,95,0.45)] hover:brightness-110 active:scale-98 transition-all font-bold" id="start-game-btn" type="button">
-            <span>IGNITE BONDFIRE (6/6)</span>
-            <span class="material-symbols-outlined text-[24px]">local_fire_department</span>
-          </button>
-        </div>
-      </aside>
-
-      <!-- Copy Toast Notification -->
-      <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-tertiary text-on-tertiary px-4 py-2 rounded-full font-label-md text-label-md shadow-lg flex items-center gap-2 pointer-events-none opacity-0 transition-opacity duration-300" id="toast">
-        <span class="material-symbols-outlined text-[16px]">check_circle</span>
-        <span>Room Code "${room.roomCode}" Copied!</span>
-      </div>
-
-      <!-- Invite Friends Modal with QR Code -->
-      <div id="invite-modal" class="fixed inset-0 bg-canvas/85 backdrop-blur-2xl z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="max-w-md w-full rounded-2xl bg-surface-container p-6 border border-border shadow-2xl text-center">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="font-headline-sm text-headline-sm text-sunset-coral font-bold flex items-center gap-2">
-              <span>🎟️</span> Invite Squad to ${room.roomCode}
-            </h3>
-            <button class="w-8 h-8 rounded-full bg-surface-bright flex items-center justify-center text-white" id="btn-close-invite-modal">✕</button>
-          </div>
-
-          <div class="bg-white p-4 rounded-xl w-44 h-44 mx-auto mb-4 flex flex-col items-center justify-center shadow-lg">
-            <div class="font-room-code text-3xl font-extrabold text-black tracking-widest">${room.roomCode}</div>
-            <div class="text-[10px] font-bold text-gray-600 uppercase mt-1">Scan to Join</div>
-            <div class="text-[8px] text-gray-500 mt-1">bondfire.app/join/${room.roomCode}</div>
-          </div>
-
-          <p class="text-xs text-gray-400 mb-4">
-            Friends join instantly on mobile web. Zero app download, zero signup required.
-          </p>
-
-          <div class="flex flex-col gap-2.5">
-            <button class="w-full py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-sm flex items-center justify-center gap-2 shadow-glow-coral hover:brightness-110 transition-all active:scale-95" id="btn-invite-from-friends" type="button">
-              <span class="material-symbols-outlined text-[18px]">diversity_3</span>
-              <span>Invite from Friends & Squads</span>
-            </button>
-            <button class="w-full py-2.5 rounded-full bg-[#25D366] text-white font-bold text-sm flex items-center justify-center gap-2 shadow hover:brightness-105 transition-all" id="btn-share-whatsapp" type="button">
-              <span>💬</span> Share to WhatsApp Group
-            </button>
-            <button class="w-full py-2.5 rounded-full bg-surface-bright text-white font-bold text-sm" id="btn-copy-link-modal" type="button">
-              📋 Copy Room Link
-            </button>
-          </div>
         </div>
       </div>
 
-      <!-- Game Mode & Deck Selector Modal -->
-      <div id="deck-modal" class="fixed inset-0 bg-canvas/85 backdrop-blur-2xl z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="max-w-lg w-full rounded-2xl bg-surface-container p-5 sm:p-6 border border-border shadow-2xl">
-          <div class="flex justify-between items-center pb-3 mb-4 border-b border-border/80">
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">🎮</span>
-              <div>
-                <h3 class="font-headline-sm text-base sm:text-lg text-white font-bold">Select Squad Party Game</h3>
-                <p class="text-xs text-on-surface-variant">Choose the vibe for tonight's pod session</p>
-              </div>
-            </div>
-            <button class="w-8 h-8 rounded-full bg-surface-bright hover:bg-surface-container-high flex items-center justify-center text-white" id="btn-close-deck-modal">✕</button>
+      <!-- Room Personalization: Language & Humor Tone -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Language Selector -->
+        <div class="p-4 rounded-2xl bg-surface border border-border">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[16px] text-amber-gold">translate</span>
+            <span class="text-xs font-bold text-white uppercase tracking-wider">Language Flavor</span>
           </div>
-
-          <div class="flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
-            ${GAME_MODES.map((mode) => {
-              const isSelected = mode.id === (room.selectedGameMode || 'RED_FLAG_COURT');
+          <div class="flex items-center gap-1.5">
+            ${[
+              { code: 'hi-IN', label: 'Hinglish (Desi)' },
+              { code: 'hi', label: 'Hindi (हिंदी)' },
+              { code: 'gu-IN', label: 'Gujarati (ગુજરાતી)' },
+              { code: 'en', label: 'English' }
+            ].map((lang) => {
+              const isActive = (room.language || 'hi-IN') === lang.code;
               return `
-                <button class="btn-select-deck text-left p-3.5 rounded-xl border ${isSelected ? 'bg-primary-container/15 border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest/80 border-border/70 hover:border-border hover:bg-surface-container-high'} transition-all active:scale-[0.99] flex items-start gap-3 group cursor-pointer" data-mode="${mode.id}">
-                  <span class="text-2xl shrink-0 mt-0.5">${mode.emoji}</span>
-                  <div class="min-w-0 flex-1">
-                    <div class="flex items-center justify-between gap-2 mb-0.5">
-                      <span class="font-headline-sm text-sm font-bold text-white group-hover:text-sunset-coral transition-colors">${mode.name}</span>
-                      <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${isSelected ? 'bg-sunset-coral text-canvas' : 'bg-surface-container-high text-gray-400'}">${mode.badgeText}</span>
-                    </div>
-                    <p class="text-xs text-amber-gold/90 font-medium mb-1">${mode.tagline}</p>
-                    <p class="text-[11px] text-gray-400 leading-relaxed">${mode.description}</p>
-                  </div>
-                  <div class="shrink-0 mt-1">
-                    <span class="material-symbols-outlined text-[18px] ${isSelected ? 'text-sunset-coral' : 'text-gray-600'}">${isSelected ? 'radio_button_checked' : 'radio_button_unchecked'}</span>
-                  </div>
+                <button class="btn-select-language flex-1 py-2 px-1 rounded-lg text-[10px] font-bold border transition-all ${isActive ? 'bg-amber-gold/20 border-amber-gold text-amber-gold' : 'bg-surface-bright border-border/70 text-gray-400 hover:text-white'}" data-lang="${lang.code}">
+                  ${lang.label}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Humor Consent Tone -->
+        <div class="p-4 rounded-2xl bg-surface border border-border">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[16px] text-sunset-coral">sentiment_very_satisfied</span>
+            <span class="text-xs font-bold text-white uppercase tracking-wider">Roast & Humor Tone</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            ${[
+              { tone: 'FAMILY_SAFE', label: 'Family Safe' },
+              { tone: 'FRIENDLY_ROAST', label: 'Friendly' },
+              { tone: 'SAVAGE_ROAST', label: 'Savage 🔥' },
+              { tone: 'ROMANTIC', label: 'Romantic 💖' }
+            ].map((item) => {
+              const isActive = (room.humorTone || 'FRIENDLY_ROAST') === item.tone;
+              return `
+                <button class="btn-select-humor flex-1 py-2 px-1 rounded-lg text-[10px] font-bold border transition-all ${isActive ? 'bg-sunset-coral/20 border-sunset-coral text-sunset-coral' : 'bg-surface-bright border-border/70 text-gray-400 hover:text-white'}" data-tone="${item.tone}">
+                  ${item.label}
                 </button>
               `;
             }).join('')}
           </div>
         </div>
       </div>
+
+      <!-- Campers Joined (Audience Grid) -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-display text-base font-bold text-white">The Room Campers (${room.players.length}/8)</h3>
+          <span class="text-xs text-mint-green font-mono font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-mint-green"></span>
+            Synced
+          </span>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3" id="lobby-player-grid">
+          ${room.players.map((p) => {
+            const isHost = p.role === 'HOST';
+            const isCurrentUser = isHost || p.name === 'Host (You)';
+            const displayName = isCurrentUser ? (user && user.isLoggedIn && user.displayName ? `${user.displayName.split(' ')[0]} (Host)` : 'You (Host)') : p.name;
+            const avatar = isCurrentUser && user && user.avatarUrl ? user.avatarUrl : (p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(displayName)}`);
+
+            return `
+              <div class="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">
+                <div class="relative">
+                  <img src="${avatar}" class="w-10 h-10 rounded-lg bg-surface-bright object-cover" />
+                  ${isHost ? `<div class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-gold flex items-center justify-center text-[10px]">👑</div>` : ''}
+                </div>
+                <div class="flex flex-col overflow-hidden">
+                  <span class="text-xs font-bold text-white truncate">${displayName}</span>
+                  <span class="text-[9px] font-bold ${p.isReady ? 'text-mint-green' : 'text-gray-500'} uppercase tracking-wider">${p.isReady ? 'Ready' : 'Joining...'}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+
+          <!-- Dynamic Add Camper Slot -->
+          <button id="btn-add-camper-slot" class="flex items-center gap-3 p-3 rounded-xl bg-surface border border-dashed border-border/80 hover:bg-surface-bright hover:border-sunset-coral/50 transition-colors text-left group">
+            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center border border-border group-hover:border-sunset-coral/50 transition-colors">
+              <span class="material-symbols-outlined text-gray-400 group-hover:text-sunset-coral transition-colors">person_add</span>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <span class="text-xs font-bold text-gray-300 group-hover:text-white transition-colors">+ Add Friend</span>
+              <span class="text-[9px] text-gray-500">Add to Adda</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Add Custom Inside Joke / Card Button -->
+        <div class="mt-3">
+          <button id="btn-open-custom-card-modal" class="w-full py-2.5 px-4 rounded-xl bg-surface-bright border border-border hover:border-amber-gold/50 text-xs font-bold text-gray-300 hover:text-amber-gold transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-amber-gold">note_add</span>
+            <span>+ Add Your Own Inside Joke / Custom Card</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="fixed bottom-0 left-0 w-full bg-canvas/90 backdrop-blur-xl border-t border-border p-4 z-40">
+        <div class="max-w-[680px] mx-auto flex gap-3">
+          <button id="btn-lobby-vault" class="flex-1 py-3.5 rounded-full bg-surface-bright border border-border text-white font-bold text-xs shadow-sm hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-amber-gold">inventory_2</span>
+            <span>Memory Vault</span>
+          </button>
+          
+          <button id="start-game-btn" class="flex-[2] py-3.5 rounded-full bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-sm shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span>Launch Show Runner</span>
+            <span class="material-symbols-outlined text-[20px]">play_arrow</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Invite QR Modal -->
+      <div id="invite-modal" class="fixed inset-0 bg-canvas/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-surface rounded-2xl border border-border p-6 text-center">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-display font-bold text-lg text-white">Join Room QR Code</h3>
+            <button id="btn-close-invite-modal" class="text-gray-400 hover:text-white text-xl font-bold">✕</button>
+          </div>
+          <div class="p-4 bg-white rounded-xl mb-4 flex items-center justify-center">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`http://localhost:3000/#/ROOMS?code=${room.roomCode}`)}" class="w-44 h-44" alt="Room QR Code" />
+          </div>
+          <p class="text-xs text-gray-400 font-mono mb-2">Scan with camera to jump in without login</p>
+          <span class="font-mono text-2xl font-black text-amber-gold tracking-widest">${room.roomCode}</span>
+        </div>
+      <!-- Add Camper Modal -->
+      <div id="add-camper-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-surface rounded-2xl border border-border p-6 text-left flex flex-col gap-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-display font-bold text-lg text-white">Add a Friend to Room</h3>
+            <button id="btn-close-camper-modal" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 font-mono uppercase block mb-1.5">Friend's Name</label>
+            <input type="text" id="input-camper-name" placeholder="e.g. Priya, Kabir, Rohan" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-bright border border-border text-white text-xs focus:outline-none focus:border-sunset-coral" />
+          </div>
+          <button id="btn-confirm-add-camper" class="w-full py-3 rounded-full bg-sunset-coral text-white font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all">
+            Add to Room
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Custom Inside Joke / Card Modal -->
+      <div id="custom-card-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-surface rounded-2xl border border-border p-6 text-left flex flex-col gap-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-display font-bold text-lg text-white">Add Custom Squad Card</h3>
+            <button id="btn-close-custom-card-modal" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 font-mono uppercase block mb-1.5">Card Title / Situation</label>
+            <input type="text" id="input-custom-card-title" placeholder="e.g. The 3 AM Maggi Incident" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-bright border border-border text-white text-xs focus:outline-none focus:border-sunset-coral mb-3" />
+            <label class="text-xs text-gray-400 font-mono uppercase block mb-1.5">Quote or What Happened?</label>
+            <textarea id="input-custom-card-quote" rows="3" placeholder="e.g. 'I didn't steal the fries, they just fell into my mouth'" class="w-full px-3.5 py-2 rounded-xl bg-surface-bright border border-border text-white text-xs focus:outline-none focus:border-sunset-coral"></textarea>
+          </div>
+          <button id="btn-confirm-custom-card" class="w-full py-3 rounded-full bg-amber-gold text-canvas font-bold text-xs shadow-sm hover:brightness-110 active:scale-95 transition-all">
+            Save Card to Active Deck
+          </button>
+        </div>
+      </div>
+
     </div>
   `;
 }
 
 export function bindLobbyEvents() {
-  const codeBtn = document.getElementById('copy-code-btn');
-  const copyIcon = document.getElementById('copy-icon');
-  const toast = document.getElementById('toast');
+  const btnStart = document.getElementById('start-game-btn');
+  const btnCopy = document.getElementById('btn-copy-code');
+  const btnVault = document.getElementById('btn-lobby-vault');
+  const slotInvite = document.getElementById('slot-invite-player');
+  const modalInvite = document.getElementById('invite-modal');
+  const btnCloseInvite = document.getElementById('btn-close-invite-modal');
 
-  const copyRoomCode = () => {
-    audio.playClick();
-    const code = store.getState().activeRoom.roomCode;
-    navigator.clipboard?.writeText(code);
-    if (copyIcon) copyIcon.textContent = 'done';
-    if (toast) {
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-        if (copyIcon) copyIcon.textContent = 'content_copy';
-      }, 2000);
-    }
-  };
-
-  if (codeBtn) {
-    codeBtn.addEventListener('click', copyRoomCode);
-  }
-
-  // Leave Room
-  const leaveBtn = document.getElementById('btn-leave-lobby');
-  if (leaveBtn) {
-    leaveBtn.addEventListener('click', () => {
-      audio.playClick();
-      store.setView('HERO');
-    });
-  }
-
-  // Start Countdown and Ignite Game
-  const startBtn = document.getElementById('start-game-btn');
-  if (startBtn) {
-    startBtn.addEventListener('click', () => {
+  // Start Show Runner -> transitions to #GAME
+  if (btnStart) {
+    btnStart.addEventListener('click', () => {
       audio.playChime();
-      startBtn.innerHTML = '<span>IGNITING POD... 3</span><span class="material-symbols-outlined text-[24px] animate-spin">rotate_right</span>';
-      startBtn.classList.add('brightness-125');
-      let count = 2;
-      const interval = setInterval(() => {
-        if (count > 0) {
-          audio.playTick();
-          startBtn.innerHTML = `<span>IGNITING POD... ${count}</span><span class="material-symbols-outlined text-[24px] animate-spin">rotate_right</span>`;
-          count--;
-        } else {
-          clearInterval(interval);
-          audio.playCorrect();
-          startBtn.innerHTML = '<span>DEALING CARDS! 🔥</span>';
-          setTimeout(() => {
-            store.setState({
-              activeGame: {
-                sessionId: `game_${Date.now()}`,
-                roundIndex: 1,
-                totalRounds: 5,
-                score: 0,
-                selectedOption: null,
-                isAnswerRevealed: false,
-                timeRemaining: 20,
-              },
-            });
-            store.setView('GAME');
-          }, 600);
-        }
-      }, 700);
+      store.setState({ currentView: 'GAME' });
+      window.location.hash = '#/GAME';
     });
   }
 
-  // Upload memory placeholder
-  const uploadBtn = document.getElementById('btn-lobby-upload');
-  if (uploadBtn) {
-    uploadBtn.addEventListener('click', () => {
-      audio.playClick();
-      store.setView('VAULT');
-    });
-  }
-
-  // Invite Modal Logic
-  const inviteSlot = document.getElementById('slot-invite-player');
-  const sharePassSlot = document.getElementById('slot-share-pass');
-  const inviteModal = document.getElementById('invite-modal');
-  const closeInviteBtn = document.getElementById('btn-close-invite-modal');
-  const copyLinkModalBtn = document.getElementById('btn-copy-link-modal');
-  const whatsappBtn = document.getElementById('btn-share-whatsapp');
-
-  const openInvite = () => {
-    audio.playClick();
-    if (inviteModal) inviteModal.style.display = 'flex';
-  };
-
-  // Add AI Camper
-  const addBotBtn = document.getElementById('slot-add-ai-camper');
-  if (addBotBtn) {
-    addBotBtn.addEventListener('click', () => {
-      audio.playChime();
-      store.addBotCamper();
-      store.setView('LOBBY');
-    });
-  }
-
-  // Kick / Remove Camper
-  const kickBtns = document.querySelectorAll('.btn-kick-camper');
-  kickBtns.forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      audio.playClick();
-      const pid = btn.dataset.playerId;
-      if (pid) {
-        store.removeCamper(pid);
-        store.setView('LOBBY');
+  // Copy Room Code
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const code = store.getState().activeRoom.roomCode;
+      navigator.clipboard.writeText(code);
+      audio.playBip();
+      const codeText = btnCopy.querySelector('.font-mono');
+      if (codeText) {
+        const orig = codeText.innerText;
+        codeText.innerText = 'COPIED!';
+        setTimeout(() => (codeText.innerText = orig), 1500);
       }
     });
+  }
+
+  // Open Vault
+  if (btnVault) {
+    btnVault.addEventListener('click', () => {
+      audio.playClick();
+      store.setState({ currentView: 'MEMORIES' });
+      window.location.hash = '#/MEMORIES';
+    });
+  }
+
+  // QR Modal
+  if (slotInvite && modalInvite) {
+    slotInvite.addEventListener('click', () => {
+      audio.playClick();
+      modalInvite.classList.remove('hidden');
+    });
+  }
+  if (btnCloseInvite && modalInvite) {
+    btnCloseInvite.addEventListener('click', () => {
+      modalInvite.classList.add('hidden');
+    });
+  }
+
+  // Template Picker clicks
+  document.querySelectorAll('.btn-select-template').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget;
+      const tmplId = target.getAttribute('data-template');
+      const tmpl = ROOM_TEMPLATES.find((t) => t.id === tmplId);
+      if (!tmpl) return;
+
+      audio.playClick();
+      const room = { ...store.getState().activeRoom, roomTemplate: tmplId, humorTone: tmpl.defaultTone };
+      store.setState({ activeRoom: room });
+      store.notify();
+    });
   });
 
-  // Quick Copy Code Button in Solo-Wait Banner
-  const quickCopyLobby = document.getElementById('btn-quick-copy-lobby');
-  if (quickCopyLobby) {
-    quickCopyLobby.addEventListener('click', () => {
+  // Language clicks
+  document.querySelectorAll('.btn-select-language').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const lang = e.currentTarget.getAttribute('data-lang');
       audio.playClick();
-      const code = store.getState().activeRoom.roomCode;
-      navigator.clipboard?.writeText(code);
-      quickCopyLobby.textContent = '✓ Copied!';
-      setTimeout(() => (quickCopyLobby.textContent = 'Copy Code'), 2000);
+      const room = { ...store.getState().activeRoom, language: lang };
+      store.setState({ activeRoom: room });
+      store.notify();
     });
-  }
-
-  if (inviteSlot) inviteSlot.addEventListener('click', openInvite);
-  if (sharePassSlot) sharePassSlot.addEventListener('click', openInvite);
-
-  if (closeInviteBtn && inviteModal) {
-    closeInviteBtn.addEventListener('click', () => {
-      audio.playClick();
-      inviteModal.style.display = 'none';
-    });
-  }
-
-  const inviteFriendsBtn = document.getElementById('btn-invite-from-friends');
-  if (inviteFriendsBtn) {
-    inviteFriendsBtn.addEventListener('click', () => {
-      audio.playClick();
-      if (inviteModal) inviteModal.style.display = 'none';
-      store.setView('FRIENDS');
-    });
-  }
-
-  if (copyLinkModalBtn) {
-    copyLinkModalBtn.addEventListener('click', () => {
-      audio.playClick();
-      const code = store.getState().activeRoom.roomCode;
-      navigator.clipboard?.writeText(`https://bondfire.app/join/${code}`);
-      copyLinkModalBtn.textContent = '✓ Link Copied!';
-      setTimeout(() => (copyLinkModalBtn.textContent = '📋 Copy Room Link'), 2000);
-    });
-  }
-
-  if (whatsappBtn) {
-    whatsappBtn.addEventListener('click', () => {
-      audio.playClick();
-      const code = store.getState().activeRoom.roomCode;
-      const text = encodeURIComponent(`Come roast and remember with code ${code} on Bondfire!\nhttps://bondfire.app/join/${code}`);
-      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-    });
-  }
-
-  // Deck & Game Mode Selection Logic
-  const deckModal = document.getElementById('deck-modal');
-  const tuneDeckBtn = document.getElementById('btn-tune-deck');
-  const deckTrigger = document.getElementById('btn-active-deck-trigger');
-  const closeDeckBtn = document.getElementById('btn-close-deck-modal');
-
-  const openDeckModal = () => {
-    audio.playClick();
-    if (deckModal) deckModal.style.display = 'flex';
-  };
-
-  if (tuneDeckBtn) tuneDeckBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openDeckModal();
   });
-  if (deckTrigger) deckTrigger.addEventListener('click', openDeckModal);
 
-  if (closeDeckBtn && deckModal) {
-    closeDeckBtn.addEventListener('click', () => {
+  // Humor Tone clicks
+  document.querySelectorAll('.btn-select-humor').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const tone = e.currentTarget.getAttribute('data-tone');
       audio.playClick();
-      deckModal.style.display = 'none';
+      const room = { ...store.getState().activeRoom, humorTone: tone };
+      store.setState({ activeRoom: room });
+      store.notify();
     });
-  }
+  });
 
-  const deckBtns = document.querySelectorAll('.btn-select-deck');
-  deckBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+  // Launch Spin the Bottle Arcade Game
+  const btnBottle = document.getElementById('btn-launch-spin-bottle');
+  if (btnBottle) {
+    btnBottle.addEventListener('click', () => {
       audio.playChime();
-      const mode = btn.dataset.mode;
-      store.setGameMode(mode);
-      if (deckModal) deckModal.style.display = 'none';
-      store.setView('LOBBY');
+      store.setState({ currentView: 'BOTTLE' });
+      window.location.hash = '#/BOTTLE';
     });
-  });
+  }
+
+  // Rename Room in place
+  const btnRename = document.getElementById('btn-rename-room');
+  if (btnRename) {
+    btnRename.addEventListener('click', () => {
+      const current = store.getState().activeRoom.podName || '';
+      const newName = prompt('Enter your squad room name:', current);
+      if (newName && newName.trim()) {
+        audio.playClick();
+        store.updateRoomName(newName.trim());
+        store.notify();
+      }
+    });
+  }
+
+  // Add Camper Modal Controls
+  const btnOpenCamper = document.getElementById('btn-add-camper-slot');
+  const modalCamper = document.getElementById('add-camper-modal');
+  const btnCloseCamper = document.getElementById('btn-close-camper-modal');
+  const btnConfirmCamper = document.getElementById('btn-confirm-add-camper');
+  const inputCamper = document.getElementById('input-camper-name');
+
+  if (btnOpenCamper && modalCamper) {
+    btnOpenCamper.addEventListener('click', () => {
+      audio.playClick();
+      modalCamper.classList.remove('hidden');
+      if (inputCamper) inputCamper.focus();
+    });
+  }
+  if (btnCloseCamper && modalCamper) {
+    btnCloseCamper.addEventListener('click', () => modalCamper.classList.add('hidden'));
+  }
+  if (btnConfirmCamper && inputCamper) {
+    btnConfirmCamper.addEventListener('click', () => {
+      const name = inputCamper.value.trim();
+      if (!name) return;
+      audio.playChime();
+      store.addRoomPlayer(name);
+      modalCamper.classList.add('hidden');
+      inputCamper.value = '';
+      store.notify();
+    });
+  }
+
+  // Add Custom Squad Card Modal Controls
+  const btnOpenCustomCard = document.getElementById('btn-open-custom-card-modal');
+  const modalCustomCard = document.getElementById('custom-card-modal');
+  const btnCloseCustomCard = document.getElementById('btn-close-custom-card-modal');
+  const btnConfirmCustomCard = document.getElementById('btn-confirm-custom-card');
+  const inputCardTitle = document.getElementById('input-custom-card-title');
+  const inputCardQuote = document.getElementById('input-custom-card-quote');
+
+  if (btnOpenCustomCard && modalCustomCard) {
+    btnOpenCustomCard.addEventListener('click', () => {
+      audio.playClick();
+      modalCustomCard.classList.remove('hidden');
+      if (inputCardTitle) inputCardTitle.focus();
+    });
+  }
+  if (btnCloseCustomCard && modalCustomCard) {
+    btnCloseCustomCard.addEventListener('click', () => modalCustomCard.classList.add('hidden'));
+  }
+  if (btnConfirmCustomCard && inputCardTitle && inputCardQuote) {
+    btnConfirmCustomCard.addEventListener('click', () => {
+      const title = inputCardTitle.value.trim();
+      const quote = inputCardQuote.value.trim();
+      if (!title) return;
+      audio.playChime();
+      store.addCustomRoomCard({ title, quote: quote || title });
+      modalCustomCard.classList.add('hidden');
+      inputCardTitle.value = '';
+      inputCardQuote.value = '';
+      alert('✅ Custom Squad Card added to your active deck!');
+      store.notify();
+    });
+  }
 }

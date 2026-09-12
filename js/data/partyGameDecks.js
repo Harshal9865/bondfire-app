@@ -10,6 +10,26 @@
 
 export const GAME_MODES = [
   {
+    id: 'OUR_LORE',
+    name: 'Our Lore (The Group Canon)',
+    tagline: 'The Squad Decides Official Group History',
+    icon: 'history_edu',
+    emoji: '📜',
+    color: 'sunset-coral',
+    badgeText: 'SIGNATURE GAME',
+    description: 'Unpack the squad’s most chaotic trips, 3 AM Maggi incidents, and group chat civil wars. Vote on the official canon history!',
+  },
+  {
+    id: 'WHO_SAID_THIS',
+    name: 'Who Said This? (Chat Exposes)',
+    tagline: 'Real Group Quotes Out of Context',
+    icon: 'format_quote',
+    emoji: '💬',
+    color: 'amber-gold',
+    badgeText: 'VIRAL CHAT',
+    description: 'Anonymous screenshots and unhinged late night messages. Spot the guilty friend before they can defend themselves!',
+  },
+  {
     id: 'RED_FLAG_COURT',
     name: 'The Red Flag Courtroom',
     tagline: 'Trial of Shame & Roast Sentences',
@@ -18,6 +38,36 @@ export const GAME_MODES = [
     color: 'sunset-coral',
     badgeText: 'HOT COURTROOM',
     description: 'Put your friends on trial for their most unhinged habits. Review Exhibit A, hear their desperate plea, and cast your jury verdict!',
+  },
+  {
+    id: 'REEL_COURT',
+    name: 'Reel Courtroom (Relatable Crimes)',
+    tagline: '7-Min Voice Notes & Bill Splitting',
+    icon: 'smart_display',
+    emoji: '🎬',
+    color: 'mint-green',
+    badgeText: 'WATCH & PLAY',
+    description: 'Review Exhibit A video clips of everyday desi struggles. Vote guilty or relatable and hand out hilarious punishments.',
+  },
+  {
+    id: 'EMOJI_CINEMA',
+    name: 'Emoji Cinema & Antakshari',
+    tagline: 'Bollywood & Desi Pop Culture Clash',
+    icon: 'movie',
+    emoji: '🍿',
+    color: 'amber-gold',
+    badgeText: 'BOLLYWOOD',
+    description: 'Decipher iconic Bollywood movie titles and sing out the missing lyrics with the entire living room!',
+  },
+  {
+    id: 'MOST_LIKELY_TO',
+    name: 'Most Likely To... Desi Chaos',
+    tagline: 'Rapid-Fire Pointing with Zero Mercy',
+    icon: 'bolt',
+    emoji: '🎭',
+    color: 'mint-green',
+    badgeText: 'RAPID FIRE',
+    description: '10-second shot clock scenario pointing. Crown the squad’s biggest chaos agents, voice of reason, and drama magnets.',
   },
   {
     id: 'CONFESSION_VAULT',
@@ -40,16 +90,6 @@ export const GAME_MODES = [
     description: 'One camper in the hot seat each round answering unfiltered friendship questions. Rate their truthfulness on the lie detector!',
   },
   {
-    id: 'MOST_LIKELY_TO',
-    name: 'Most Likely To... Savage',
-    tagline: 'Rapid-Fire Pointing with Zero Mercy',
-    icon: 'bolt',
-    emoji: '🎭',
-    color: 'mint-green',
-    badgeText: 'RAPID FIRE',
-    description: '10-second shot clock scenario pointing. Crown the squad’s biggest chaos agents, voice of reason, and drama magnets.',
-  },
-  {
     id: 'INSIDE_JOKE_VAULT',
     name: 'Inside Joke Mystery Deck',
     tagline: 'Who Actually Said This in 2019?',
@@ -61,66 +101,65 @@ export const GAME_MODES = [
   },
 ];
 
-// 1. THE RED FLAG COURTROOM (Trial of Shame)
+// 1. THE RED FLAG COURTROOM (Call Out Your Friends)
 export const RED_FLAG_COURT_DECK = [
   {
     round: 1,
-    caseNumber: 'CASE #204',
+    caseNumber: 'ROUND #1',
     defendant: 'Liam',
-    charge: 'The Phantom Texter Felony',
-    details: 'Left a group question on "Read" for 11 consecutive days, but viewed 42 Instagram stories within 3 hours.',
-    exhibitTitle: 'Exhibit A: Screenshot of Group Chat vs. IG Activity',
-    exhibitSnippet: '“Guys are we still doing dinner tonight?” · Read by Liam at 11:42 PM · 0 Replies',
-    defensePlea: '“I mentally drafted a 3-paragraph reply in my head and genuinely assumed I sent it with my mind.”',
+    charge: 'Left the group chat on Read for 4 days',
+    details: 'Ignored "Are we hanging out tonight?" but was actively watching and liking reels 10 minutes later.',
+    exhibitTitle: 'Exhibit A: Real Chat Receipts',
+    exhibitSnippet: '“Guys dinner plan confirm karo?” · Seen by Liam · 0 replies for 96 hours',
+    defensePlea: '“I swear on everything I typed a whole reply in my head and thought I sent it!”',
     guiltyRoasts: [
-      'Must change group chat nickname to "The Ghost of Goa" for 7 days',
-      'Must buy the first round of drinks or snacks next meetup',
-      'Must post Exhibit A to their close friends story with no context',
+      'Must pay for the first round of snacks next meetup',
+      'Aux cord privileges revoked for the next road trip',
+      'Has to reply within 60 seconds to the group chat for a whole week',
     ],
   },
   {
     round: 2,
-    caseNumber: 'CASE #205',
+    caseNumber: 'ROUND #2',
     defendant: 'Sarah',
-    charge: 'The "5 Minutes Away" Perjury',
-    details: 'Sent "Just pulling into the parking lot now!" while still standing wrapped in a towel looking for missing socks.',
+    charge: 'The "On My Way" Big Lie',
+    details: 'Texted "Just entering the parking lot now!" while still drying hair in a towel at home.',
     exhibitTitle: 'Exhibit A: Live Location Ping',
-    exhibitSnippet: 'Sarah location ping: 8.4 miles away on the expressway · ETA: 28 mins',
-    defensePlea: '“Time is an arbitrary social construct and emotional punctuality counts more than physical presence.”',
+    exhibitSnippet: 'Sarah location ping: 7.2 km away · Estimated arrival in 35 mins',
+    defensePlea: '“I was emotionally on my way, physical presence takes time!”',
     guiltyRoasts: [
-      'Forced to arrive 15 minutes before everyone else to all future events',
-      'Must surrender aux cord privileges for the first 30 minutes of the next road trip',
-      'Must narrate their entire morning routine aloud like a nature documentary',
+      'Has to arrive 20 minutes before everyone else next time',
+      'Must buy cutting chai for the whole table',
+      'Banned from using Google Maps ETA forever',
     ],
   },
   {
     round: 3,
-    caseNumber: 'CASE #206',
+    caseNumber: 'ROUND #3',
     defendant: 'Alex',
-    charge: 'Aux Cord Terrorism & Song-Skipping',
-    details: 'Skipped 14 songs within 6 minutes, then forced the car to listen to a 9-minute experimental psychedelic drone track.',
-    exhibitTitle: 'Exhibit A: Spotify Queue Log',
-    exhibitSnippet: 'Played 0:18s -> Skipped -> Played 0:24s -> Skipped -> Now Playing: "Tibetan Throat Singing (Dubstep Edit)"',
-    defensePlea: '“The vibe in the vehicle was stagnant and required acoustic spiritual elevation.”',
+    charge: 'Skipping every song 30 seconds in',
+    details: 'Took the car aux cord and skipped 18 songs in a row before anyone could hear the chorus.',
+    exhibitTitle: 'Exhibit A: Car Aux Logs',
+    exhibitSnippet: '18 songs queued · Average listening duration: 24 seconds',
+    defensePlea: '“I was just searching for the right vibe for the group!”',
     guiltyRoasts: [
-      'Banned from touching any audio cable, Bluetooth, or speaker for 1 month',
-      'Must listen to Baby Shark on repeat for 10 minutes without making a face',
-      'Must DJ a full set consisting entirely of 90s commercial jingles',
+      'Must sit in the back seat and listen to 90s radio ads',
+      'Aux cord handed over to the most responsible person',
+      'Must sing one full song out loud without skipping',
     ],
   },
   {
     round: 4,
-    caseNumber: 'CASE #207',
+    caseNumber: 'ROUND #4',
     defendant: 'Rohan',
-    charge: 'The French Exit Without Human Contact',
-    details: 'Disappeared from the house party at 11:15 PM without saying goodbye to a single living person.',
-    exhibitTitle: 'Exhibit A: Doorbell Cam Footage',
-    exhibitSnippet: 'Motion detected at Front Porch: Figure in hoodie tip-toeing into Uber at 11:18 PM',
-    defensePlea: '“Saying goodbye to 12 people takes 45 minutes of awkward hugs and promises to catch up soon.”',
+    charge: 'The Irish Exit Ninja Move',
+    details: 'Disappeared from the meetup at 11:15 PM without saying goodbye to a single person.',
+    exhibitTitle: 'Exhibit A: Security Camera',
+    exhibitSnippet: 'Figure in black hoodie seen quietly slipping into an auto at 11:18 PM',
+    defensePlea: '“Saying bye to 8 people takes 40 minutes of awkward handshakes!”',
     guiltyRoasts: [
-      'Must give a 60-second farewell toast before leaving any gathering forever',
-      'Must wear a high-vis neon vest at the next squad party',
-      'Must write a heartfelt personalized farewell haiku for each camper',
+      'Must give a formal 2-minute greeting speech next time',
+      'Responsible for ordering the food next meetup',
     ],
   },
 ];
@@ -296,8 +335,24 @@ export const INSIDE_JOKE_DECK = [
   },
 ];
 
+import {
+  OUR_LORE_DECK,
+  WHO_SAID_THIS_DECK,
+  MOST_LIKELY_TO_INDIAN_DECK,
+  REEL_COURTROOM_DECK,
+  EMOJI_CINEMA_DECK,
+} from './indianCultureDecks.js';
+
 export function getDeckForMode(modeId) {
   switch (modeId) {
+    case 'OUR_LORE':
+      return OUR_LORE_DECK;
+    case 'WHO_SAID_THIS':
+      return WHO_SAID_THIS_DECK;
+    case 'REEL_COURT':
+      return REEL_COURTROOM_DECK;
+    case 'EMOJI_CINEMA':
+      return EMOJI_CINEMA_DECK;
     case 'RED_FLAG_COURT':
       return RED_FLAG_COURT_DECK;
     case 'CONFESSION_VAULT':
@@ -305,9 +360,9 @@ export function getDeckForMode(modeId) {
     case 'HOT_SEAT_ROULETTE':
       return HOT_SEAT_DECK;
     case 'MOST_LIKELY_TO':
-      return MOST_LIKELY_TO_DECK;
+      return MOST_LIKELY_TO_INDIAN_DECK;
     case 'INSIDE_JOKE_VAULT':
     default:
-      return INSIDE_JOKE_DECK;
+      return OUR_LORE_DECK;
   }
 }

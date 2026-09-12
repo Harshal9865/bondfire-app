@@ -12,6 +12,7 @@ import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { ConfettiEngine } from '../visuals/confetti.js';
 import { GAME_MODES, getDeckForMode } from '../data/partyGameDecks.js';
+import { initKineticWordReveal, initLiveVoteBars, init3DCardFlip } from './cardRevealInteraction.js';
 
 let timerInterval = null;
 let confettiInstance = null;
@@ -137,15 +138,14 @@ export function renderGameScreen() {
           <span class="font-label-md text-label-md tracking-wider text-secondary font-bold">ROUND ${game.roundIndex}/${totalRounds}</span>
         </div>
 
-        <!-- Center: Radial Countdown Timer -->
-        <div class="relative flex items-center justify-center w-14 h-14">
-          <svg class="w-14 h-14 -rotate-90" viewBox="0 0 48 48">
-            <circle class="stroke-surface-variant fill-none" cx="24" cy="24" r="19" stroke-width="3"></circle>
-            <circle class="stroke-secondary fill-none transition-all duration-300" cx="24" cy="24" id="timer-ring" r="19" stroke-dasharray="119.38" stroke-dashoffset="35" stroke-linecap="round" stroke-width="3.5"></circle>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span class="font-room-code text-headline-sm text-secondary font-bold leading-none tracking-tight" id="shot-clock-text">${game.timeRemaining}<span class="text-[11px] font-normal tracking-normal text-secondary/80">s</span></span>
-          </div>
+        <!-- Center: Split-Flap Countdown Timer -->
+        <div class="split-flap-container shadow-glow-amber" title="Mechanical Split-Flap Countdown">
+          <span class="text-[12px] mr-1">⏱️</span>
+          <div class="split-flap-digit" id="game-flap-m">0</div>
+          <span class="font-mono text-amber-gold font-bold">:</span>
+          <div class="split-flap-digit" id="game-flap-s1">${Math.floor(game.timeRemaining / 10)}</div>
+          <div class="split-flap-digit" id="game-flap-s2">${game.timeRemaining % 10}</div>
+          <span class="text-[10px] font-mono text-gray-400 ml-1">left</span>
         </div>
 
         <!-- Right: Pod Score -->
@@ -236,10 +236,16 @@ export function renderGameScreen() {
               <span class="font-label-md text-caption text-secondary count">12</span>
             </button>
           </div>
-          <!-- Quick Buzzer / Send Reaction Pin -->
-          <button id="btn-reveal-now" class="px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-md text-caption font-bold hover:brightness-110 active:scale-95 transition-all shrink-0" ${game.isAnswerRevealed ? 'disabled' : ''}>
-            Reveal Now ⚡
-          </button>
+          <!-- Quick Buzzer / Send Reaction Pin & Private Panic Button -->
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="btn-panic-soften" class="px-2.5 py-1.5 rounded-full bg-surface-container-high border border-sunset-coral/40 hover:bg-sunset-coral/20 text-sunset-coral font-label-md text-caption font-bold flex items-center gap-1 transition-all active:scale-95" title="Private Panic Button: anonymously swap this card if uncomfortable">
+              <span>🛡️</span>
+              <span class="hidden sm:inline">Soften</span>
+            </button>
+            <button id="btn-reveal-now" class="px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-md text-caption font-bold hover:brightness-110 active:scale-95 transition-all" ${game.isAnswerRevealed ? 'disabled' : ''}>
+              Reveal Now ⚡
+            </button>
+          </div>
         </div>
 
         <div class="flex items-center justify-between pt-1 border-t border-surface-variant/30 text-xs">
@@ -299,6 +305,14 @@ export function renderGameScreen() {
 // ------------------------------------------------------------------------------
 function renderActiveGameModeViewport(modeId, card, game, currentUserName, userAvatar) {
   switch (modeId) {
+    case 'OUR_LORE':
+      return renderOurLoreView(card, game, currentUserName);
+    case 'WHO_SAID_THIS':
+      return renderWhoSaidThisView(card, game, currentUserName);
+    case 'REEL_COURT':
+      return renderReelCourtView(card, game, currentUserName);
+    case 'EMOJI_CINEMA':
+      return renderEmojiCinemaView(card, game, currentUserName);
     case 'RED_FLAG_COURT':
       return renderRedFlagCourtView(card, game, currentUserName);
     case 'CONFESSION_VAULT':
@@ -311,6 +325,211 @@ function renderActiveGameModeViewport(modeId, card, game, currentUserName, userA
     default:
       return renderInsideJokeView(card, game, currentUserName, userAvatar);
   }
+}
+
+// ==============================================================================
+// 2.0 INDIAN CULTURE VIEWPORT RENDERERS
+// ==============================================================================
+
+// A. OUR LORE VIEW
+function renderOurLoreView(card, game, currentUserName) {
+  const options = card.options || [
+    'Left inside the rented scooter',
+    'Dropped in the beach shack sand',
+    'Accidentally thrown in the trash bag',
+    'Still with Kabir in Mumbai'
+  ];
+  return `
+    <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="lore-card">
+      <div class="flex items-center justify-between pb-3 border-b border-border/70">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[10px] font-mono font-bold tracking-widest uppercase">OUR LORE · ROUND ${card.round || 1}</span>
+          <span class="text-xs text-gray-400 font-mono">${card.exhibitDate || 'October 2024'}</span>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-amber-gold/15 text-amber-gold text-[10px] font-bold border border-amber-gold/30">
+          📜 GROUP CANON
+        </span>
+      </div>
+
+      <div class="my-4">
+        <h3 class="font-headline-sm text-lg font-bold text-white mb-1.5">${card.title || 'The Goa Trip That Was Supposed to Be Relaxing'}</h3>
+        <p class="text-xs text-gray-300 leading-relaxed font-mono">${card.prompt || 'What was the EXACT sequence of events on Night 2 when the Airbnb key vanished?'}</p>
+      </div>
+
+      ${card.coverImage ? `
+        <div class="mb-4 rounded-xl overflow-hidden border border-border/60 h-36 w-full relative">
+          <img src="${card.coverImage}" class="w-full h-full object-cover" alt="Exhibit Photo" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
+            <span class="text-[10px] font-mono text-white/90">📸 Verified Squad Exhibit Photo</span>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3" id="game-option-grid">
+        ${options.map((opt, idx) => {
+          const optText = typeof opt === 'string' ? opt : (opt.text || opt.name);
+          const isSelected = game.selectedOption === optText;
+          return `
+            <button class="game-opt-btn p-3.5 rounded-xl border ${isSelected ? 'bg-sunset-coral text-white border-sunset-coral shadow-glow-coral' : 'bg-surface-container-lowest border-border/80 text-gray-200 hover:border-sunset-coral/50'} text-left text-xs font-bold transition-all active:scale-98 cursor-pointer flex items-start gap-2.5" data-option="${optText}" ${game.isAnswerRevealed ? 'disabled' : ''}>
+              <span class="w-5 h-5 rounded-full bg-surface-bright flex items-center justify-center text-[10px] font-mono shrink-0 ${isSelected ? 'text-sunset-coral bg-white' : 'text-gray-400'}">${String.fromCharCode(65 + idx)}</span>
+              <span class="leading-snug">${optText}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Lore Reveal & Official Canon Seal -->
+      <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-sunset-coral/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
+        <div class="flex items-center gap-2 text-sunset-coral font-bold text-sm mb-2">
+          <span>📜 THE SQUAD HAS SPOKEN:</span>
+        </div>
+        <div class="p-3 rounded-lg bg-surface border border-border text-xs text-amber-gold font-mono leading-relaxed mb-3">
+          ${card.officialCanon || 'Kabir had the key the whole time while the rest of the squad searched the beach with phone torches.'}
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] text-mint-green font-mono flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">verified</span>
+            Added to 2026 Group Memory Graph
+          </span>
+          <button id="btn-next-round" class="px-5 py-2 rounded-full bg-sunset-coral text-white font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5">
+            <span>Next Lore</span>
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// B. WHO SAID THIS VIEW
+function renderWhoSaidThisView(card, game, currentUserName) {
+  const suspects = card.suspects || ['Aarav', 'Liam', 'Sarah', 'Priya'];
+  return `
+    <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="who-said-card">
+      <div class="flex items-center justify-between pb-3 border-b border-border/70">
+        <span class="px-2.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold tracking-widest uppercase">WHO SAID THIS? · CHAT EXPOSE</span>
+        <span class="text-xs text-sunset-coral font-bold">UNFILTERED QUOTE 💬</span>
+      </div>
+
+      <!-- Chat Bubble Exhibit -->
+      <div class="my-4 p-5 rounded-2xl bg-[#0B141A] border border-[#202C33] shadow-inner relative">
+        <div class="text-[10px] font-mono text-gray-400 mb-1.5 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-mint-green"></span>
+          <span>${card.context || 'WhatsApp Group Chat · 10:45 PM'}</span>
+        </div>
+        <p class="font-display text-base sm:text-lg text-white font-bold leading-relaxed">
+          ${card.quote || '“Maine pehle hi bola tha ki plan cancel hoga, ab sab mujhe biryani khilao.”'}
+        </p>
+      </div>
+
+      <div class="text-center my-3">
+        <h4 class="font-display text-sm font-bold text-white">Spot the friend who sent this message:</h4>
+      </div>
+
+      <!-- Suspects Grid -->
+      <div class="grid grid-cols-2 gap-2.5 mb-3" id="game-option-grid">
+        ${suspects.map((suspect) => {
+          const isSelected = game.selectedOption === suspect;
+          return `
+            <button class="game-opt-btn p-3 rounded-xl border ${isSelected ? 'bg-amber-gold text-canvas border-amber-gold shadow-sm font-bold' : 'bg-surface-container-lowest border-border/80 text-gray-200 hover:border-amber-gold/50'} flex items-center gap-2.5 text-left text-xs font-bold transition-all active:scale-98 cursor-pointer" data-option="${suspect}" ${game.isAnswerRevealed ? 'disabled' : ''}>
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(suspect)}" class="w-8 h-8 rounded-lg bg-surface-bright shrink-0" />
+              <span class="truncate">${suspect}</span>
+            </button>
+          `;
+        })}
+      </div>
+
+      <!-- Reveal Banner -->
+      <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-amber-gold/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
+        <div class="flex items-center gap-2 text-amber-gold font-bold text-sm mb-1.5">
+          <span>EXPOSED: It was ${card.correctSuspect || 'Sarah'}!</span>
+        </div>
+        <p class="text-xs text-gray-300 font-mono mb-3">${card.revealedSnippet || 'Sarah was 4.8 km away when claiming she was at the gate.'}</p>
+        <div class="flex justify-end">
+          <button id="btn-next-round" class="px-5 py-2 rounded-full bg-amber-gold text-canvas font-bold text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-1">
+            <span>Next Quote</span>
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// C. REEL COURT VIEW
+function renderReelCourtView(card, game, currentUserName) {
+  return `
+    <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="reel-court-card">
+      <div class="flex items-center justify-between pb-3 border-b border-border/70">
+        <span class="px-2.5 py-0.5 rounded bg-mint-green/20 text-mint-green text-[10px] font-mono font-bold tracking-widest uppercase">THE REEL COURTROOM 🎬</span>
+        <span class="text-xs text-amber-gold font-bold">EXHIBIT A HEARING</span>
+      </div>
+
+      <div class="my-4">
+        <h3 class="font-headline-sm text-base font-bold text-white mb-1">🚨 ${card.caseTitle || 'The 7-Minute Voice Note Felony'}</h3>
+        <p class="text-xs text-gray-300 font-mono">${card.charge || 'Sending a podcast episode instead of typing “Reach safely”'}</p>
+      </div>
+
+      <div class="p-3 rounded-xl bg-[#0B141A] border border-[#202C33] text-xs font-mono text-gray-300 mb-4">
+        <div class="text-[10px] text-amber-gold font-bold mb-1">DEFENSE PLEA:</div>
+        ${card.plea || '“My emotional nuance cannot be captured by mere alphabets.”'}
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <button class="game-opt-btn p-3 rounded-xl border ${game.selectedOption === 'GUILTY' ? 'bg-sunset-coral text-white border-sunset-coral' : 'bg-surface-container-lowest border-border'} font-bold text-xs" data-option="GUILTY" ${game.isAnswerRevealed ? 'disabled' : ''}>
+          <span>⚖️ 100% GUILTY</span>
+        </button>
+        <button class="game-opt-btn p-3 rounded-xl border ${game.selectedOption === 'RELATABLE' ? 'bg-mint-green text-canvas border-mint-green' : 'bg-surface-container-lowest border-border'} font-bold text-xs" data-option="RELATABLE" ${game.isAnswerRevealed ? 'disabled' : ''}>
+          <span>🕊️ RELATABLE (PASS)</span>
+        </button>
+      </div>
+
+      <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-mint-green/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
+        <div class="text-mint-green font-bold text-sm mb-2">VERDICT: SENTENCE PRONOUNCED!</div>
+        <p class="text-xs text-gray-300 mb-3">${(card.punishments && card.punishments[0]) || 'Must buy cutting chai for the squad.'}</p>
+        <div class="flex justify-end">
+          <button id="btn-next-round" class="px-5 py-2 rounded-full bg-mint-green text-canvas font-bold text-xs">Next Case</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// D. EMOJI CINEMA VIEW
+function renderEmojiCinemaView(card, game, currentUserName) {
+  const options = card.options || ['Dilwale Dulhania Le Jayenge', 'Jab We Met', 'Chennai Express', 'Gadar'];
+  return `
+    <div class="relative w-full my-3.5 rounded-2xl bg-surface-container p-5 shadow-2xl border border-border/80 overflow-hidden" id="emoji-cinema-card">
+      <div class="flex items-center justify-between pb-3 border-b border-border/70">
+        <span class="px-2.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold tracking-widest uppercase">EMOJI CINEMA 🍿</span>
+        <span class="text-xs text-white font-mono">BOLLYWOOD GUESS</span>
+      </div>
+
+      <div class="my-6 text-center">
+        <div class="text-4xl sm:text-5xl tracking-widest mb-3 select-none">${card.emojis || '🚂 💨 🏃‍♀️ 👨 🤝 🌻'}</div>
+        <h4 class="font-display text-sm font-bold text-white">${card.prompt || 'Guess the iconic Bollywood film from the emojis:'}</h4>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3" id="game-option-grid">
+        ${options.map((opt, idx) => {
+          const isSelected = game.selectedOption === opt;
+          return `
+            <button class="game-opt-btn p-3.5 rounded-xl border ${isSelected ? 'bg-amber-gold text-canvas border-amber-gold font-bold' : 'bg-surface-container-lowest border-border text-gray-200 hover:border-amber-gold/50'} text-left text-xs font-bold transition-all active:scale-98 cursor-pointer" data-option="${opt}" ${game.isAnswerRevealed ? 'disabled' : ''}>
+              ${opt}
+            </button>
+          `;
+        })}
+      </div>
+
+      <div id="game-reveal-banner" class="mt-4 p-4 rounded-xl bg-surface-container-lowest border border-amber-gold/40 shadow-xl" style="display: ${game.isAnswerRevealed ? 'block' : 'none'};">
+        <div class="text-amber-gold font-bold text-sm mb-1.5">BOLLYWOOD CANON: ${options[card.correctIndex || 0]}!</div>
+        <p class="text-xs text-gray-300 italic font-serif mb-3">${card.iconicDialogue || '“Ja Simran ja, jee le apni zindagi!”'}</p>
+        <div class="flex justify-end">
+          <button id="btn-next-round" class="px-5 py-2 rounded-full bg-amber-gold text-canvas font-bold text-xs">Next Scene</button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // 1. THE RED FLAG COURTROOM VIEW
@@ -714,9 +933,9 @@ export function bindGameEvents() {
   const activeDeck = resolveActiveDeck(state, selectedModeId);
   const currentCard = activeDeck[(game.roundIndex - 1) % activeDeck.length];
 
-  // Shot clock logic
-  const clockText = document.getElementById('shot-clock-text');
-  const timerRing = document.getElementById('timer-ring');
+  // Shot clock logic with Split-Flap animation
+  const flapS1 = document.getElementById('game-flap-s1');
+  const flapS2 = document.getElementById('game-flap-s2');
   let seconds = game.timeRemaining;
 
   if (timerInterval) clearInterval(timerInterval);
@@ -724,16 +943,27 @@ export function bindGameEvents() {
   if (!game.isAnswerRevealed) {
     timerInterval = setInterval(() => {
       seconds--;
-      if (clockText) clockText.innerHTML = `${seconds}<span class="text-[11px] font-normal tracking-normal text-secondary/80">s</span>`;
+      if (seconds < 0) seconds = 0;
 
-      if (timerRing) {
-        const offset = 119.38 - (119.38 * seconds) / 20;
-        timerRing.style.strokeDashoffset = offset;
-        if (seconds <= 5) {
-          audio.playTick();
-          timerRing.classList.remove('stroke-secondary');
-          timerRing.classList.add('stroke-primary-container');
-        }
+      const s1Val = Math.floor(seconds / 10).toString();
+      const s2Val = (seconds % 10).toString();
+
+      if (flapS2 && flapS2.textContent !== s2Val) {
+        flapS2.classList.remove('split-flap-flip');
+        void flapS2.offsetWidth;
+        flapS2.textContent = s2Val;
+        flapS2.classList.add('split-flap-flip');
+      }
+
+      if (flapS1 && flapS1.textContent !== s1Val) {
+        flapS1.classList.remove('split-flap-flip');
+        void flapS1.offsetWidth;
+        flapS1.textContent = s1Val;
+        flapS1.classList.add('split-flap-flip');
+      }
+
+      if (seconds <= 5 && seconds > 0) {
+        audio.playTick();
       }
 
       if (seconds <= 0) {
@@ -791,7 +1021,21 @@ export function bindGameEvents() {
     });
 
     const revealBanner = document.getElementById('game-reveal-banner');
-    if (revealBanner) revealBanner.style.display = 'block';
+    if (revealBanner) {
+      revealBanner.style.display = 'block';
+      // Trigger card flip
+      const activeCard = document.querySelector('#live-memory-card, #court-card, #game-option-grid');
+      if (activeCard && activeCard.id !== 'game-option-grid') {
+        init3DCardFlip(activeCard.id);
+      }
+      
+      // Trigger kinetic text reveal
+      const revealText = revealBanner.querySelector('.font-headline-sm');
+      if (revealText) {
+        if (!revealText.id) revealText.id = 'reveal-text-' + Date.now();
+        initKineticWordReveal(revealText.id);
+      }
+    }
 
     const revealBtn = document.getElementById('btn-reveal-now');
     if (revealBtn) revealBtn.disabled = true;
@@ -952,6 +1196,29 @@ export function bindGameEvents() {
     castTvBtn.addEventListener('click', () => {
       audio.playChime();
       store.setView('TV_MODE');
+    });
+  }
+
+  // Private Panic Button (Soften Card)
+  const btnPanic = document.getElementById('btn-panic-soften');
+  if (btnPanic) {
+    btnPanic.addEventListener('click', () => {
+      audio.playBip();
+      btnPanic.innerHTML = '<span>✅</span><span class="text-mint-green">Softened</span>';
+      setTimeout(() => {
+        const st = store.getState();
+        const nextRound = (st.activeGame.roundIndex % (st.activeGame.totalRounds || 4)) + 1;
+        store.setState({
+          activeGame: {
+            ...st.activeGame,
+            roundIndex: nextRound,
+            selectedOption: null,
+            isAnswerRevealed: false,
+            timeRemaining: 20,
+          },
+        });
+        store.notify();
+      }, 400);
     });
   }
 }

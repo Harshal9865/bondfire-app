@@ -5,8 +5,8 @@
   "description": "Party games made from your own memories. Zero gambling, 100% human connection.",
   "main": "index.html",
   "scripts": {
-    "dev": "npm run build && serve -s . -p 5173",
-    "start": "serve -s . -p 5173",
+    "dev": "npx serve -s . -p 3000",
+    "start": "npx serve -s . -p 3000",
     "build": "tailwindcss -i ./css/input.css -o ./css/output.css",
     "test": "node tests/scenario_full_lifecycle.js && node tests/verify_services.js",
     "deploy": "npm run build && npx vercel"

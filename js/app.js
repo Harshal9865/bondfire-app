@@ -13,16 +13,19 @@ import { renderHeader, bindHeaderEvents } from './components/header.js';
 import { renderHero, bindHeroEvents } from './components/hero.js';
 import { renderLobby, bindLobbyEvents } from './components/lobby.js';
 import { renderGameScreen, bindGameEvents } from './components/gameScreen.js';
-import { renderCoupleScreen, bindCoupleEvents } from './components/coupleScreen.js';
-import { renderSoloScreen, bindSoloEvents } from './components/soloScreen.js';
 import { renderVaultScreen, bindVaultEvents } from './components/vaultScreen.js';
 import { renderYearbookScreen, bindYearbookEvents } from './components/yearbookScreen.js';
-import { renderStoreScreen, bindStoreEvents } from './components/storeScreen.js';
-import { renderPixelGladeScreen, bindPixelGladeEvents } from './components/pixelGladeScreen.js';
 import { renderProfileScreen, bindProfileEvents } from './components/profileScreen.js';
-import { renderPricingScreen, bindPricingEvents } from './components/pricingScreen.js';
 import { renderFriendsScreen, bindFriendsEvents } from './components/friendsScreen.js';
+import { renderShowsScreen, bindShowsEvents } from './components/showsScreen.js';
+import { renderSpinBottleGame, bindSpinBottleEvents } from './components/spinBottleGame.js';
+import { renderNeverHaveIEverGame, bindNeverHaveIEverEvents } from './components/neverHaveIEverGame.js';
+import { renderMostLikelyToGame, bindMostLikelyToEvents } from './components/mostLikelyToGame.js';
+import { renderArcadeScreen, bindArcadeEvents } from './components/arcadeScreen.js';
+import { renderEmporiumScreen, bindEmporiumEvents } from './components/emporiumScreen.js';
 import { renderTvModeScreen, bindTvModeEvents } from './components/tvModeScreen.js';
+import { renderSoloScreen, bindSoloEvents } from './components/soloScreen.js';
+import { renderCoupleScreen, bindCoupleEvents } from './components/coupleScreen.js';
 import { renderFooter, bindFooterEvents } from './components/footer.js';
 
 class BondfireApp {
@@ -71,8 +74,19 @@ class BondfireApp {
 
   handleHashChange() {
     const hash = window.location.hash.replace('#/', '').toUpperCase();
-    const validViews = ['HERO', 'LOBBY', 'GAME', 'COUPLE', 'SOLO', 'VAULT', 'YEARBOOK', 'STORE', 'GLADE', 'PROFILE', 'PRICING', 'FRIENDS', 'TV_MODE'];
-    const targetView = validViews.includes(hash) ? hash : 'HERO';
+    const aliasMap = {
+      'VAULT': 'MEMORIES',
+      'PHOTOBOOK': 'YEARBOOK',
+      'EMPORIUM': 'STORE',
+      'US': 'COUPLE',
+      'COUPLES': 'COUPLE',
+      'TIME_CAPSULE': 'SOLO',
+      'SOLO': 'SOLO',
+      'PODS': 'ROOMS'
+    };
+    const resolvedHash = aliasMap[hash] || hash;
+    const validViews = ['HOME', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE'];
+    const targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
 
     if (store.getState().currentView !== targetView) {
       store.setState({ currentView: targetView });
@@ -83,15 +97,41 @@ class BondfireApp {
 
   render(state) {
     // 1. Render Global Header
-    if (this.headerMount) {
+    if (this.headerMount && state.currentView !== 'TV_MODE' && state.currentView !== 'GAME') {
       this.headerMount.innerHTML = renderHeader();
       bindHeaderEvents();
+    } else if (this.headerMount) {
+      this.headerMount.innerHTML = '';
     }
 
     // 2. Render Active View
     if (!this.appMount) return;
 
+    // Apply global dark mode class for the new aesthetic
+    document.body.classList.add('dark');
+
     switch (state.currentView) {
+      case 'ARCADE':
+        this.appMount.innerHTML = renderArcadeScreen();
+        bindArcadeEvents();
+        break;
+
+      case 'BOTTLE':
+        this.appMount.innerHTML = renderSpinBottleGame();
+        bindSpinBottleEvents();
+        break;
+
+      case 'NHIE':
+        this.appMount.innerHTML = renderNeverHaveIEverGame();
+        bindNeverHaveIEverEvents();
+        break;
+
+      case 'MOST_LIKELY_TO':
+        this.appMount.innerHTML = renderMostLikelyToGame();
+        bindMostLikelyToEvents();
+        break;
+
+      case 'ROOMS':
       case 'LOBBY':
         this.appMount.innerHTML = renderLobby();
         bindLobbyEvents();
@@ -102,44 +142,21 @@ class BondfireApp {
         bindGameEvents();
         break;
 
-      case 'COUPLE':
-        this.appMount.innerHTML = renderCoupleScreen();
-        bindCoupleEvents();
-        break;
-
-      case 'SOLO':
-        this.appMount.innerHTML = renderSoloScreen();
-        bindSoloEvents();
-        break;
-
+      case 'MEMORIES':
       case 'VAULT':
         this.appMount.innerHTML = renderVaultScreen();
         bindVaultEvents();
         break;
 
       case 'YEARBOOK':
+      case 'PHOTOBOOK':
         this.appMount.innerHTML = renderYearbookScreen();
         bindYearbookEvents();
         break;
 
-      case 'STORE':
-        this.appMount.innerHTML = renderStoreScreen();
-        bindStoreEvents();
-        break;
-
-      case 'GLADE':
-        this.appMount.innerHTML = renderPixelGladeScreen();
-        bindPixelGladeEvents();
-        break;
-
-      case 'PROFILE':
-        this.appMount.innerHTML = renderProfileScreen();
-        bindProfileEvents();
-        break;
-
-      case 'PRICING':
-        this.appMount.innerHTML = renderPricingScreen();
-        bindPricingEvents();
+      case 'SHOWS':
+        this.appMount.innerHTML = renderShowsScreen();
+        bindShowsEvents();
         break;
 
       case 'FRIENDS':
@@ -147,14 +164,35 @@ class BondfireApp {
         bindFriendsEvents();
         break;
 
+      case 'STORE':
+      case 'EMPORIUM':
+        this.appMount.innerHTML = renderEmporiumScreen();
+        bindEmporiumEvents();
+        break;
+
+      case 'PROFILE':
+        this.appMount.innerHTML = renderProfileScreen();
+        bindProfileEvents();
+        break;
+
       case 'TV_MODE':
         this.appMount.innerHTML = renderTvModeScreen();
         bindTvModeEvents();
-        if (this.headerMount) this.headerMount.innerHTML = '';
         if (this.footerMount) this.footerMount.innerHTML = '';
         return; // TV Mode manages its own full-viewport layout
 
-      case 'HERO':
+      case 'SOLO':
+        this.appMount.innerHTML = renderSoloScreen();
+        bindSoloEvents();
+        break;
+
+      case 'COUPLE':
+      case 'US':
+        this.appMount.innerHTML = renderCoupleScreen();
+        bindCoupleEvents();
+        break;
+
+      case 'HOME':
       default:
         this.appMount.innerHTML = renderHero();
         bindHeroEvents();

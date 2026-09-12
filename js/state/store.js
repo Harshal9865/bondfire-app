@@ -173,6 +173,66 @@ class ReactiveStore {
     };
   }
 
+  getDefaultMemoryGraphNodes() {
+    return [
+      {
+        id: 'node_1',
+        category: 'QUOTES',
+        title: '“Maine pehle hi bola tha”',
+        contextSnippet: 'Aarav at 2:00 AM before train departure · Said with 100% smug confidence',
+        eventDate: '2024-10-15',
+        sentimentTag: 'FUNNY',
+        status: 'APPROVED',
+      },
+      {
+        id: 'node_2',
+        category: 'FOOD',
+        title: 'Biryani vs Pulao Group Chat Civil War',
+        contextSnippet: '600-word heated thesis in WhatsApp · 22 voice notes exchanged',
+        eventDate: '2024-08-12',
+        sentimentTag: 'CHAOTIC',
+        status: 'APPROVED',
+      },
+      {
+        id: 'node_3',
+        category: 'RUNNING_JOKES',
+        title: 'The "5 Minutes Away" Legend',
+        contextSnippet: 'Sarah texting "Just entering parking" while standing in bathroom towel',
+        eventDate: '2024-11-04',
+        sentimentTag: 'ROAST',
+        status: 'APPROVED',
+      },
+      {
+        id: 'node_4',
+        category: 'PLACES',
+        title: 'Anjuna Beach Shack 3 AM Sand Search',
+        contextSnippet: '4 flashlights looking for Kabir scooter key that was in his own pocket',
+        eventDate: '2024-10-16',
+        sentimentTag: 'NOSTALGIC',
+        status: 'APPROVED',
+      },
+      {
+        id: 'node_5',
+        category: 'SONGS',
+        title: 'Ilahi Sing-Along in Rented Dzire',
+        contextSnippet: 'Everyone hitting the high pitch completely out of tune',
+        eventDate: '2024-10-17',
+        sentimentTag: 'EMOTIONAL',
+        status: 'PENDING_APPROVAL',
+      },
+    ];
+  }
+
+  getDefaultWeeklyMission() {
+    return {
+      weekNumber: 42,
+      title: 'Upload 1 Photo or Screenshot from this week',
+      subtitle: 'Unlock next Friday’s Squad Night game deck instantly!',
+      submissionType: 'PHOTO',
+      isCompleted: false,
+    };
+  }
+
   loadInitialState() {
     if (typeof localStorage !== 'undefined') {
       try {
@@ -188,7 +248,16 @@ class ReactiveStore {
               parsed.activeRoom.roomCode = generateRoomCode();
             }
             if (!parsed.activeRoom.selectedGameMode) {
-              parsed.activeRoom.selectedGameMode = 'RED_FLAG_COURT';
+              parsed.activeRoom.selectedGameMode = 'OUR_LORE';
+            }
+            if (!parsed.activeRoom.roomTemplate) {
+              parsed.activeRoom.roomTemplate = 'SQUAD_NIGHT';
+            }
+            if (!parsed.activeRoom.humorTone) {
+              parsed.activeRoom.humorTone = 'FRIENDLY_ROAST';
+            }
+            if (!parsed.activeRoom.language) {
+              parsed.activeRoom.language = 'hi-IN';
             }
             if (Array.isArray(parsed.activeRoom.players)) {
               parsed.activeRoom.players = parsed.activeRoom.players.map((p) => {
@@ -208,6 +277,8 @@ class ReactiveStore {
             parsed.friendRequests = this.getDefaultFriendRequests();
           }
           if (!parsed.customGameDeck) parsed.customGameDeck = [];
+          if (!parsed.memoryGraphNodes) parsed.memoryGraphNodes = this.getDefaultMemoryGraphNodes();
+          if (!parsed.weeklyMission) parsed.weeklyMission = this.getDefaultWeeklyMission();
           return parsed;
         }
       } catch (e) {
@@ -223,11 +294,16 @@ class ReactiveStore {
       friendsList: this.getDefaultFriendsList(),
       squadsList: this.getDefaultSquadsList(),
       friendRequests: this.getDefaultFriendRequests(),
+      memoryGraphNodes: this.getDefaultMemoryGraphNodes(),
+      weeklyMission: this.getDefaultWeeklyMission(),
       activeRoom: {
         roomCode: generateRoomCode(),
-        podName: 'The Goa Trip Crew 🏖️',
+        podName: 'The Ahmedabad Squad 🏖️',
+        roomTemplate: 'SQUAD_NIGHT',
+        humorTone: 'FRIENDLY_ROAST',
+        language: 'hi-IN',
         isHost: true,
-        selectedGameMode: 'RED_FLAG_COURT',
+        selectedGameMode: 'OUR_LORE',
         players: [
           { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=BondfireHost' },
           { id: 'usr_2', name: 'Liam', role: 'PLAYER', isReady: true, avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Liam' },
@@ -291,6 +367,57 @@ class ReactiveStore {
   setUserTier(tier) {
     const currentUser = { ...this.state.currentUser, tier };
     this.setState({ currentUser });
+  }
+
+  updateRoomName(name) {
+    if (!name) return;
+    const activeRoom = { ...this.state.activeRoom, podName: name };
+    this.setState({ activeRoom });
+  }
+
+  addRoomPlayer(name, avatar) {
+    if (!name) return;
+    const currentPlayers = this.state.activeRoom.players || [];
+    const newPlayer = {
+      id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,
+      name: name.trim(),
+      role: 'PLAYER',
+      isReady: true,
+      avatar: avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`,
+    };
+    const activeRoom = {
+      ...this.state.activeRoom,
+      players: [...currentPlayers, newPlayer],
+    };
+    this.setState({ activeRoom });
+    return newPlayer;
+  }
+
+  removeRoomPlayer(playerId) {
+    const currentPlayers = this.state.activeRoom.players || [];
+    const filtered = currentPlayers.filter((p) => p.id !== playerId);
+    const activeRoom = {
+      ...this.state.activeRoom,
+      players: filtered,
+    };
+    this.setState({ activeRoom });
+  }
+
+  addCustomRoomCard(card) {
+    const customList = this.state.customGameDeck || [];
+    const newCard = {
+      id: `custom_${Date.now()}`,
+      round: customList.length + 1,
+      title: card.title || 'Custom Squad Card',
+      prompt: card.prompt || card.title,
+      quote: card.quote || card.prompt,
+      author: card.author || 'Squad Anonymous',
+      timestamp: 'Custom Entry',
+      isPlayable: true,
+      options: card.options || ['Option A', 'Option B', 'Option C', 'Option D'],
+    };
+    this.setState({ customGameDeck: [newCard, ...customList] });
+    return newCard;
   }
 
   updateUserProfile(updates) {

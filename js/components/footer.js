@@ -97,9 +97,9 @@ export function renderFooter() {
                 </button>
               </li>
               <li>
-                <button class="footer-nav-btn text-xs text-mint-green hover:text-mint-green/80 flex items-center gap-2 py-0.5 transition-colors font-medium" data-view="GLADE">
-                  <span class="material-symbols-outlined text-[15px] text-mint-green">videogame_asset</span>
-                  <span>Pixel Glade Arcade</span>
+                <button class="footer-nav-btn text-xs text-mint-green hover:text-mint-green/80 flex items-center gap-2 py-0.5 transition-colors font-medium" data-view="ARCADE">
+                  <span class="material-symbols-outlined text-[15px] text-mint-green">sports_esports</span>
+                  <span>Multiplayer Party Arcade</span>
                 </button>
               </li>
             </ul>
