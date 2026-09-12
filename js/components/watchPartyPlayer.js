@@ -7,10 +7,19 @@
 import { audio } from '../visuals/audioSynth.js';
 import { socketService } from '../services/socket.js';
 
+export const SQUAD_WATCH_PICKS = [
+  { name: 'BeastBoyShub', query: 'https://www.youtube.com/watch?v=RWZJDRcmXm0', icon: 'sports_esports' },
+  { name: 'Samay Raina', query: 'Samay Raina live chess comedy', icon: 'psychology' },
+  { name: 'Tanmay Bhat', query: 'Tanmay Bhat vlogs reactions', icon: 'mic' },
+  { name: 'Chai Lo-Fi', query: 'Lofi hip hop beats campfire chill', icon: 'nightlight' },
+  { name: 'Zakir Khan', query: 'Zakir Khan stand up comedy', icon: 'theater_comedy' },
+  { name: 'Bollywood Hits', query: 'Bollywood party mashup dance tracks', icon: 'music_note' },
+];
+
 export class WatchPartyPlayer {
   constructor(containerId, initialVideoUrl) {
     this.container = document.getElementById(containerId);
-    this.videoUrl = initialVideoUrl || 'https://assets.mixkit.co/videos/preview/mixkit-friends-sitting-on-a-curb-and-talking-41584-large.mp4';
+    this.videoUrl = initialVideoUrl || 'https://www.youtube.com/watch?v=RWZJDRcmXm0';
     this.isHost = true;
     this.isPlaying = false;
     this.isMuted = false;
@@ -23,13 +32,21 @@ export class WatchPartyPlayer {
   }
 
   render() {
-    const isYouTube = this.videoUrl.includes('youtube.com') || this.videoUrl.includes('youtu.be');
+    const isYouTubeUrl = this.videoUrl.includes('youtube.com') || this.videoUrl.includes('youtu.be');
+    const isGenericHttp = this.videoUrl.startsWith('http://') || this.videoUrl.startsWith('https://');
     let ytEmbedUrl = '';
-    if (isYouTube) {
+
+    if (isYouTubeUrl) {
       const match = this.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
       const ytId = match ? match[1] : '';
       ytEmbedUrl = `https://www.youtube-nocookie.com/embed/${ytId}?enablejsapi=1&autoplay=1&mute=0&controls=1`;
+    } else if (!isGenericHttp && this.videoUrl.trim().length > 0) {
+      // Official YouTube zero-API search embed!
+      const cleanQuery = encodeURIComponent(this.videoUrl.trim());
+      ytEmbedUrl = `https://www.youtube-nocookie.com/embed?listType=search&list=${cleanQuery}&autoplay=1&controls=1`;
     }
+
+    const isYouTube = isYouTubeUrl || (!isGenericHttp && this.videoUrl.trim().length > 0);
 
     this.container.innerHTML = `
       <div class="relative w-full rounded-3xl overflow-hidden bg-black border border-border shadow-2xl flex flex-col group select-none">
@@ -86,16 +103,16 @@ export class WatchPartyPlayer {
           <!-- URL Swapper Input (Host only) -->
           <div class="flex items-center gap-2 w-full sm:w-auto flex-1">
             <div class="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-bright border border-border focus-within:border-sunset-coral">
-              <span class="material-symbols-outlined text-[16px] text-gray-400">link</span>
+              <span class="material-symbols-outlined text-[16px] text-gray-400">search</span>
               <input 
                 type="text" 
                 id="input-stream-url" 
-                placeholder="Paste YouTube or video link..." 
+                placeholder="Search creator/title or paste YouTube link..." 
                 value="${this.videoUrl}" 
                 class="w-full bg-transparent text-xs text-white placeholder:text-gray-500 focus:outline-none font-mono"
               />
             </div>
-            <button id="btn-load-stream-url" class="px-4 py-2 rounded-xl bg-sunset-coral text-white font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all shrink-0">
+            <button id="btn-load-stream-url" class="px-4 py-2 rounded-xl bg-sunset-coral text-white font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all shrink-0 cursor-pointer">
               Load Stream
             </button>
           </div>
@@ -109,17 +126,31 @@ export class WatchPartyPlayer {
               { icon: 'celebration', color: 'text-mint-green', label: 'HYPE' },
               { icon: 'movie', color: 'text-blue-400', label: 'CINEMA' }
             ].map((rx) => `
-              <button class="btn-stream-reaction w-9 h-9 rounded-full bg-surface-bright hover:bg-surface-container-high border border-border flex items-center justify-center transition-transform active:scale-90" data-label="${rx.label}">
+              <button class="btn-stream-reaction w-9 h-9 rounded-full bg-surface-bright hover:bg-surface-container-high border border-border flex items-center justify-center transition-transform active:scale-90 cursor-pointer" data-label="${rx.label}">
                 <span class="material-symbols-outlined text-base ${rx.color}">${rx.icon}</span>
               </button>
             `).join('')}
 
-            <button id="btn-trigger-predict-modal" class="px-3 py-2 rounded-xl bg-amber-gold/20 border border-amber-gold text-amber-gold font-bold text-xs hover:bg-amber-gold/30 transition-all flex items-center gap-1.5 ml-1">
+            <button id="btn-trigger-predict-modal" class="px-3 py-2 rounded-xl bg-amber-gold/20 border border-amber-gold text-amber-gold font-bold text-xs hover:bg-amber-gold/30 transition-all flex items-center gap-1.5 ml-1 cursor-pointer">
               <span class="material-symbols-outlined text-sm">ads_click</span>
               <span class="retro-pixel-badge text-[8px]">Predict Round</span>
             </button>
           </div>
 
+        </div>
+
+        <!-- Squad Quick Picks Bar (Zero API Required) -->
+        <div class="px-4 py-2 bg-surface-container-high/40 border-t border-border/50 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <span class="text-[10px] text-amber-gold font-mono uppercase tracking-wider shrink-0 font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">flash_on</span>
+            <span>Quick Picks:</span>
+          </span>
+          ${SQUAD_WATCH_PICKS.map((pick) => `
+            <button class="btn-quick-watch-pick px-2.5 py-1 rounded-full bg-surface-container hover:bg-surface-bright border border-border/80 text-[11px] text-gray-300 font-bold shrink-0 transition-all active:scale-95 flex items-center gap-1 cursor-pointer hover:border-sunset-coral/50" data-query="${pick.query}">
+              <span class="material-symbols-outlined text-[13px] text-amber-gold">${pick.icon}</span>
+              <span>${pick.name}</span>
+            </button>
+          `).join('')}
         </div>
 
         <!-- Compliance & Creator Credit Micro-Badge -->
@@ -160,7 +191,7 @@ export class WatchPartyPlayer {
       });
     }
 
-    // Load new URL
+    // Load new URL or Search
     if (btnLoad && inputUrl) {
       btnLoad.addEventListener('click', () => {
         const val = inputUrl.value.trim();
@@ -169,8 +200,29 @@ export class WatchPartyPlayer {
         this.videoUrl = val;
         this.render();
         this.bindEvents();
+        socketService.send('CLIENT_SYNC_STREAM', { url: this.videoUrl });
+      });
+
+      inputUrl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          btnLoad.click();
+        }
       });
     }
+
+    // Squad Quick Picks Click
+    document.querySelectorAll('.btn-quick-watch-pick').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const query = btn.dataset.query;
+        if (!query) return;
+        audio.playChime();
+        this.videoUrl = query;
+        this.render();
+        this.bindEvents();
+        socketService.send('CLIENT_SYNC_STREAM', { url: this.videoUrl });
+      });
+    });
 
     // Reaction Blast (Spawn floating retro tokens)
     document.querySelectorAll('.btn-stream-reaction').forEach((btn) => {

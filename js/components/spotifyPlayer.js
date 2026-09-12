@@ -9,11 +9,27 @@ import { audio } from '../visuals/audioSynth.js';
 export const SPOTIFY_PRESETS = [
   {
     id: 'antakshari',
-    name: 'Antakshari & Bollywood Classics',
+    name: 'Antakshari & Bollywood',
     tagline: 'Sing-along essentials for squad road trips',
     embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX0XUfTFmNBRM?utm_source=generator&theme=0',
     icon: 'music_note',
     color: '#06D6A0',
+  },
+  {
+    id: 'punjabi',
+    name: 'Punjabi Dhol & Hype',
+    tagline: 'Diljit, AP Dhillon, Karan Aujla party hits',
+    embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX5cZuTvnNXUt?utm_source=generator&theme=0',
+    icon: 'local_fire_department',
+    color: '#F72585',
+  },
+  {
+    id: 'coke_studio',
+    name: 'Coke Studio & Sufi',
+    tagline: 'Soulful acoustic, Pasoori, Ali Sethi & Amit Trivedi',
+    embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWVUpZ9yP0nB1?utm_source=generator&theme=0',
+    icon: 'spa',
+    color: '#7209B7',
   },
   {
     id: 'lofi',
@@ -24,20 +40,20 @@ export const SPOTIFY_PRESETS = [
     color: '#FFB703',
   },
   {
-    id: 'nostalgia',
-    name: '2000s Nostalgia Rewind',
-    tagline: 'School & college era throwback anthems',
-    embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4o1oenSJRJd?utm_source=generator&theme=0',
+    id: 'indie',
+    name: 'Hindi Indie & 90s Rewind',
+    tagline: 'Lucky Ali, KK, Prateek Kuhad, Anuv Jain',
+    embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXd8cOUiye1o2?utm_source=generator&theme=0',
     icon: 'history',
     color: '#FF5A5F',
   },
   {
     id: 'party',
-    name: 'Hype Squad Bangers',
+    name: 'Squad Energy Bangers',
     tagline: 'High energy party hits for roast verdicts',
     embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXa2PvU927Am1?utm_source=generator&theme=0',
-    icon: 'local_fire_department',
-    color: '#7209B7',
+    icon: 'celebration',
+    color: '#3B82F6',
   },
 ];
 
@@ -151,19 +167,42 @@ export function bindSpotifyEvents() {
     });
   });
 
+export function resolveSpotifyQuery(queryOrUrl) {
+  if (!queryOrUrl || typeof queryOrUrl !== 'string') return SPOTIFY_PRESETS[0].embedUrl;
+  const q = queryOrUrl.trim().toLowerCase();
+
+  if (q.includes('open.spotify.com/')) {
+    const parts = queryOrUrl.split('open.spotify.com/')[1].split('?')[0];
+    return `https://open.spotify.com/embed/${parts}?utm_source=generator&theme=0`;
+  }
+
+  if (q.includes('punjabi') || q.includes('diljit') || q.includes('dhillon') || q.includes('dhol')) {
+    return SPOTIFY_PRESETS[1].embedUrl; // Punjabi
+  }
+  if (q.includes('coke') || q.includes('sufi') || q.includes('pasoori') || q.includes('acoustic')) {
+    return SPOTIFY_PRESETS[2].embedUrl; // Coke Studio
+  }
+  if (q.includes('lofi') || q.includes('chai') || q.includes('chill') || q.includes('ambient')) {
+    return SPOTIFY_PRESETS[3].embedUrl; // Lo-Fi
+  }
+  if (q.includes('indie') || q.includes('90s') || q.includes('lucky') || q.includes('kuhad') || q.includes('jain') || q.includes('nostalgia')) {
+    return SPOTIFY_PRESETS[4].embedUrl; // Indie
+  }
+  if (q.includes('party') || q.includes('banger') || q.includes('edm') || q.includes('hype')) {
+    return SPOTIFY_PRESETS[5].embedUrl; // Squad Energy
+  }
+
+  return SPOTIFY_PRESETS[0].embedUrl; // Antakshari & Bollywood
+}
+
   if (customForm && customInput && iframe) {
     customForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const rawUrl = customInput.value.trim();
-      if (!rawUrl) return;
+      const rawVal = customInput.value.trim();
+      if (!rawVal) return;
 
       audio.playChime();
-      let embedTarget = rawUrl;
-      if (rawUrl.includes('open.spotify.com/')) {
-        const parts = rawUrl.split('open.spotify.com/')[1].split('?')[0];
-        embedTarget = `https://open.spotify.com/embed/${parts}?utm_source=generator&theme=0`;
-      }
-
+      const embedTarget = resolveSpotifyQuery(rawVal);
       currentEmbedUrl = embedTarget;
       iframe.src = embedTarget;
       customInput.value = '';
@@ -179,14 +218,7 @@ export function playSongOnSpotify(queryOrUrl) {
   isJukeboxOpen = true;
   panel.style.display = 'flex';
 
-  if (queryOrUrl && queryOrUrl.startsWith('http')) {
-    let embed = queryOrUrl;
-    if (queryOrUrl.includes('open.spotify.com/')) {
-      const parts = queryOrUrl.split('open.spotify.com/')[1].split('?')[0];
-      embed = `https://open.spotify.com/embed/${parts}?utm_source=generator&theme=0`;
-    }
-    iframe.src = embed;
-  } else {
-    iframe.src = SPOTIFY_PRESETS[0].embedUrl;
-  }
+  const embedTarget = resolveSpotifyQuery(queryOrUrl);
+  currentEmbedUrl = embedTarget;
+  iframe.src = embedTarget;
 }

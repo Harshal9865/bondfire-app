@@ -1371,7 +1371,15 @@ export function bindGameEvents() {
       audio.playClick();
       if (!p2pMesh.isVoiceActive()) {
         btnGameVoiceMic.classList.add('animate-pulse');
-        await p2pMesh.startVoiceStream();
+        const ok = await p2pMesh.startVoiceStream();
+        if (!ok) {
+          gameMicText.textContent = 'Mic Blocked';
+          const toastMount = document.getElementById('toast-mount');
+          if (toastMount) {
+            toastMount.innerHTML = '<div class="toast toast-coral show"><span class="material-symbols-outlined text-sm mr-1 text-sunset-coral">mic_off</span><span>Microphone access blocked. Click the lock icon in your URL bar to allow.</span></div>';
+            setTimeout(() => (toastMount.innerHTML = ''), 4000);
+          }
+        }
       } else {
         p2pMesh.toggleMute();
       }
