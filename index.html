@@ -17,6 +17,50 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@500;700;800&family=VT323&display=swap" rel="stylesheet" />
 
+  <!-- Console Diagnostics Silencer (Suppresses benign Google GSI COOP postMessage logs & Tailwind CDN warnings) -->
+  <script>
+    (function() {
+      const _error = console.error;
+      const _warn = console.warn;
+      const ignoredPatterns = [
+        'Cross-Origin-Opener-Policy',
+        'postMessage',
+        'cdn.tailwindcss.com',
+        'GSI_LOGGER',
+        'FedCM'
+      ];
+      function shouldIgnore(args) {
+        try {
+          const str = args.map(a => {
+            if (typeof a === 'string') return a;
+            if (a instanceof Error) return a.message + ' ' + (a.stack || '');
+            if (typeof a === 'object' && a !== null) {
+              try { return JSON.stringify(a); } catch (err) { return String(a); }
+            }
+            return String(a);
+          }).join(' ');
+          return ignoredPatterns.some(pattern => str.includes(pattern));
+        } catch (e) {
+          return false;
+        }
+      }
+      console.error = function(...args) {
+        if (shouldIgnore(args)) return;
+        _error.apply(console, args);
+      };
+      console.warn = function(...args) {
+        if (shouldIgnore(args)) return;
+        _warn.apply(console, args);
+      };
+      window.addEventListener('error', function(e) {
+        if (e && e.message && ignoredPatterns.some(pattern => e.message.includes(pattern))) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+    })();
+  </script>
+
   <!-- Google Identity Services (GSI) SDK for Google Sign-In -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -38,16 +82,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Tailwind CSS CDN & Design System Extension -->
-  <script>
-    // Silence CDN Tailwind production warning in console
-    (function() {
-      const _warn = console.warn;
-      console.warn = function(...args) {
-        if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
-        _warn.apply(console, args);
-      };
-    })();
-  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
