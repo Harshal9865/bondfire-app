@@ -130,8 +130,8 @@ export function renderNeverHaveIEverGame() {
             return `
               <div class="flex items-center justify-between p-3 rounded-xl ${isEliminated ? 'bg-red-500/10 border border-red-500/30 opacity-70' : 'bg-surface-bright/50 border border-border'} transition-all">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-duo-rose/20 to-amber-gold/20 border ${isEliminated ? 'border-red-500' : 'border-border'} flex items-center justify-center shrink-0">
-                    ${p.avatar && !p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-base">person</span>'}
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-duo-rose/20 to-amber-gold/20 border ${isEliminated ? 'border-red-500' : 'border-border'} flex items-center justify-center shrink-0 overflow-hidden">
+                    ${p.avatar && (p.avatar.startsWith('http') || p.avatar.startsWith('data:') || p.avatar.startsWith('/')) ? `<img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>` : (p.avatar && p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-base">person</span>')}
                   </div>
                   <div>
                     <div class="flex items-center gap-1.5">

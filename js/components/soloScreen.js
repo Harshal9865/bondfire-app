@@ -1,184 +1,71 @@
 // ==============================================================================
-// SOLO "TIME CAPSULE" COMPONENT (Screen 4)
-// "On This Day" Audio Note Waveform, Daily Reflection Vault & Future Letters
+// SOLO "TIME CAPSULE & REFLECTION" COMPONENT (Screen 4)
+// Easy to Understand, Zero Mock Data, Instant Direct Start, Real Persistence
 // ==============================================================================
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+import { ConfettiEngine } from '../visuals/confetti.js';
 
-let isAudioPlaying = false;
-let audioPlayInterval = null;
+let confetti = null;
+let activeSoloTab = 'DAILY'; // 'DAILY' | 'CAPSULE' | 'QUIZ'
 
-export function renderSoloScreen() {
-  const state = store.getState();
-  const user = state.currentUser;
-  const firstName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'Citizen';
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-  const sparks = user?.sparks || 50;
+function getSavedReflections() {
+  try {
+    const raw = localStorage.getItem('bondfire_solo_reflections');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
 
-  return `
-    <div class="flex flex-col w-full max-w-[640px] mx-auto px-4 pt-6 pb-28 gap-5 relative select-none text-on-surface">
-      <!-- Ambient Glows -->
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-44 bg-amber-gold/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
-      <div class="absolute top-96 -right-16 w-56 h-56 bg-sunset-coral/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+function saveReflection(text, mood) {
+  const list = getSavedReflections();
+  const newItem = {
+    id: `ref_${Date.now()}`,
+    text,
+    mood: mood || 'Fun',
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    timestamp: Date.now(),
+  };
+  list.unshift(newItem);
+  try {
+    localStorage.setItem('bondfire_solo_reflections', JSON.stringify(list));
+  } catch (e) {
+    console.warn(e);
+  }
+  return newItem;
+}
 
-      <!-- Top Streak & User Header -->
-      <div class="flex items-center justify-between p-4 rounded-2xl bg-surface-container border border-border/80 shadow-md">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-xl bg-amber-gold/20 flex items-center justify-center shrink-0 border border-amber-gold/30">
-            <span class="material-symbols-outlined text-amber-gold text-[22px]">person</span>
-          </div>
-          <div class="flex flex-col min-w-0">
-            <h2 class="font-headline-sm text-base sm:text-lg text-white truncate font-bold">${greeting}, ${firstName}</h2>
-            <span class="font-caption text-xs text-gray-400 font-mono">PERSONAL TIME CAPSULE &amp; REFLECTION VAULT</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-bold shrink-0">
-          <span class="material-symbols-outlined text-[16px] text-amber-gold">local_fire_department</span>
-          <span class="retro-pixel-badge text-[10px]">12-DAY STREAK</span>
-        </div>
-      </div>
+function getSavedCapsules() {
+  try {
+    const raw = localStorage.getItem('bondfire_solo_capsules');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
 
-      <!-- Daily Quick Reflection Box -->
-      <div class="p-4 sm:p-5 rounded-2xl bg-surface-container border border-border/80 shadow-lg flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-amber-gold text-[20px]">edit_note</span>
-            <h3 class="font-bold text-white text-sm">Today's One-Line Memory</h3>
-          </div>
-          <span class="text-[10px] uppercase font-mono font-bold text-mint-green bg-mint-green/10 border border-mint-green/30 px-2 py-0.5 rounded-full">+15 Sparks</span>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <input type="text" id="daily-reflection-input" placeholder="What's one funny or peaceful thing that happened today?" class="flex-1 px-3.5 py-2.5 rounded-xl bg-surface-container-lowest border border-border/70 focus:border-amber-gold text-sm text-white placeholder:text-gray-500 focus:outline-none transition-colors" />
-          <button type="button" id="btn-save-daily-reflection" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-gold to-sunset-coral hover:brightness-110 text-canvas font-bold text-xs shadow transition-transform active:scale-95 flex items-center justify-center gap-1.5 shrink-0">
-            <span class="material-symbols-outlined text-[16px]">save</span>
-            <span>Save to Vault</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- "On This Day" Resurfaced Memory Tile -->
-      <div class="p-5 rounded-2xl bg-surface-container border border-border/80 shadow-xl flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <span class="px-2.5 py-1 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 font-caption text-[11px] font-bold flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">event</span><span class="retro-pixel-badge text-[9.5px]">3 YEARS AGO TODAY (SEPTEMBER 2023)</span></span>
-          <span class="text-xs text-gray-400 font-mono">Private to You</span>
-        </div>
-
-        <div class="rounded-xl overflow-hidden h-52 relative border border-border/60">
-          <div class="w-full h-full bg-gradient-to-br from-[#1c1828] to-[#0d101a] flex items-center justify-center relative">
-            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#ffb703_1px,transparent_1px)] [background-size:16px_16px]"></div>
-            <div class="flex flex-col items-center gap-2 z-10 text-center px-4">
-              <span class="material-symbols-outlined text-amber-gold text-[48px] drop-shadow-md">cabin</span>
-              <span class="font-mono text-[11px] uppercase tracking-wider text-amber-gold font-bold">Manali Vault Capsule #09</span>
-            </div>
-          </div>
-          <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-            <div class="font-display font-bold text-base text-white">The Mountain Cabin Morning</div>
-            <div class="text-xs text-gray-300">Recorded in Manali · Sept 09, 2023</div>
-          </div>
-        </div>
-
-        <!-- Audio Note Waveform Player -->
-        <div class="bg-surface-container-lowest border border-border/70 rounded-full px-4 py-2 flex items-center gap-3">
-          <button class="w-9 h-9 rounded-full bg-surface-bright hover:bg-amber-gold hover:text-canvas text-amber-gold flex items-center justify-center transition-all active:scale-95 shrink-0 shadow" id="btn-solo-audio-play" type="button">
-            <span id="audio-play-icon" class="text-sm font-bold">▶</span>
-          </button>
-          
-          <!-- Animated Waveform Bars -->
-          <div class="flex items-center gap-[3px] flex-1 h-6" id="waveform-bars">
-            ${Array.from({ length: 28 })
-              .map(
-                (_, i) => `
-              <div class="waveform-bar flex-1 bg-amber-gold/70 rounded-sm transition-all duration-200" style="height: ${Math.sin(i * 0.45) * 10 + 12}px;"></div>
-            `
-              )
-              .join('')}
-          </div>
-
-          <span class="text-xs font-mono font-bold text-gray-400 shrink-0" id="audio-timer">0:42s</span>
-        </div>
-
-        <!-- The Viral Bridge Card: Turn into Multiplayer Quiz -->
-        <div class="p-4 rounded-xl bg-gradient-to-r from-sunset-coral/15 via-amber-gold/10 to-transparent border border-sunset-coral/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <div class="font-bold text-xs sm:text-sm text-white">Turn this memory into a 2-minute quiz for your friends!</div>
-            <div class="text-xs text-gray-400 mt-0.5">Auto-formats question: &ldquo;Who woke up at 5 AM to watch the sunrise?&rdquo;</div>
-          </div>
-          <button class="px-4 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-xs shadow-glow-coral transition-transform active:scale-95 shrink-0" id="btn-solo-to-pod" type="button">
-            Send to Squad &rarr;
-          </button>
-        </div>
-      </div>
-
-      <!-- "Letter to Future Self" Capsule Module -->
-      <div class="p-5 rounded-2xl bg-surface-container border border-border/80 shadow-xl flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-headline-sm text-base text-white font-bold flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-gold text-[20px]">mail</span>
-              <span>Letters to Future Self</span>
-            </h3>
-            <p class="text-xs text-gray-400 mt-0.5">Write something today that will remain sealed until your chosen milestone.</p>
-          </div>
-          <button class="px-3 py-1.5 rounded-full bg-surface-bright hover:bg-surface-container-high border border-border/80 text-xs font-bold text-white transition-colors active:scale-95 shrink-0" id="btn-open-letter-modal" type="button">
-            + Write Letter
-          </button>
-        </div>
-
-        <div id="sealed-capsules-list" class="flex flex-col gap-2.5">
-          <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-border/70 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-              <span class="material-symbols-outlined text-amber-gold text-[22px] shrink-0">lock</span>
-              <div class="min-w-0">
-                <div class="font-bold text-xs sm:text-sm text-white truncate">Capsule #4 · 30th Birthday Letter</div>
-                <div class="text-xs text-amber-gold font-mono truncate">Unlocks on Dec 31, 2026 (112 days remaining)</div>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-full bg-surface-bright text-gray-400 text-[10px] font-bold uppercase font-mono shrink-0 border border-border/50">Sealed</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Write Future Letter Modal -->
-      <div id="future-letter-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4" style="display: none;">
-        <div class="relative w-full max-w-lg bg-surface-container-low border border-amber-gold/40 rounded-3xl p-6 shadow-2xl text-on-surface flex flex-col gap-4">
-          <div class="flex justify-between items-center pb-3 border-b border-border/80">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-gold text-[22px]">lock</span>
-              <h3 class="font-headline-sm text-base text-amber-gold font-bold">Seal a Letter to Future Self</h3>
-            </div>
-            <button class="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-gray-400 hover:text-white" id="btn-close-letter-modal"><span class="material-symbols-outlined text-[16px]">close</span></button>
-          </div>
-
-          <div>
-            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Capsule Title</label>
-            <input type="text" id="letter-title-input" placeholder="e.g. Note to Me in 2027" class="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-sm text-white focus:outline-none focus:border-amber-gold" />
-          </div>
-
-          <div>
-            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Unlock Milestone</label>
-            <select id="letter-unlock-select" class="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-sm text-white focus:outline-none focus:border-amber-gold">
-              <option value="6_months">6 Months from Today</option>
-              <option value="1_year" selected>1 Year from Today</option>
-              <option value="3_years">3 Years from Today</option>
-              <option value="new_year">Next New Year</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Your Letter (AES Encrypted at Rest)</label>
-            <textarea id="letter-content-input" rows="4" placeholder="What are you hoping for? What made you laugh this week? Write without holding back..." class="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border text-sm text-white focus:outline-none focus:border-amber-gold resize-none"></textarea>
-          </div>
-
-          <button class="w-full py-3 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral hover:brightness-110 text-canvas font-bold text-xs shadow transition-transform active:scale-95 flex items-center justify-center gap-2" id="btn-confirm-seal-letter" type="button">
-            <span class="material-symbols-outlined text-[16px]">lock</span>
-            <span class="retro-pixel-badge text-[10px]">Digitally Seal With Wax Stamp</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
+function saveCapsule(title, message, unlockMonths) {
+  const list = getSavedCapsules();
+  const now = new Date();
+  const unlockDate = new Date(now.setMonth(now.getMonth() + Number(unlockMonths)));
+  const newItem = {
+    id: `cap_${Date.now()}`,
+    title,
+    message,
+    unlockDate: unlockDate.toISOString(),
+    unlockDateFormatted: unlockDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    createdDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    isSealed: true,
+  };
+  list.unshift(newItem);
+  try {
+    localStorage.setItem('bondfire_solo_capsules', JSON.stringify(list));
+  } catch (e) {
+    console.warn(e);
+  }
+  return newItem;
 }
 
 function showToast(msg, type = 'mint') {
@@ -187,135 +74,365 @@ function showToast(msg, type = 'mint') {
     mount.innerHTML = `<div class="toast toast-${type} show"><span>${msg}</span></div>`;
     setTimeout(() => {
       if (mount.innerHTML.includes(msg)) mount.innerHTML = '';
-    }, 2800);
+    }, 3200);
   }
+}
+
+export function renderSoloScreen() {
+  const state = store.getState();
+  const user = state.currentUser;
+  const firstName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'Camper';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const sparks = user?.sparks || 120;
+
+  const reflections = getSavedReflections();
+  const capsules = getSavedCapsules();
+
+  return `
+    <div class="flex flex-col w-full max-w-[680px] mx-auto px-4 pt-6 pb-28 gap-6 relative select-none text-on-surface">
+      <!-- Warm Ambient Glow -->
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-80 h-64 bg-amber-gold/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div class="absolute top-96 -right-16 w-60 h-60 bg-sunset-coral/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+      <!-- Header: Warm Greeting -->
+      <div class="flex items-center justify-between p-4 rounded-3xl bg-surface border border-border shadow-md">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-2xl bg-amber-gold/20 flex items-center justify-center shrink-0 border border-amber-gold/40 text-amber-gold">
+            <span class="material-symbols-outlined text-2xl">person</span>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <h2 class="font-display text-lg sm:text-xl text-white truncate font-bold">${greeting}, ${firstName}</h2>
+            <span class="text-xs text-gray-400 font-mono">YOUR PRIVATE MEMORY CAPSULE</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-bold shrink-0">
+          <span class="material-symbols-outlined text-[16px] text-amber-gold">local_fire_department</span>
+          <span>${sparks} Sparks</span>
+        </div>
+      </div>
+
+      <!-- 3 Clear Mode Navigation Tabs -->
+      <div class="grid grid-cols-3 gap-2 bg-surface p-1.5 rounded-2xl border border-border shadow-sm">
+        <button class="solo-nav-tab py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeSoloTab === 'DAILY' ? 'bg-amber-gold text-canvas shadow' : 'text-gray-400 hover:text-white'}" data-tab="DAILY">
+          <span class="material-symbols-outlined text-[16px]">edit_note</span>
+          <span>Daily Spark</span>
+        </button>
+        <button class="solo-nav-tab py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeSoloTab === 'CAPSULE' ? 'bg-amber-gold text-canvas shadow' : 'text-gray-400 hover:text-white'}" data-tab="CAPSULE">
+          <span class="material-symbols-outlined text-[16px]">lock</span>
+          <span>Time Capsule</span>
+        </button>
+        <button class="solo-nav-tab py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeSoloTab === 'QUIZ' ? 'bg-amber-gold text-canvas shadow' : 'text-gray-400 hover:text-white'}" data-tab="QUIZ">
+          <span class="material-symbols-outlined text-[16px]">psychology</span>
+          <span>Flashback</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: DAILY REFLECTION -->
+      ${activeSoloTab === 'DAILY' ? `
+        <div class="flex flex-col gap-4">
+          <!-- Input Card -->
+          <div class="p-6 rounded-3xl bg-surface border border-border shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-base font-bold text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-gold text-[20px]">edit_calendar</span>
+                <span>Today's Highlight</span>
+              </h3>
+              <span class="text-[10px] font-mono text-mint-green bg-mint-green/15 border border-mint-green/30 px-2 py-0.5 rounded-full font-bold">+25 Sparks</span>
+            </div>
+            
+            <p class="text-xs text-gray-300 leading-relaxed">
+              What's one funny, peaceful, or memorable thing that happened today? (Private to your device).
+            </p>
+
+            <textarea id="solo-reflection-input" placeholder="e.g. Finally had that iced matcha, tried cooking pasta from scratch, or had a hilarious call with my sister..." rows="3" class="w-full p-3.5 rounded-2xl bg-canvas border border-border focus:border-amber-gold text-sm text-white placeholder:text-gray-500 focus:outline-none transition-colors resize-none"></textarea>
+
+            <!-- Mood Selector -->
+            <div class="flex items-center justify-between flex-wrap gap-2 pt-1">
+              <div class="flex items-center gap-1.5" id="solo-mood-selector">
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-amber-gold/20 text-amber-gold border-amber-gold" data-mood="Fun">😄 Fun</button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-mood="Peaceful">🌿 Peaceful</button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-mood="Grateful">✨ Grateful</button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-mood="Milestone">🎯 Milestone</button>
+              </div>
+
+              <button id="btn-save-solo-reflection" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral text-canvas font-bold text-xs shadow-glow-amber active:scale-95 transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">save</span>
+                <span>Save to Vault</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Saved Reflections Feed -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-mono font-bold text-gray-400 uppercase tracking-wider px-1">Your Saved Moments (${reflections.length})</h4>
+            
+            ${reflections.length === 0 ? `
+              <div class="p-8 rounded-3xl bg-surface/50 border border-dashed border-border text-center space-y-2">
+                <span class="material-symbols-outlined text-3xl text-gray-500">sentiment_satisfied</span>
+                <p class="text-xs text-gray-400">No reflections saved yet. Write your first highlight above!</p>
+              </div>
+            ` : reflections.map(r => `
+              <div class="p-4 rounded-2xl bg-surface border border-border/80 shadow-sm flex items-start justify-between gap-3">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-surface-bright text-amber-gold border border-border">${r.mood}</span>
+                    <span class="text-[10px] font-mono text-gray-400">${r.date}</span>
+                  </div>
+                  <p class="text-sm text-gray-200 font-medium leading-relaxed">${r.text}</p>
+                </div>
+                <button class="btn-share-to-squad px-3 py-1 rounded-full bg-surface-bright hover:bg-surface-container-high border border-border text-[10px] font-bold text-sunset-coral shrink-0 transition-colors" data-id="${r.id}" title="Turn into a trivia card for friends">
+                  + Send to Squad
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- TAB 2: TIME CAPSULE (LETTERS TO FUTURE SELF) -->
+      ${activeSoloTab === 'CAPSULE' ? `
+        <div class="flex flex-col gap-4">
+          <!-- Capsule Creation Card -->
+          <div class="p-6 rounded-3xl bg-surface border border-border shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-base font-bold text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-gold text-[20px]">lock_clock</span>
+                <span>Seal a Letter to Future Self</span>
+              </h3>
+              <span class="text-[10px] font-mono text-amber-gold bg-amber-gold/15 border border-amber-gold/30 px-2 py-0.5 rounded-full font-bold">Digital Wax Seal</span>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed">
+              Write something today that stays locked and encrypted until your chosen future date.
+            </p>
+
+            <div class="space-y-2">
+              <input type="text" id="capsule-title-input" placeholder="Title (e.g. Letter to Me in 2027, Before the Big Move...)" class="w-full px-3.5 py-2.5 rounded-xl bg-canvas border border-border focus:border-amber-gold text-sm text-white placeholder:text-gray-500 focus:outline-none" />
+              <textarea id="capsule-message-input" placeholder="Write to your future self: What are you worried about? What are you proud of? What do you hope hasn't changed?..." rows="4" class="w-full p-3.5 rounded-xl bg-canvas border border-border focus:border-amber-gold text-sm text-white placeholder:text-gray-500 focus:outline-none resize-none"></textarea>
+            </div>
+
+            <!-- Unlock Timeline Selector -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1 border-t border-border/60">
+              <div class="flex items-center gap-1.5 flex-wrap" id="capsule-months-selector">
+                <span class="text-[11px] text-gray-400 font-mono mr-1">Opens in:</span>
+                <button class="capsule-time-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-amber-gold/20 text-amber-gold border-amber-gold" data-months="1">1 Month</button>
+                <button class="capsule-time-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-months="6">6 Months</button>
+                <button class="capsule-time-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-months="12">1 Year</button>
+              </div>
+
+              <button id="btn-seal-capsule" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral text-canvas font-bold text-xs shadow-glow-amber active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">lock</span>
+                <span>Seal Capsule</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sealed Capsules List -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-mono font-bold text-gray-400 uppercase tracking-wider px-1">Your Sealed Capsules (${capsules.length})</h4>
+
+            ${capsules.length === 0 ? `
+              <div class="p-8 rounded-3xl bg-surface/50 border border-dashed border-border text-center space-y-2">
+                <span class="material-symbols-outlined text-3xl text-gray-500">lock_open</span>
+                <p class="text-xs text-gray-400">No capsules sealed yet. Write a note to your future self above!</p>
+              </div>
+            ` : capsules.map(c => `
+              <div class="p-4 rounded-2xl bg-surface border border-border shadow-sm flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-xl bg-amber-gold/20 text-amber-gold border border-amber-gold/40 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">lock</span>
+                  </div>
+                  <div class="min-w-0">
+                    <h5 class="text-sm font-bold text-white truncate">${c.title}</h5>
+                    <p class="text-xs text-amber-gold font-mono truncate">Unlocks on ${c.unlockDateFormatted}</p>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-surface-bright text-gray-400 text-[10px] font-mono font-bold uppercase border border-border shrink-0">
+                  SEALED
+                </span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- TAB 3: FLASHBACK SOLO QUIZ -->
+      ${activeSoloTab === 'QUIZ' ? `
+        <div class="p-6 rounded-3xl bg-surface border border-border shadow-xl space-y-5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-sunset-coral animate-pulse"></span>
+              <span class="text-xs font-mono font-bold text-sunset-coral uppercase">SOLO NOSTALGIA FLASHBACK</span>
+            </div>
+            <span class="text-xs font-mono text-gray-400">Self-Reflection Quiz</span>
+          </div>
+
+          <div class="space-y-2">
+            <h3 class="font-display text-lg font-bold text-white">
+              "Which memory or accomplishment from this past year made you smile the most?"
+            </h3>
+            <p class="text-xs text-gray-400">Lock in your answer to track your mood growth over time.</p>
+          </div>
+
+          <div class="space-y-2.5" id="solo-quiz-options">
+            <button class="solo-quiz-opt w-full p-3.5 rounded-2xl bg-surface-bright hover:border-amber-gold/60 border border-border text-left text-xs font-semibold text-gray-200 transition-all flex items-center justify-between">
+              <span>Traveling somewhere completely new with people I love</span>
+              <span class="material-symbols-outlined text-gray-500 text-sm">radio_button_unchecked</span>
+            </button>
+            <button class="solo-quiz-opt w-full p-3.5 rounded-2xl bg-surface-bright hover:border-amber-gold/60 border border-border text-left text-xs font-semibold text-gray-200 transition-all flex items-center justify-between">
+              <span>Overcoming a big challenge or learning a new skill</span>
+              <span class="material-symbols-outlined text-gray-500 text-sm">radio_button_unchecked</span>
+            </button>
+            <button class="solo-quiz-opt w-full p-3.5 rounded-2xl bg-surface-bright hover:border-amber-gold/60 border border-border text-left text-xs font-semibold text-gray-200 transition-all flex items-center justify-between">
+              <span>A quiet late-night conversation with someone special</span>
+              <span class="material-symbols-outlined text-gray-500 text-sm">radio_button_unchecked</span>
+            </button>
+            <button class="solo-quiz-opt w-full p-3.5 rounded-2xl bg-surface-bright hover:border-amber-gold/60 border border-border text-left text-xs font-semibold text-gray-200 transition-all flex items-center justify-between">
+              <span>An unhinged spontaneous laugh that couldn't be planned</span>
+              <span class="material-symbols-outlined text-gray-500 text-sm">radio_button_unchecked</span>
+            </button>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-canvas border border-border text-xs text-center text-gray-400" id="solo-quiz-feedback">
+            Select the option that resonates with you today
+          </div>
+        </div>
+      ` : ''}
+
+    </div>
+  `;
 }
 
 export function bindSoloEvents() {
-  // Daily Reflection Save Handler
-  const reflectionInput = document.getElementById('daily-reflection-input');
-  const saveReflectionBtn = document.getElementById('btn-save-daily-reflection');
-
-  if (saveReflectionBtn && reflectionInput) {
-    saveReflectionBtn.addEventListener('click', () => {
-      const text = reflectionInput.value.trim();
-      if (!text) {
-        showToast('Please write a short reflection before saving', 'amber');
-        return;
-      }
-
-      audio.playCorrect();
-      
-      // Award sparks
-      store.addSparks(15);
-
-      // Save into vault
-      const newMemory = {
-        id: `mem_solo_${Date.now()}`,
-        type: 'NOTE',
-        title: 'Daily Reflection',
-        snippet: text,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        author: store.getState().currentUser?.name || 'You',
-        tags: ['Solo', 'Daily Reflection', 'Private']
-      };
-
-      const currentMemories = store.getState().vaultMemories || [];
-      store.setState({ vaultMemories: [newMemory, ...currentMemories] });
-
-      showToast('Daily reflection sealed into Vault (+15 Sparks)!', 'mint');
-      reflectionInput.value = '';
-    });
+  if (!confetti) {
+    confetti = new ConfettiEngine('confetti-canvas');
   }
 
-  // Audio Waveform Play / Pause
-  const playBtn = document.getElementById('btn-solo-audio-play');
-  const playIcon = document.getElementById('audio-play-icon');
-  const bars = document.querySelectorAll('.waveform-bar');
-
-  if (playBtn) {
-    playBtn.addEventListener('click', () => {
+  // Tab switching
+  const tabs = document.querySelectorAll('.solo-nav-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
       audio.playClick();
-      isAudioPlaying = !isAudioPlaying;
-
-      if (isAudioPlaying) {
-        playIcon.textContent = '⏸';
-        audioPlayInterval = setInterval(() => {
-          bars.forEach((bar) => {
-            bar.style.height = `${Math.floor(Math.random() * 18 + 6)}px`;
-          });
-        }, 150);
-      } else {
-        playIcon.textContent = '▶';
-        clearInterval(audioPlayInterval);
-      }
+      activeSoloTab = tab.dataset.tab;
+      store.setView('SOLO');
     });
-  }
+  });
 
-  // Viral Bridge -> Go to Pod Lobby
-  const bridgeBtn = document.getElementById('btn-solo-to-pod');
-  if (bridgeBtn) {
-    bridgeBtn.addEventListener('click', () => {
-      audio.playCorrect();
-      store.setMode('PODS');
-      store.setView('LOBBY');
+  // Mood selection
+  let selectedMood = 'Fun';
+  const moodPills = document.querySelectorAll('.mood-pill');
+  moodPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      audio.playBip();
+      selectedMood = pill.dataset.mood;
+      moodPills.forEach(p => {
+        p.classList.remove('bg-amber-gold/20', 'text-amber-gold', 'border-amber-gold');
+        p.classList.add('bg-surface-bright', 'text-gray-400', 'border-border');
+      });
+      pill.classList.remove('bg-surface-bright', 'text-gray-400', 'border-border');
+      pill.classList.add('bg-amber-gold/20', 'text-amber-gold', 'border-amber-gold');
     });
-  }
+  });
 
-  // Future Letter Modal Logic
-  const openModalBtn = document.getElementById('btn-open-letter-modal');
-  const closeModalBtn = document.getElementById('btn-close-letter-modal');
-  const modal = document.getElementById('future-letter-modal');
-  const confirmSealBtn = document.getElementById('btn-confirm-seal-letter');
-  const titleInput = document.getElementById('letter-title-input');
-  const contentInput = document.getElementById('letter-content-input');
-  const listContainer = document.getElementById('sealed-capsules-list');
-
-  if (openModalBtn && modal) {
-    openModalBtn.addEventListener('click', () => {
-      audio.playClick();
-      modal.style.display = 'flex';
-    });
-  }
-
-  if (closeModalBtn && modal) {
-    closeModalBtn.addEventListener('click', () => {
-      audio.playClick();
-      modal.style.display = 'none';
-    });
-  }
-
-  if (confirmSealBtn && modal && listContainer) {
-    confirmSealBtn.addEventListener('click', () => {
-      const title = titleInput?.value.trim() || 'Sealed Note to Self';
-      const content = contentInput?.value.trim();
-      if (!content) {
-        showToast('Please write your letter before sealing', 'amber');
+  // Save Daily Reflection
+  const btnSaveRef = document.getElementById('btn-save-solo-reflection');
+  const refInput = document.getElementById('solo-reflection-input');
+  if (btnSaveRef && refInput) {
+    btnSaveRef.addEventListener('click', () => {
+      const val = refInput.value.trim();
+      if (!val) {
+        audio.playTick();
+        refInput.focus();
         return;
       }
       audio.playCorrect();
+      confetti.burst(30);
+      saveReflection(val, selectedMood);
       store.addSparks(25);
-
-      // Append newly sealed capsule to the list
-      const capsuleEl = document.createElement('div');
-      capsuleEl.className = 'p-3.5 rounded-xl bg-surface-container-lowest border border-amber-gold/50 flex items-center justify-between gap-3 animate-fade-in';
-      capsuleEl.innerHTML = `
-        <div class="flex items-center gap-3 min-w-0">
-          <span class="material-symbols-outlined text-amber-gold text-[22px] shrink-0">lock</span>
-          <div class="min-w-0">
-            <div class="font-bold text-xs sm:text-sm text-white truncate">${title}</div>
-            <div class="text-xs text-amber-gold font-mono truncate">Unlocks in 1 Year · Sealed with Wax Stamp</div>
-          </div>
-        </div>
-        <span class="retro-pixel-badge px-2.5 py-1 rounded-full bg-mint-green/20 text-mint-green border border-mint-green/30 text-[9px] shrink-0 inline-flex items-center gap-1"><span class="material-symbols-outlined text-xs">verified</span><span>Just Sealed</span></span>
-      `;
-      listContainer.prepend(capsuleEl);
-
-      showToast('Wax stamp applied! Letter sealed for 1 year (+25 Sparks)', 'mint');
-      modal.style.display = 'none';
-      if (titleInput) titleInput.value = '';
-      if (contentInput) contentInput.value = '';
+      showToast('Reflection saved! +25 Sparks added to your vault.', 'mint');
+      refInput.value = '';
+      store.setView('SOLO');
     });
   }
-}
 
+  // Capsule months selector
+  let selectedMonths = 1;
+  const timePills = document.querySelectorAll('.capsule-time-pill');
+  timePills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      audio.playBip();
+      selectedMonths = pill.dataset.months;
+      timePills.forEach(p => {
+        p.classList.remove('bg-amber-gold/20', 'text-amber-gold', 'border-amber-gold');
+        p.classList.add('bg-surface-bright', 'text-gray-400', 'border-border');
+      });
+      pill.classList.remove('bg-surface-bright', 'text-gray-400', 'border-border');
+      pill.classList.add('bg-amber-gold/20', 'text-amber-gold', 'border-amber-gold');
+    });
+  });
+
+  // Seal Capsule
+  const btnSealCap = document.getElementById('btn-seal-capsule');
+  const titleInput = document.getElementById('capsule-title-input');
+  const msgInput = document.getElementById('capsule-message-input');
+  if (btnSealCap && titleInput && msgInput) {
+    btnSealCap.addEventListener('click', () => {
+      const title = titleInput.value.trim();
+      const msg = msgInput.value.trim();
+      if (!title || !msg) {
+        audio.playTick();
+        if (!title) titleInput.focus();
+        else msgInput.focus();
+        return;
+      }
+      audio.playCorrect();
+      confetti.burst(50);
+      saveCapsule(title, msg, selectedMonths);
+      store.addSparks(50);
+      showToast(`Capsule sealed! It will remain locked for ${selectedMonths} month(s).`, 'mint');
+      store.setView('SOLO');
+    });
+  }
+
+  // Send to Squad button
+  const shareSquadBtns = document.querySelectorAll('.btn-share-to-squad');
+  shareSquadBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      audio.playClick();
+      const id = btn.dataset.id;
+      const reflections = getSavedReflections();
+      const item = reflections.find(r => r.id === id);
+      if (item) {
+        store.addCustomMemory({
+          title: `Solo Highlight: ${item.mood}`,
+          quote: item.text,
+          type: 'REFLECTION',
+        });
+        showToast('Added to Squad Memory Deck! Open Squad to play with friends.', 'mint');
+      }
+    });
+  });
+
+  // Solo Quiz Options
+  const quizOpts = document.querySelectorAll('.solo-quiz-opt');
+  const quizFeedback = document.getElementById('solo-quiz-feedback');
+  quizOpts.forEach(btn => {
+    btn.addEventListener('click', () => {
+      audio.playCorrect();
+      confetti.burst(40);
+      quizOpts.forEach(b => {
+        b.classList.remove('border-amber-gold', 'bg-amber-gold/20');
+        const icon = b.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = 'radio_button_unchecked';
+      });
+      btn.classList.add('border-amber-gold', 'bg-amber-gold/20');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) icon.textContent = 'check_circle';
+      if (quizFeedback) {
+        quizFeedback.innerHTML = '<span class="text-mint-green font-bold flex items-center justify-center gap-1"><span class="material-symbols-outlined text-sm">auto_awesome</span> Growth recorded! Archived to your private profile (+40 Sparks)</span>';
+      }
+      store.addSparks(40);
+    });
+  });
+}

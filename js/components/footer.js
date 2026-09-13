@@ -128,7 +128,7 @@ export function renderFooter() {
               <li>
                 <button class="footer-nav-btn text-xs text-gray-400 hover:text-white flex items-center gap-2 py-0.5 transition-colors group" data-view="STORE">
                   <span class="material-symbols-outlined text-[15px] text-gray-500 group-hover:text-secondary transition-colors">shopping_bag</span>
-                  <span>The Emporium</span>
+                  <span>The Store</span>
                 </button>
               </li>
               <li>

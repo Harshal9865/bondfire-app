@@ -315,7 +315,7 @@ class ReactiveStore {
     this.setState({ activeRoom });
   }
 
-  joinRoomWithCode(roomCode) {
+  joinRoomWithCode(roomCode, isDuo = false) {
     if (!roomCode) return this.state.activeRoom;
     const cleanCode = roomCode.trim().toUpperCase();
     const user = this.state.currentUser;
@@ -324,7 +324,7 @@ class ReactiveStore {
     const myId = user?.id || `usr_${Date.now()}`;
     const myName = (user && user.displayName && user.displayName !== 'Guest Citizen')
       ? user.displayName.split(' ')[0]
-      : (isAlreadyHost ? 'Host (You)' : `Camper_${Math.floor(100 + Math.random() * 900)}`);
+      : (isAlreadyHost ? (isDuo ? 'You' : 'Host (You)') : `Camper_${Math.floor(100 + Math.random() * 900)}`);
     const myAvatar = user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(myName)}`;
 
     const myPlayer = {
@@ -346,10 +346,12 @@ class ReactiveStore {
     const activeRoom = {
       ...this.state.activeRoom,
       roomCode: cleanCode,
+      mode: isDuo ? 'US' : (this.state.activeRoom?.mode || 'PODS'),
+      roomType: isDuo ? 'DUO' : (this.state.activeRoom?.roomType || 'SQUAD'),
       isHost: isAlreadyHost,
       players: updatedPlayers,
     };
-    this.setState({ activeRoom });
+    this.setState({ activeRoom, currentMode: isDuo ? 'US' : (this.state.currentMode || 'PODS') });
 
     // Sync with Supabase Realtime across devices
     if (typeof window !== 'undefined') {
@@ -359,11 +361,63 @@ class ReactiveStore {
           name: myName,
           avatar: myAvatar,
           isHost: isAlreadyHost,
+          mode: isDuo ? 'US' : 'PODS',
         });
       }).catch((err) => console.warn('Realtime sync notice:', err));
     }
 
     return activeRoom;
+  }
+
+  createDuoRoom(customName) {
+    const roomCode = generateRoomCode();
+    const user = this.state.currentUser;
+    const hostName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'You';
+    const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(hostName)}`;
+    const activeRoom = {
+      roomCode,
+      mode: 'US',
+      roomType: 'DUO',
+      podName: customName || `${hostName}'s Duo Room ❤️`,
+      isHost: true,
+      sessionStarted: false,
+      players: [
+        { id: user?.id || `usr_host_${Date.now()}`, name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
+      ],
+    };
+    this.setState({ activeRoom, currentMode: 'US' });
+
+    // Sync newly created duo room with Supabase Realtime
+    if (typeof window !== 'undefined') {
+      import('../services/supabaseClient.js').then(({ syncRealtimeRoom }) => {
+        syncRealtimeRoom(roomCode, {
+          id: user?.id || 'usr_host',
+          name: hostName,
+          avatar: hostAvatar,
+          isHost: true,
+          mode: 'US',
+        });
+      }).catch((err) => console.warn('Realtime sync notice:', err));
+    }
+    return activeRoom;
+  }
+
+  leaveDuoRoom() {
+    this.setState({
+      activeRoom: {
+        roomCode: generateRoomCode(),
+        podName: 'My Squad Room',
+        roomTemplate: 'SQUAD_NIGHT',
+        humorTone: 'FRIENDLY_ROAST',
+        language: 'hi-IN',
+        isHost: true,
+        selectedGameMode: 'RED_FLAG_COURT',
+        players: [
+          { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost' },
+        ],
+      },
+      currentMode: 'US',
+    });
   }
 
   createNewRoom(podName) {

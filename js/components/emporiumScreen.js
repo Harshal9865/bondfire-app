@@ -69,7 +69,7 @@ export function renderEmporiumScreen() {
         <div>
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-mono font-bold tracking-widest uppercase mb-3">
             <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
-            <span>THE EMPORIUM // PHYSICAL MERCH</span>
+            <span>THE STORE // PHYSICAL KEEPSAKES</span>
           </div>
           <h1 class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             Turn memories into real-world keepsakes.

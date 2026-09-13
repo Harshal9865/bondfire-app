@@ -127,8 +127,8 @@ export function renderMostLikelyToGame() {
 
                 <div class="relative z-10 flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-surface border ${isLeader ? 'border-amber-gold' : 'border-border'} flex items-center justify-center shrink-0">
-                      ${p.avatar && !p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-lg">person</span>'}
+                    <div class="w-11 h-11 rounded-full bg-surface border ${isLeader ? 'border-amber-gold' : 'border-border'} flex items-center justify-center shrink-0 overflow-hidden">
+                      ${p.avatar && (p.avatar.startsWith('http') || p.avatar.startsWith('data:') || p.avatar.startsWith('/')) ? `<img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>` : (p.avatar && p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-lg">person</span>')}
                     </div>
                     <div>
                       <div class="flex items-center gap-1.5">

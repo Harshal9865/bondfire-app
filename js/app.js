@@ -136,10 +136,15 @@ class BondfireApp {
     const validViews = ['HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE'];
     let targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
 
-    // If an invite code was present, automatically join that room and land in LOBBY!
+    // If an invite code was present, automatically join that room!
     if (roomCodeFromUrl && roomCodeFromUrl.length >= 3) {
-      targetView = 'LOBBY';
-      store.joinRoomWithCode(roomCodeFromUrl);
+      if (resolvedHash === 'COUPLE') {
+        targetView = 'COUPLE';
+        store.joinRoomWithCode(roomCodeFromUrl, true);
+      } else {
+        targetView = 'LOBBY';
+        store.joinRoomWithCode(roomCodeFromUrl, false);
+      }
     }
 
     if (store.getState().currentView !== targetView) {

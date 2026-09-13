@@ -377,6 +377,16 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
             isAnswerRevealed: false,
           },
         });
+      } else if (payload.action === 'START_DUO_SESSION') {
+        const currentRoom = store.getState().activeRoom;
+        store.setState({
+          currentView: 'COUPLE',
+          activeRoom: {
+            ...currentRoom,
+            sessionStarted: true,
+          },
+        });
+        window.location.hash = '#/COUPLE';
       } else if (payload.action === 'SYNC_STREAM' && payload.url) {
         window.dispatchEvent(new CustomEvent('bondfire:sync-stream', { detail: { url: payload.url } }));
       }

@@ -71,7 +71,7 @@ export function renderHeader() {
             </button>
             <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'STORE' || currentView === 'EMPORIUM' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold' : 'text-gray-400 hover:text-secondary'} transition-all" data-view="STORE">
               <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
-              <span class="whitespace-nowrap">Emporium</span>
+              <span class="whitespace-nowrap">Store</span>
             </button>
           </div>
         </nav>
@@ -150,7 +150,7 @@ export function renderHeader() {
         </button>
         <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'STORE' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="STORE">
           <span class="material-symbols-outlined text-[14px] text-secondary">shopping_bag</span>
-          <span>Emporium</span>
+          <span>Store</span>
         </button>
         <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${['ROOMS', 'LOBBY', 'GAME'].includes(currentView) || currentMode === 'PODS' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="ROOMS" data-mode="PODS">
           <span class="material-symbols-outlined text-[14px] text-sunset-coral">groups</span>
@@ -294,8 +294,8 @@ export function renderHeader() {
                 <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
               </div>
               <div class="min-w-0">
-                <div class="text-xs font-bold text-white truncate">Emporium</div>
-                <div class="text-[10px] text-gray-400 truncate">Sparks & Albums</div>
+                <div class="text-xs font-bold text-white truncate">Store</div>
+                <div class="text-[10px] text-gray-400 truncate">Keepsakes & Merch</div>
               </div>
             </button>
 

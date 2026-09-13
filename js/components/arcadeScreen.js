@@ -48,7 +48,9 @@ export function renderArcadeScreen() {
         <span class="retro-pixel-badge text-[9px] text-gray-400 tracking-wider shrink-0 mr-1">Campers:</span>
         ${players.map((p) => `
           <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-bright/70 border border-border shrink-0 shadow-sm">
-            <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs text-gray-300 bg-surface">${p.avatar && !p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-[14px] text-sunset-coral">person</span>'}</span>
+            <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs text-gray-300 bg-surface overflow-hidden shrink-0">
+              ${p.avatar && (p.avatar.startsWith('http') || p.avatar.startsWith('data:') || p.avatar.startsWith('/')) ? `<img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>` : (p.avatar && p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-[14px] text-sunset-coral">person</span>')}
+            </span>
             <span class="text-xs font-bold text-white font-mono">${p.name}</span>
           </div>
         `).join('')}
