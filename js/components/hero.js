@@ -581,7 +581,7 @@ export function bindHeroEvents() {
       const code = heroInput.value.trim().toUpperCase();
       if (code.length >= 3) {
         audio.playChime();
-        store.setRoomCode(code);
+        store.joinRoomWithCode(code);
         store.setView('LOBBY');
       } else {
         audio.playClick();
@@ -608,7 +608,7 @@ export function bindHeroEvents() {
       const code = footerInput.value.trim().toUpperCase();
       if (code.length >= 3) {
         audio.playChime();
-        store.setRoomCode(code);
+        store.joinRoomWithCode(code);
         store.setView('LOBBY');
       } else {
         audio.playClick();

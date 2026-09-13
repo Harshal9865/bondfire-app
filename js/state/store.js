@@ -322,20 +322,25 @@ class ReactiveStore {
     const isAlreadyHost = this.state.activeRoom?.isHost && this.state.activeRoom?.roomCode === cleanCode;
 
     const myId = user?.id || `usr_${Date.now()}`;
-    const myName = (user && user.displayName) ? user.displayName.split(' ')[0] : 'Camper';
+    const myName = (user && user.displayName && user.displayName !== 'Guest Citizen')
+      ? user.displayName.split(' ')[0]
+      : (isAlreadyHost ? 'Host (You)' : `Camper_${Math.floor(100 + Math.random() * 900)}`);
     const myAvatar = user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(myName)}`;
 
+    const myPlayer = {
+      id: myId,
+      name: myName,
+      role: isAlreadyHost ? 'HOST' : 'Player',
+      isReady: true,
+      avatar: myAvatar,
+    };
+
     const currentPlayers = this.state.activeRoom?.players || [];
-    let updatedPlayers = [...currentPlayers];
-    const exists = updatedPlayers.some((p) => p.name.toLowerCase() === myName.toLowerCase());
-    if (!exists) {
-      updatedPlayers.push({
-        id: myId,
-        name: myName,
-        role: isAlreadyHost ? 'HOST' : 'Player',
-        isReady: true,
-        avatar: myAvatar,
-      });
+    let updatedPlayers;
+    if (isAlreadyHost) {
+      updatedPlayers = currentPlayers.length > 0 ? currentPlayers : [myPlayer];
+    } else {
+      updatedPlayers = [myPlayer];
     }
 
     const activeRoom = {

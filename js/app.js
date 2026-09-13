@@ -89,25 +89,35 @@ class BondfireApp {
   handleHashChange() {
     let roomCodeFromUrl = null;
 
-    // 1. Check query params in search (?code=XXXX)
+    // 1. Check query params in search (?code=XXXX or ?room=XXXX)
     if (typeof window !== 'undefined' && window.location.search) {
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('code')) {
-        roomCodeFromUrl = urlParams.get('code').trim().toUpperCase();
+      roomCodeFromUrl = urlParams.get('code') || urlParams.get('room');
+    }
+
+    // 2. Check query params or hash routing in window.location.hash
+    if (!roomCodeFromUrl && typeof window !== 'undefined' && window.location.hash) {
+      const cleanHash = window.location.hash.replace(/^#\/?/, '');
+      if (cleanHash.startsWith('room=') || cleanHash.startsWith('code=')) {
+        const hashParams = new URLSearchParams(cleanHash);
+        roomCodeFromUrl = hashParams.get('room') || hashParams.get('code');
+      } else {
+        const [hashPath, hashQuery] = cleanHash.split('?');
+        if (hashQuery) {
+          const hashParams = new URLSearchParams(hashQuery);
+          roomCodeFromUrl = hashParams.get('code') || hashParams.get('room');
+        }
       }
     }
 
-    // 2. Check query params in hash (#/ROOMS?code=XXXX)
-    const rawHash = window.location.hash.replace('#/', '');
-    const [hashPath, hashQuery] = rawHash.split('?');
-    if (!roomCodeFromUrl && hashQuery) {
-      const hashParams = new URLSearchParams(hashQuery);
-      if (hashParams.get('code')) {
-        roomCodeFromUrl = hashParams.get('code').trim().toUpperCase();
-      }
+    if (roomCodeFromUrl) {
+      roomCodeFromUrl = roomCodeFromUrl.trim().toUpperCase();
     }
 
-    const hash = (hashPath || '').toUpperCase();
+    const rawHash = (typeof window !== 'undefined' && window.location.hash) 
+      ? window.location.hash.replace(/^#\/?/, '').split('?')[0] 
+      : '';
+    const hash = (rawHash || '').toUpperCase();
     const aliasMap = {
       'VAULT': 'MEMORIES',
       'PHOTOBOOK': 'YEARBOOK',
@@ -116,10 +126,14 @@ class BondfireApp {
       'COUPLES': 'COUPLE',
       'TIME_CAPSULE': 'SOLO',
       'SOLO': 'SOLO',
-      'PODS': 'ROOMS'
+      'PODS': 'ROOMS',
+      'SQUAD': 'ROOMS',
+      'PIXEL_GLADE': 'ARCADE',
+      'GLADE': 'ARCADE',
+      'HERO': 'HOME',
     };
     const resolvedHash = aliasMap[hash] || hash;
-    const validViews = ['HOME', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE'];
+    const validViews = ['HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE'];
     let targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
 
     // If an invite code was present, automatically join that room and land in LOBBY!
@@ -153,6 +167,8 @@ class BondfireApp {
 
       switch (state.currentView) {
       case 'ARCADE':
+      case 'GLADE':
+      case 'PIXEL_GLADE':
         this.appMount.innerHTML = renderArcadeScreen();
         bindArcadeEvents();
         break;
@@ -233,6 +249,7 @@ class BondfireApp {
         bindCoupleEvents();
         break;
 
+      case 'HERO':
       case 'HOME':
       default:
         this.appMount.innerHTML = renderHero();

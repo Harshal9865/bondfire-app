@@ -152,11 +152,15 @@ export function renderHeader() {
           <span class="material-symbols-outlined text-[14px] text-secondary">shopping_bag</span>
           <span>Emporium</span>
         </button>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'SOLO' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="SOLO">
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${['ROOMS', 'LOBBY', 'GAME'].includes(currentView) || currentMode === 'PODS' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="ROOMS" data-mode="PODS">
+          <span class="material-symbols-outlined text-[14px] text-sunset-coral">groups</span>
+          <span>Squad</span>
+        </button>
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'SOLO' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="SOLO" data-mode="SOLO">
           <span class="material-symbols-outlined text-[14px] text-amber-gold">person</span>
           <span>Solo</span>
         </button>
-        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'COUPLE' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="COUPLE">
+        <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'COUPLE' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="COUPLE" data-mode="US">
           <span class="material-symbols-outlined text-[14px] text-duo-rose">favorite</span>
           <span>Us Mode</span>
         </button>
@@ -414,10 +418,7 @@ export function bindHeaderEvents() {
       const code = joinInput.value.trim().toUpperCase();
       if (code.length >= 3) {
         audio.playChime();
-        const currentPod = store.getState().activeRoom;
-        store.setState({
-          activeRoom: { ...currentPod, roomCode: code, isHost: false },
-        });
+        store.joinRoomWithCode(code);
         store.setView('LOBBY');
       } else {
         audio.playClick();
@@ -440,10 +441,7 @@ export function bindHeaderEvents() {
       const code = drawerJoinInput.value.trim().toUpperCase();
       if (code.length >= 3) {
         audio.playChime();
-        const currentPod = store.getState().activeRoom;
-        store.setState({
-          activeRoom: { ...currentPod, roomCode: code, isHost: false },
-        });
+        store.joinRoomWithCode(code);
         const mobileDrawer = document.getElementById('mobile-drawer');
         if (mobileDrawer) mobileDrawer.style.display = 'none';
         store.setView('LOBBY');
