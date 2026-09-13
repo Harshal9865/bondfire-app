@@ -9,12 +9,17 @@ export class GoogleAuthService {
   static init() {
     // Check if Google GSI SDK is loaded
     if (typeof window !== 'undefined' && window.google && window.google.accounts) {
-      window.google.accounts.id.initialize({
-        client_id: CONFIG.GOOGLE_CLIENT_ID,
-        callback: this.handleCredentialResponse.bind(this),
-        auto_select: false, // Prevents auto-locking into a single default account
-        cancel_on_tap_outside: true,
-      });
+      try {
+        window.google.accounts.id.initialize({
+          client_id: CONFIG.GOOGLE_CLIENT_ID,
+          callback: this.handleCredentialResponse.bind(this),
+          auto_select: false, // Prevents auto-locking into a single default account
+          cancel_on_tap_outside: true,
+          use_fedcm_for_prompt: true, // Modern FedCM compliance for Chrome & Web standards
+        });
+      } catch (err) {
+        console.warn('Google Identity initialize notice:', err);
+      }
     }
   }
 
@@ -44,13 +49,32 @@ export class GoogleAuthService {
     }
   }
 
-  static promptSignIn(customEmail = null) {
+  static promptSignIn(customEmail = null, onFallback = null) {
     if (typeof window !== 'undefined' && window.google && window.google.accounts) {
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          console.log('Google One Tap suppressed or dismissed; use standard button or email form.');
+      try {
+        window.google.accounts.id.prompt((notification) => {
+          let wasDismissed = false;
+          try {
+            if (notification && typeof notification.isDismissedMoment === 'function' && notification.isDismissedMoment()) {
+              wasDismissed = true;
+            }
+          } catch (e) {
+            wasDismissed = true;
+          }
+
+          if (wasDismissed) {
+            console.log('Google One Tap dismissed or suppressed by browser policy.');
+            if (typeof onFallback === 'function') {
+              onFallback();
+            }
+          }
+        });
+      } catch (err) {
+        console.warn('Google prompt notice:', err);
+        if (typeof onFallback === 'function') {
+          onFallback();
         }
-      });
+      }
     } else {
       // Simulate Google Sign-In for development / offline
       console.log('Simulating Google Sign-In flow...');

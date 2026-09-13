@@ -160,13 +160,22 @@ function bindAuthModalEvents() {
   if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
       audio.playChime();
-      const signedInUser = GoogleAuthService.promptSignIn();
+      try {
+        const oauthRes = await signInWithGoogle();
+        if (oauthRes) return;
+      } catch (err) {
+        console.warn('Supabase OAuth redirect notice:', err);
+      }
+
+      // If OAuth redirect is not configured, use GoogleAuthService with fallback
+      const signedInUser = GoogleAuthService.promptSignIn(null, () => {
+        const emailInput = document.getElementById('auth-email-input');
+        if (emailInput) emailInput.focus();
+      });
       if (signedInUser) {
         audio.playCorrect();
         closeAuthModal();
         store.setView('PROFILE');
-      } else {
-        await signInWithGoogle();
       }
     });
   }

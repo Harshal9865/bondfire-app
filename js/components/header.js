@@ -471,13 +471,13 @@ export function bindHeaderEvents() {
     });
   }
 
-  // Google Sign-In Direct Header Button
+  // Google Sign-In Direct Header Button -> Opens Auth Modal directly for 100% reliable sign-in
   const googleAuthBtn = document.getElementById('btn-google-auth-header');
   if (googleAuthBtn) {
     googleAuthBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       audio.playClick();
-      GoogleAuthService.promptSignIn();
+      openAuthModal('Sign in with Google or Email to unlock cloud vault and start games');
     });
   }
 
