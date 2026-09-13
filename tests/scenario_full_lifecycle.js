@@ -171,7 +171,7 @@ async function runTests() {
   assert.strictEqual(files[1].filename, '002_add_pixel_art_and_audit.sql');
 
   const unapplied = MigrationRunner.planMigrations(files, new Set(['001_initial_schema']));
-  assert.strictEqual(unapplied.length, 1);
+  assert.strictEqual(unapplied.length, files.length - 1);
   assert.strictEqual(unapplied[0].version, '002_add_pixel_art_and_audit');
   console.log('✅ Suite 11 Passed: SQL Migration Discovery & Planning Logic');
 

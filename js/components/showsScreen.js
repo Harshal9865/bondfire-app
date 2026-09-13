@@ -67,7 +67,7 @@ export function renderShowsScreen() {
               <span class="text-[10px] font-mono font-bold uppercase bg-white/10 px-2 py-0.5 rounded text-gray-200">Every Friday · 9 PM IST</span>
               <span class="w-1.5 h-1.5 rounded-full bg-mint-green"></span>
             </div>
-            <h4 class="font-bold text-xs sm:text-sm text-white mt-0.5">“Guess the Punchline with Rohan Joshi”</h4>
+            <h4 class="font-bold text-xs sm:text-sm text-white mt-0.5">“Guess the Punchline: Live Stand-Up Special”</h4>
           </div>
         </div>
 

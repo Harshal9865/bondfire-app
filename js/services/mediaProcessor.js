@@ -93,8 +93,8 @@ export class MediaProcessor {
 
   // 3. Parse real WhatsApp exported text files (.txt)
   // Supports formats:
-  // "14/10/2021, 2:41 AM - Liam: If anyone orders another Hawaiian pizza..."
-  // "[14/10/21, 02:41:05] Sarah: I am legally changing my name..."
+  // "14/10/2024, 2:41 AM - Camper: If anyone asks for another scenic detour..."
+  // "[14/10/24, 02:41:05] Camper2: I am officially retiring as navigator..."
   static parseWhatsAppChatExport(rawText) {
     const lines = rawText.split('\n');
     const parsedMessages = [];

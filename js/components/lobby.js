@@ -35,7 +35,7 @@ export const ROOM_TEMPLATES = [
   },
   {
     id: 'FAMILY_ADDA',
-    name: 'Family Adda',
+    name: 'Family Game Night',
     icon: 'local_cafe',
     tagline: 'Wholesome Antakshari, festival memories & relative trivia',
     defaultGame: 'EMOJI_CINEMA',
@@ -97,12 +97,12 @@ export function renderLobby() {
             <span class="text-[11px] font-mono font-bold text-mint-green uppercase tracking-wider">Bondfire Room OS Live</span>
           </div>
           <div class="flex items-center gap-2">
-            <h2 class="font-display text-2xl font-bold text-white tracking-tight" id="display-room-name">${room.podName || "The Ahmedabad Squad"}</h2>
+            <h2 class="font-display text-2xl font-bold text-white tracking-tight" id="display-room-name">${room.podName || "Our Squad Room"}</h2>
             <button id="btn-rename-room" class="p-1 rounded text-gray-400 hover:text-amber-gold transition-colors" title="Rename Room">
               <span class="material-symbols-outlined text-[16px]">edit</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400 mt-0.5">Host: <span class="text-white font-bold">${hostName}</span> · ${room.players.length} Campers in Adda</p>
+          <p class="text-xs text-gray-400 mt-0.5">Host: <span class="text-white font-bold">${hostName}</span> · ${room.players.length} Campers in Room</p>
         </div>
         
         <button id="btn-copy-code" class="group flex flex-col items-end cursor-pointer bg-surface-bright/70 hover:bg-surface-bright p-2.5 rounded-xl border border-border/80 transition-all">
@@ -116,7 +116,7 @@ export function renderLobby() {
 
       <!-- Quick Social Sharing: 1-Tap WhatsApp & QR -->
       <div class="grid grid-cols-2 gap-3 mb-4">
-        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Join our private Bondfire Adda tonight! Room Code: ${room.roomCode} -> ${typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''}#/ROOMS?code=${room.roomCode}`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
+        <a id="btn-whatsapp-share" href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Join our private Bondfire room tonight! Room Code: ${room.roomCode} -> ${typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''}#/ROOMS?code=${room.roomCode}`)}" target="_blank" class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 text-[#25D366] font-bold text-xs transition-all active:scale-95 shadow-sm">
           <span class="material-symbols-outlined text-[18px]">chat</span>
           <span>1-Tap WhatsApp Invite</span>
         </a>
@@ -136,7 +136,7 @@ export function renderLobby() {
           <div>
             <div class="flex items-center gap-2">
               <span class="retro-pixel-badge px-2 py-0.5 rounded text-[8px] bg-sunset-coral/30 text-sunset-coral">Arcade Multiplayer</span>
-              <span class="text-xs text-mint-green font-mono font-bold">5 Players Ready</span>
+              <span class="text-xs text-mint-green font-mono font-bold">${room.players.length} Players Ready</span>
             </div>
             <h4 class="font-display text-sm sm:text-base font-bold text-white mt-0.5">Spin the Bottle (Truth or Dare)</h4>
             <p class="text-[11px] text-gray-300">Realistic physics bottle spinner pointing at real players in the room.</p>
@@ -154,7 +154,7 @@ export function renderLobby() {
         <div class="flex justify-between items-center mb-3">
           <div>
             <span class="text-[10px] font-mono font-bold text-sunset-coral uppercase tracking-wider">Step 1 · Room Template</span>
-            <h3 class="font-display text-base font-bold text-white">Choose Your Adda Format</h3>
+            <h3 class="font-display text-base font-bold text-white">Choose Game Format</h3>
           </div>
           <span class="text-xs text-amber-gold font-bold font-mono">${currentTemplate.duration}</span>
         </div>
@@ -295,7 +295,7 @@ export function renderLobby() {
             </div>
             <div class="flex flex-col overflow-hidden">
               <span class="text-xs font-bold text-gray-300 group-hover:text-white transition-colors">+ Add Friend</span>
-              <span class="text-[9px] text-gray-500">Add to Adda</span>
+              <span class="text-[9px] text-gray-500">Add to Room</span>
             </div>
           </button>
         </div>
@@ -318,7 +318,7 @@ export function renderLobby() {
           </button>
           
           <button id="start-game-btn" class="flex-[2] py-3.5 rounded-full bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-sm shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span>Launch Show Runner</span>
+            <span>Start Game</span>
             <span class="material-symbols-outlined text-[20px]">play_arrow</span>
           </button>
         </div>
@@ -348,7 +348,7 @@ export function renderLobby() {
           </div>
           <div>
             <label class="text-xs text-gray-400 font-mono uppercase block mb-1.5">Friend's Name</label>
-            <input type="text" id="input-camper-name" placeholder="e.g. Priya, Kabir, Rohan" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-bright border border-border text-white text-xs focus:outline-none focus:border-sunset-coral" />
+            <input type="text" id="input-camper-name" placeholder="e.g. Enter friend's name" class="w-full px-3.5 py-2.5 rounded-xl bg-surface-bright border border-border text-white text-xs focus:outline-none focus:border-sunset-coral" />
           </div>
           <button id="btn-confirm-add-camper" class="w-full py-3 rounded-full bg-sunset-coral text-white font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all">
             Add to Room

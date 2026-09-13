@@ -223,18 +223,18 @@ export function renderHomeScrollStory() {
                   </div>
                 </div>
                 <div class="text-[11px] text-gray-300 italic">
-                  "Priya claimed she could start a fire with two sticks... burnt the marshmallows in 4 seconds."
+                  "Claimed we could start a fire with two sticks... toasted the marshmallows in record time."
                 </div>
-                <div class="text-[9px] font-mono text-sunset-coral font-bold uppercase">MVP CHAOS AGENT: PRIYA</div>
+                <div class="text-[9px] font-mono text-sunset-coral font-bold uppercase">CAMPFIRE STORYTELLER</div>
               </div>
 
               <!-- Right Page: Superlatives & Scores -->
               <div class="bg-[#1C2033] rounded-xl p-3 border border-white/5 flex flex-col justify-between shadow-inner">
-                <div class="text-[11px] font-bold text-white mb-1 font-mono uppercase">POD AWARDS 2025</div>
+                <div class="text-[11px] font-bold text-white mb-1 font-mono uppercase">POD SUPERLATIVES</div>
                 <div class="space-y-1.5 text-[10px] text-gray-400 font-mono">
-                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-amber-gold">hotel_class</span><span>Lore Master</span></span><span class="text-white font-bold">Harshal</span></div>
-                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-sunset-coral">local_pizza</span><span>Hawaiian Pizza Ally</span></span><span class="text-white font-bold">Marcus</span></div>
-                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-duo-rose">bedtime</span><span>First Asleep on Couch</span></span><span class="text-white font-bold">Sam</span></div>
+                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-amber-gold">hotel_class</span><span>Trivia Champion</span></span><span class="text-white font-bold">Camper 1</span></div>
+                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-sunset-coral">explore</span><span>Lead Navigator</span></span><span class="text-white font-bold">Camper 2</span></div>
+                  <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px] text-duo-rose">headphones</span><span>Playlist Curator</span></span><span class="text-white font-bold">Camper 3</span></div>
                 </div>
                 <div class="w-full py-1.5 rounded-lg bg-amber-gold/20 text-amber-gold text-[10px] font-bold text-center border border-amber-gold/30 uppercase tracking-wider font-mono">
                   ARCHIVED FOREVER

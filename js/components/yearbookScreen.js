@@ -23,10 +23,10 @@ export function renderYearbookScreen() {
   const p4 = realPlayers[3] || realPlayers[1] || hostUser;
 
   const awards = [
-    { title: 'MVP Lore Master', winner: p1, icon: 'hotel_class', reason: 'Highest trivia and roast score in the squad room', color: 'text-amber-gold bg-amber-gold/15 border-amber-gold/30' },
-    { title: 'The Chaos Agent', winner: p2, icon: 'local_fire_department', reason: 'Dropped the most unhinged answers and spicy defense pleas', color: 'text-sunset-coral bg-sunset-coral/15 border-sunset-coral/30' },
+    { title: 'MVP Trivia Master', winner: p1, icon: 'hotel_class', reason: 'Highest trivia and memory score in the squad room', color: 'text-amber-gold bg-amber-gold/15 border-amber-gold/30' },
+    { title: 'The Quick Wit', winner: p2, icon: 'local_fire_department', reason: 'Delivered the most creative answers and memorable banter', color: 'text-sunset-coral bg-sunset-coral/15 border-sunset-coral/30' },
     { title: 'Fastest Buzzer Finger', winner: p3, icon: 'bolt', reason: 'Locked in first answer in under 2.4 seconds', color: 'text-duo-rose bg-duo-rose/15 border-duo-rose/30' },
-    { title: 'Unforgivable Alibi', winner: p4, icon: 'notifications_active', reason: 'Voted guilty by the squad jury verdict', color: 'text-mint-green bg-mint-green/15 border-mint-green/30' },
+    { title: 'The Crowd Favorite', winner: p4, icon: 'favorite', reason: 'Voted most memorable moment by squad consensus', color: 'text-mint-green bg-mint-green/15 border-mint-green/30' },
   ];
 
   return `
@@ -109,7 +109,7 @@ export function renderYearbookScreen() {
                     <div class="w-full h-32 rounded-lg bg-gray-900 overflow-hidden mb-2">
                       <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80" alt="Pizza Incident" class="w-full h-full object-cover" />
                     </div>
-                    <div class="text-[11px] font-mono text-gray-800 font-bold truncate">Hawaiian Pizza Arrival</div>
+                    <div class="text-[11px] font-mono text-gray-800 font-bold truncate">Scenic Overlook Stop</div>
                     <div class="text-[9px] font-mono text-gray-500">Exhibit #204</div>
                   </div>
                 </div>
@@ -120,10 +120,10 @@ export function renderYearbookScreen() {
                     UNANIMOUS VERDICT
                   </span>
                   <p class="text-sm text-gray-200 italic font-sans leading-snug">
-                    "If anyone orders another Hawaiian pizza tonight, ${p2} is legally liable for calling the police."
+                    "If anyone asks for another scenic detour before morning coffee, ${p2} is officially retiring as group navigator."
                   </p>
                   <div class="flex items-center justify-between mt-3 text-[11px] font-mono text-gray-400">
-                    <span>Voted guilty: ${p2} (65%)</span>
+                    <span>Voted most relatable: ${p2} (85%)</span>
                     <span class="text-sunset-coral font-bold">VERIFIED INSIDE JOKE</span>
                   </div>
                 </div>
@@ -187,9 +187,9 @@ export function renderYearbookScreen() {
                   <span class="text-xs font-mono text-gray-400">PAGE 16</span>
                 </div>
 
-                <h3 class="font-display text-xl font-bold text-white mb-4">The Ahmedabad &amp; Goa Legends</h3>
+                <h3 class="font-display text-xl font-bold text-white mb-4">Squad Hall of Fame &amp; Legends</h3>
                 <p class="text-xs text-gray-300 leading-relaxed mb-6">
-                  Official verdicts certified by the Pod Tribunal. No appeals permitted under Section 4 of Campfire Law.
+                  Official verdicts certified by room consensus. The moments that defined our game night.
                 </p>
 
                 <div class="space-y-4">
@@ -199,16 +199,16 @@ export function renderYearbookScreen() {
                       <span>100% APPROVAL</span>
                     </div>
                     <div class="text-base font-bold text-white">${p1}</div>
-                    <p class="text-xs text-gray-400 mt-1">Carried the group playlist, planned the stops, and woke everyone up for sunrise.</p>
+                    <p class="text-xs text-gray-400 mt-1">Carried the group playlist, planned the stops, and brought the best energy.</p>
                   </div>
 
                   <div class="p-4 rounded-2xl bg-canvas border border-border">
                     <div class="flex justify-between items-center text-xs text-sunset-coral font-mono mb-1">
-                      <span>CHIEF COMPLAINER</span>
+                      <span>THE QUICK WIT</span>
                       <span>VERIFIED</span>
                     </div>
                     <div class="text-base font-bold text-white">${p2}</div>
-                    <p class="text-xs text-gray-400 mt-1">Complained about the heat, the AC, the walking distance, and still had the best time.</p>
+                    <p class="text-xs text-gray-400 mt-1">Delivered the funniest answers and most memorable banter of the night.</p>
                   </div>
                 </div>
               </div>
@@ -224,18 +224,18 @@ export function renderYearbookScreen() {
 
                 <div class="space-y-3">
                   <div class="p-3.5 rounded-xl bg-canvas border border-border">
-                    <div class="text-[10px] font-mono text-gray-500 mb-1">2:41 AM · iMessage</div>
-                    <p class="text-xs text-gray-200 italic">“If we don’t leave in 10 minutes I am ordering another 3 pizzas.”</p>
+                    <div class="text-[10px] font-mono text-gray-500 mb-1">2:41 AM · Group Chat</div>
+                    <p class="text-xs text-gray-200 italic">“Next time someone says 'it's just a short 15-minute walk', check the elevation map first.”</p>
                     <div class="text-right text-[10px] font-bold text-sunset-coral mt-1">— ${p1}</div>
                   </div>
                   <div class="p-3.5 rounded-xl bg-canvas border border-border">
-                    <div class="text-[10px] font-mono text-gray-500 mb-1">3:18 AM · WhatsApp</div>
-                    <p class="text-xs text-gray-200 italic">“Bro who took my charger? My phone has been on 2% for 3 hours.”</p>
+                    <div class="text-[10px] font-mono text-gray-500 mb-1">3:18 AM · Group Chat</div>
+                    <p class="text-xs text-gray-200 italic">“Who packed the portable charger? We are running on 3% battery and pure optimism.”</p>
                     <div class="text-right text-[10px] font-bold text-amber-gold mt-1">— ${p3}</div>
                   </div>
                   <div class="p-3.5 rounded-xl bg-canvas border border-border">
-                    <div class="text-[10px] font-mono text-gray-500 mb-1">11:05 AM · Discord</div>
-                    <p class="text-xs text-gray-200 italic">“Good morning everyone, I have zero memory of that last karaoke round.”</p>
+                    <div class="text-[10px] font-mono text-gray-500 mb-1">11:05 AM · Group Chat</div>
+                    <p class="text-xs text-gray-200 italic">“Good morning everyone, that was officially the best game night of the year.”</p>
                     <div class="text-right text-[10px] font-bold text-mint-green mt-1">— ${p4}</div>
                   </div>
                 </div>

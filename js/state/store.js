@@ -72,7 +72,7 @@ class ReactiveStore {
         id: 'node_1',
         category: 'QUOTES',
         title: '“Maine pehle hi bola tha”',
-        contextSnippet: 'Aarav at 2:00 AM before train departure · Said with 100% smug confidence',
+        contextSnippet: 'Said at 2:00 AM before train departure · Delivered with 100% smug confidence',
         eventDate: '2024-10-15',
         sentimentTag: 'FUNNY',
         status: 'APPROVED',
@@ -90,7 +90,7 @@ class ReactiveStore {
         id: 'node_3',
         category: 'RUNNING_JOKES',
         title: 'The "5 Minutes Away" Legend',
-        contextSnippet: 'Sarah texting "Just entering parking" while standing in bathroom towel',
+        contextSnippet: 'Texting "Just entering parking" while still getting ready at home',
         eventDate: '2024-11-04',
         sentimentTag: 'ROAST',
         status: 'APPROVED',
@@ -98,8 +98,8 @@ class ReactiveStore {
       {
         id: 'node_4',
         category: 'PLACES',
-        title: 'Anjuna Beach Shack 3 AM Sand Search',
-        contextSnippet: '4 flashlights looking for Kabir scooter key that was in his own pocket',
+        title: 'Beach Shack 3 AM Sand Search',
+        contextSnippet: '4 flashlights looking for the scooter key that was in their own pocket',
         eventDate: '2024-10-16',
         sentimentTag: 'NOSTALGIC',
         status: 'APPROVED',
@@ -490,20 +490,20 @@ class ReactiveStore {
     const cleanUsername = (friend.username || friend.name || 'camper').toLowerCase().replace(/\s+/g, '_').replace('@', '');
     const avatar = friend.avatarUrl || friend.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(friend.name || 'Camper')}`;
     const newFriend = {
-      id: `fr_${Date.now()}`,
+      ...friend,
+      id: friend.id || `fr_${Date.now()}`,
       name: friend.name || 'New Camper',
-      username: cleanUsername,
-      tag: `@${cleanUsername}`,
+      username: friend.username || cleanUsername,
+      tag: friend.tag || `@${cleanUsername}`,
       status: (friend.status || 'ONLINE').toUpperCase(),
       currentRoom: friend.currentRoom || null,
       mutualGames: friend.mutualGames || 0,
       role: friend.role || 'Camper',
-      lastActive: 'Just now',
-      giftedToday: false,
+      lastActive: friend.lastActive || 'Just now',
+      giftedToday: friend.giftedToday || false,
       sparks: friend.sparks || 50,
       avatarUrl: avatar,
       avatar: avatar,
-      ...friend,
     };
     const friendsList = [newFriend, ...(this.state.friendsList || [])];
     this.setState({ friendsList });
@@ -629,6 +629,7 @@ class ReactiveStore {
     ];
 
     const newGameCard = {
+      id: newMem.id,
       round: (this.state.customGameDeck?.length || 0) + 1,
       timestamp: 'Today · Pod Ingestion',
       quote: memory.quote || memory.title || '“No context needed, you know what you did.”',

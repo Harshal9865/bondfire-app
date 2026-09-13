@@ -103,7 +103,7 @@ function renderAuthModalMarkup(reason) {
         <form id="auth-form" class="relative z-10 flex flex-col gap-3">
           <div id="name-field-container" class="hidden">
             <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Your Name</label>
-            <input type="text" id="auth-name-input" placeholder="e.g. Alex River" class="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border/80 focus:border-sunset-coral text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors" />
+            <input type="text" id="auth-name-input" placeholder="e.g. Your Full Name" class="w-full px-3.5 py-2.5 rounded-xl bg-surface border border-border/80 focus:border-sunset-coral text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors" />
           </div>
 
           <div>

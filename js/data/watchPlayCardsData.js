@@ -11,19 +11,19 @@ export const WATCH_PLAY_CARDS = [
     badge: 'REEL COURTROOM',
     title: 'Exhibit A: The "Bas Signal Pe Hoon" Text',
     creator: {
-      name: 'Rohan Joshi & The Squad',
-      handle: '@rohan_adda',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rohan'
+      name: 'Squad Highlights',
+      handle: '@squad_moments',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Squad'
     },
     mediaUrl: 'https://assets.mixkit.co/videos/preview/mixkit-friends-sitting-on-a-curb-and-talking-41584-large.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=80',
     pauseTimestampSeconds: 6.5,
     promptQuestion: 'Defendant texted "Main bas auto mein baitha hoon". What is their ACTUAL real-time status?',
     options: [
-      { id: 'opt_1', text: 'Still standing wrapped in towel drying hair', isCorrect: true },
+      { id: 'opt_1', text: 'Still looking for car keys in the living room', isCorrect: true },
       { id: 'opt_2', text: 'Actually sitting in the auto on route', isCorrect: false },
       { id: 'opt_3', text: 'Frantically looking for lost left sneaker', isCorrect: false },
-      { id: 'opt_4', text: 'Ordering Swiggy snacks before leaving', isCorrect: false }
+      { id: 'opt_4', text: 'Ordering snacks before stepping outside', isCorrect: false }
     ],
     revealText: 'GUILTY! Location ping revealed they had not even stepped outside their apartment building door.',
     likesCount: 3840,

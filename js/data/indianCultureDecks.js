@@ -20,10 +20,10 @@ export const OUR_LORE_DECK = [
     options: [
       'Left inside the rented Activa helmet box',
       'Dropped in the sand at Thalassa shack',
-      'Accidentally thrown in the trash with Domino’s boxes',
-      'Kabir secretly kept it in his pocket and forgot for 4 hours'
+      'Accidentally thrown in the trash with takeout boxes',
+      'Someone secretly kept it in their pocket and forgot for 4 hours'
     ],
-    officialCanon: 'Kabir had the key the whole time while the rest of the squad searched the beach with phone torches.',
+    officialCanon: 'The key was in a jacket pocket the whole time while the rest of the squad searched the beach with phone torches.',
     groupBadge: 'The Beach Torch Investigators'
   },
   {
@@ -49,8 +49,8 @@ export const OUR_LORE_DECK = [
     coverImage: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&auto=format&fit=crop&q=80',
     exhibitDate: 'August 2024',
     prompt: 'Who typed a 600-word essay arguing that Veg Biryani is scientifically just flavored pulao?',
-    options: ['Aarav', 'Priya', 'Kabir', 'Rohan'],
-    officialCanon: 'Aarav sent 22 consecutive WhatsApp voice notes defending Lucknowi dum cooking.',
+    options: ['The Biryani Purist', 'The Pulao Diplomat', 'The Street Food Critic', 'The Midnight Chef'],
+    officialCanon: 'The food purist of the group sent 22 consecutive WhatsApp voice notes defending authentic dum cooking.',
     groupBadge: 'Culinary Extremists'
   }
 ];
@@ -60,26 +60,26 @@ export const WHO_SAID_THIS_DECK = [
   {
     round: 1,
     quote: '“Bhai main literally 2 minute mein gate pe hoon, auto wale bhaiya se ladai chal rahi hai.”',
-    context: 'Timestamp: 10:45 PM · Actually sitting in towel eating bhujia at home',
-    suspects: ['Aarav', 'Liam', 'Sarah', 'Priya'],
-    correctSuspect: 'Sarah',
-    revealedSnippet: 'Sarah location 15 mins later: 4.8 km away at home.'
+    context: 'Timestamp: 10:45 PM · Actually sitting on the couch eating snacks at home',
+    suspects: ['Organizer', 'Navigator', 'Storyteller', 'DJ'],
+    correctSuspect: 'Navigator',
+    revealedSnippet: 'Live location 15 mins later: 4.8 km away at home.'
   },
   {
     round: 2,
     quote: '“Ek baat batao, if we start a chai startup right now in Bengaluru, will we get Y Combinator funding by Thursday?”',
     context: 'Timestamp: 3:42 AM · 1 day before Final Semester Exam',
-    suspects: ['Kabir', 'Rohan', 'Alex', 'Aarav'],
-    correctSuspect: 'Kabir',
-    revealedSnippet: 'Kabir registered 3 domain names that night and never opened them again.'
+    suspects: ['Organizer', 'Navigator', 'Storyteller', 'DJ'],
+    correctSuspect: 'Storyteller',
+    revealedSnippet: 'Registered 3 domain names that night and never opened them again.'
   },
   {
     round: 3,
     quote: '“I don’t care about society, but if my wedding entry doesn’t have dry ice fog and 4 dhol walas, I’m boycotting.”',
     context: 'Sent in family cousins group chat with zero irony',
-    suspects: ['Priya', 'Meera', 'Rohan', 'Sarah'],
-    correctSuspect: 'Priya',
-    revealedSnippet: 'Priya has already choreographed a 12-minute Sangeet solo for an imaginary groom.'
+    suspects: ['Organizer', 'Navigator', 'Storyteller', 'DJ'],
+    correctSuspect: 'Organizer',
+    revealedSnippet: 'Has already choreographed a 12-minute dance solo for the group.'
   }
 ];
 
@@ -105,7 +105,7 @@ export const MOST_LIKELY_TO_INDIAN_DECK = [
   },
   {
     round: 4,
-    prompt: 'Who is most likely to say “Main drink nahi karunga aaj” and then end up dancing on a plastic chair by 11:30 PM?',
+    prompt: 'Who is most likely to say “I am going to sleep early tonight” and then end up leading the group dance by 11:30 PM?',
     theme: 'PARTY_PROMISES',
     sound: 'dhol_beat'
   },
@@ -152,7 +152,7 @@ export const REEL_COURTROOM_DECK = [
     caseTitle: 'The Sneaky Bill Split Calculation',
     accused: 'The Financial Auditor',
     charge: 'Deducting ₹14 because they “didn’t touch the garlic bread basket”',
-    exhibit: 'Splitwise note: "Itemized breakdown: Aarav had 2 extra sips of Coke Zero"',
+    exhibit: 'Splitwise note: "Itemized breakdown: 2 extra sips of soda from the table basket"',
     plea: '“Accuracy is not stinginess, it is economic discipline!”',
     punishments: [
       'Must round up and pay the entire tip next dinner',

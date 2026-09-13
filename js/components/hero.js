@@ -108,12 +108,12 @@ export function renderHero() {
                 <span class="px-2 py-0.5 rounded bg-surface border border-border text-gray-400 text-[10px]">Unedited</span>
               </div>
               <p class="text-base sm:text-lg font-medium text-gray-100 italic leading-relaxed">
-                “If anyone orders another Hawaiian pizza tonight I am literally revoking my Netflix password for all 5 of you.”
+                “If anyone asks for another scenic detour before morning coffee, I am officially retiring as group navigator.”
               </p>
               <div class="mt-3 flex items-center gap-2 text-[11px] text-amber-gold/90 font-medium">
                 <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-sunset-coral">local_fire_department</span><span class="retro-led-coral text-[11px]">8 reactions</span></span>
                 <span>•</span>
-                <span class="font-mono text-gray-400">Context: Austin Airbnb trip</span>
+                <span class="font-mono text-gray-400">Context: Weekend Road Trip</span>
               </div>
             </div>
 
@@ -278,7 +278,7 @@ export function renderHero() {
                 </p>
               </div>
               <p class="text-xs text-gray-300 leading-relaxed">
-                Roast trivia, inside joke bluffing, drunken voice note reaction rounds, and auto-generated yearbooks with zero icebreakers.
+                Interactive trivia, witty bluffing, shared audio reaction rounds, and auto-generated yearbooks with zero awkward icebreakers.
               </p>
               <!-- Mini Visual Feature Preview -->
               <div class="p-3 rounded-2xl bg-canvas border border-border space-y-2">
@@ -291,7 +291,7 @@ export function renderHero() {
                   <span class="px-1.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[9px] font-mono">0:04 Clip</span>
                 </div>
                 <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs">
-                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-amber-gold">emoji_events</span><span class="font-medium text-gray-200 text-[11px]">Roast Champion</span></div>
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-amber-gold">emoji_events</span><span class="font-medium text-gray-200 text-[11px]">Trivia Champion</span></div>
                   <span class="retro-led-amber font-bold text-[11px]">${(store.getState()?.currentUser?.displayName ? store.getState().currentUser.displayName.split(' ')[0] : 'Squad Host')} (+450)</span>
                 </div>
               </div>
@@ -477,19 +477,19 @@ export function renderHero() {
                         </div>
                       </div>
                       <div class="text-[11px] text-gray-300 italic my-2">
-                        "Priya claimed she could start a fire with two sticks... burnt the marshmallows in 4 seconds."
+                        "Claimed we could start a fire with two sticks... toasted the marshmallows in record time."
                       </div>
-                      <div class="text-[9px] font-mono text-sunset-coral font-bold uppercase">MVP CHAOS AGENT: PRIYA</div>
+                      <div class="text-[9px] font-mono text-sunset-coral font-bold uppercase">CAMPFIRE STORYTELLER</div>
                     </div>
 
                     <!-- Right Page -->
                     <div class="bg-[#161928] rounded-2xl p-4 border border-[#262B40] flex flex-col justify-between shadow-inner min-h-[220px]">
                       <div>
-                        <div class="text-xs font-bold text-white mb-2 font-mono uppercase">POD AWARDS 2025</div>
+                        <div class="text-xs font-bold text-white mb-2 font-mono uppercase">POD SUPERLATIVES</div>
                         <div class="space-y-2 text-[11px] text-gray-400 font-mono">
-                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-amber-gold">hotel_class</span><span>Lore Master</span></span><span class="text-white font-bold">Harshal</span></div>
-                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-sunset-coral">local_pizza</span><span>Hawaiian Pizza Ally</span></span><span class="text-white font-bold">Marcus</span></div>
-                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-duo-rose">bedtime</span><span>First Asleep on Couch</span></span><span class="text-white font-bold">Sam</span></div>
+                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-amber-gold">hotel_class</span><span>Trivia Champion</span></span><span class="text-white font-bold">${userName}</span></div>
+                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-sunset-coral">explore</span><span>Lead Navigator</span></span><span class="text-white font-bold">${(state.activeRoom?.players || []).length > 1 ? state.activeRoom.players[1].name : 'Camper 2'}</span></div>
+                          <div class="flex items-center justify-between py-0.5 border-b border-white/5"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-duo-rose">headphones</span><span>Playlist Curator</span></span><span class="text-white font-bold">${(state.activeRoom?.players || []).length > 2 ? state.activeRoom.players[2].name : 'Camper 3'}</span></div>
                         </div>
                       </div>
                       <div class="w-full py-2 rounded-xl bg-amber-gold/20 text-amber-gold text-[10px] font-bold text-center border border-amber-gold/30 hover:bg-amber-gold/30 transition-colors uppercase tracking-wider font-mono mt-2">

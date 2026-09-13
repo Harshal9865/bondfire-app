@@ -49,7 +49,7 @@ function resolveActiveDeck(state, selectedModeId) {
 
       const sanitizeText = (str) => {
         if (!str || typeof str !== 'string') return str;
-        return str.replace(/\b(Liam|Sarah|Alex|Rohan|Maya)\b/g, targetCamper);
+        return str.replace(/\b(The Group Chat Ghost|The Perpetual Latecomer|The Aux Dictator|The Stealth Exit Strategist|Organizer|Navigator|Storyteller|DJ)\b/g, targetCamper);
       };
 
       return {
@@ -904,10 +904,10 @@ function renderMostLikelyToView(card, game) {
 // 5. INSIDE JOKE MYSTERY DECK VIEW (Upgraded classic)
 function renderInsideJokeView(card, game, currentUserName, userAvatar) {
   const options = card.options.map((opt) => {
-    if (opt.name === 'Maya') {
-      return { ...opt, name: currentUserName, avatar: userAvatar };
+    if (opt.name === currentUserName) {
+      return { ...opt, avatar: userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(opt.name)}` };
     }
-    return { ...opt, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(opt.name)}` };
+    return { ...opt, avatar: opt.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(opt.name)}` };
   });
 
   return `

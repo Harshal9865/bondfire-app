@@ -114,6 +114,7 @@ export function renderHeader() {
                   <span class="w-full h-full flex items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
                 `}
               </div>
+              <div class="w-2 h-2 rounded-full bg-mint-green shrink-0 shadow-sm" title="Verified Online"></div>
               <span class="hidden xl:inline text-xs font-bold text-gray-200">${(user.displayName || 'User').split(' ')[0]}</span>
             </div>
           ` : `

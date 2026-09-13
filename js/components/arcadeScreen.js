@@ -31,7 +31,7 @@ export function renderArcadeScreen() {
             <span class="material-symbols-outlined text-coral-red text-2xl">local_fire_department</span>
           </h2>
           <p class="text-xs text-gray-400 mt-1 font-mono">
-            Room: <span class="text-amber-gold font-bold">${room.podName || "The Ahmedabad Squad"}</span> (${room.roomCode}) · ${players.length} Campers Ready
+            Room: <span class="text-amber-gold font-bold">${room.podName || "Our Squad Room"}</span> (${room.roomCode}) · ${players.length} Campers Ready
           </p>
         </div>
 

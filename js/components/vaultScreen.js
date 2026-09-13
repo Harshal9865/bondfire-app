@@ -15,19 +15,19 @@ const SAMPLE_VAULT_PHOTOS = [
   {
     id: 's_photo_1',
     category: 'PHOTOS',
-    title: 'Midnight Beach Bonfire',
+    title: 'Campfire by the Deck',
     imageUrl: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=600&auto=format&fit=crop&q=80',
-    caption: '3:15 AM deck fire. Burnt the marshmallows in 4 seconds.',
-    tag: 'Group Trip',
-    badge: 'Ready for Trivia',
+    caption: 'Group trip moment around the fire with toasted marshmallows.',
+    tag: 'Trip Moments',
+    badge: 'Ready for Game',
   },
   {
     id: 's_photo_2',
     category: 'PHOTOS',
-    title: 'Hawaiian Pizza Delivery Scandal',
+    title: 'Scenic Road Trip Overlook',
     imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80',
-    caption: 'The pineapple that divided the entire Airbnb squad.',
-    tag: 'Food Lore',
+    caption: 'The spontaneous scenic stop on the way to the weekend cabin.',
+    tag: 'Adventures',
     badge: 'Archived',
   },
 ];
@@ -36,17 +36,17 @@ const SAMPLE_VAULT_QUOTES = [
   {
     id: 's_quote_1',
     category: 'QUOTES',
-    author: 'Harshal',
-    quote: '“If anyone orders another Hawaiian pizza tonight I am revoking my Netflix password for all 5 of you.”',
-    context: 'Austin Airbnb Trip · Group Chat Archive',
+    author: 'Squad Camper',
+    quote: '“If anyone asks for another scenic detour before morning coffee, I am officially retiring as group navigator.”',
+    context: 'Weekend Road Trip · Group Chat',
     reactions: '8 reactions 🔥',
   },
   {
     id: 's_quote_2',
     category: 'QUOTES',
-    author: 'Sam',
-    quote: '“Bas 5 minute mein aa raha hoon!” (Standing in towel scrolling Reels for 40 minutes)',
-    context: 'Friday Dinner Group Chat',
+    author: 'Squad Camper',
+    quote: '“On my way, literally turning onto your street right now.” (Sent from the living room couch)',
+    context: 'Dinner Gathering Group Chat',
     reactions: '12 reactions 😂',
   },
 ];
@@ -55,18 +55,18 @@ const SAMPLE_VAULT_AWARDS = [
   {
     id: 's_award_1',
     category: 'AWARDS',
-    title: 'MVP Lore Master',
-    winner: 'Harshal',
+    title: 'Trivia Champion',
+    winner: 'Campfire Host',
     icon: 'hotel_class',
-    description: 'Scored 1,420 points in Roast Tribunal round',
+    description: 'Highest points across all memory rounds',
   },
   {
     id: 's_award_2',
     category: 'AWARDS',
-    title: 'First Asleep on Couch',
-    winner: 'Sam',
-    icon: 'bedtime',
-    description: 'Asleep 12 minutes into the movie with popcorn in hand',
+    title: 'Campfire Storyteller',
+    winner: 'Room Camper',
+    icon: 'local_fire_department',
+    description: 'Shared the most memorable group moments',
   },
 ];
 
@@ -195,7 +195,7 @@ export function renderVaultScreen() {
               <p class="text-xs text-gray-300 leading-relaxed">${p.caption}</p>
             </div>
             <div class="mt-3 pt-3 border-t border-border/80 flex items-center justify-between text-xs text-gray-400">
-              <span class="font-mono text-[10px]">Tagged: ${userName}, Marcus</span>
+              <span class="font-mono text-[10px]">Tagged: ${userName}, Room Campers</span>
               <button class="btn-vault-play-in-game text-sunset-coral font-bold hover:underline" data-title="${p.title}">
                 Play in Game →
               </button>
