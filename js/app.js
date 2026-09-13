@@ -28,6 +28,7 @@ import { renderTvModeScreen, bindTvModeEvents } from './components/tvModeScreen.
 import { renderSoloScreen, bindSoloEvents } from './components/soloScreen.js';
 import { renderCoupleScreen, bindCoupleEvents } from './components/coupleScreen.js';
 import { renderFooter, bindFooterEvents } from './components/footer.js';
+import { renderSpotifyJukebox, bindSpotifyEvents } from './components/spotifyPlayer.js';
 
 class BondfireApp {
   constructor() {
@@ -70,6 +71,11 @@ class BondfireApp {
           reg.update();
         })
         .catch((err) => console.warn('PWA Service Worker registration warning:', err));
+    // 4b. Mount Global Campfire Jukebox
+    const jukeboxMount = document.getElementById('jukebox-mount');
+    if (jukeboxMount) {
+      jukeboxMount.innerHTML = renderSpotifyJukebox();
+      bindSpotifyEvents();
     }
 
     // 5. Bind Store updates to re-render

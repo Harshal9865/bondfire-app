@@ -6,6 +6,7 @@
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { ConfettiEngine } from '../visuals/confetti.js';
+import { triggerGameCountdown } from './gameCountdownOverlay.js';
 
 let currentQuizIndex = 0;
 let isFlippedThen = false;
@@ -721,19 +722,25 @@ export function bindCoupleEvents() {
   const btnStartSession = document.getElementById('btn-start-duo-session');
   if (btnStartSession) {
     btnStartSession.addEventListener('click', () => {
-      audio.playCorrect();
-      confetti.burst(60);
+      audio.playClick();
       const activeRoom = store.getState().activeRoom;
-      store.setState({
-        activeRoom: { ...activeRoom, sessionStarted: true },
+
+      triggerGameCountdown({
+        mode: 'US',
+        title: 'Us Mode · Date Night Compatibility',
+        onComplete: () => {
+          store.setState({
+            activeRoom: { ...activeRoom, sessionStarted: true },
+          });
+
+          // Broadcast to partner device
+          import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+            broadcastRoomAction('START_DUO_SESSION', { roomCode: activeRoom.roomCode });
+          }).catch((e) => console.warn(e));
+
+          store.setView('COUPLE');
+        },
       });
-
-      // Broadcast to partner device
-      import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
-        broadcastRoomAction('START_DUO_SESSION', { roomCode: activeRoom.roomCode });
-      }).catch((e) => console.warn(e));
-
-      store.setView('COUPLE');
     });
   }
 

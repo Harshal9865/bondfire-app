@@ -326,9 +326,6 @@ export function renderGameScreen() {
           </div>
         </div>
       </div>
-
-      <!-- Floating Spotify Squad Jukebox -->
-      ${renderSpotifyJukebox()}
     </div>
   `;
 }

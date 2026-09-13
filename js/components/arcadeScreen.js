@@ -5,6 +5,7 @@
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+import { triggerGameCountdown } from './gameCountdownOverlay.js';
 
 export function renderArcadeScreen() {
   const state = store.getState();
@@ -186,8 +187,14 @@ export function bindArcadeEvents() {
   if (btnBottle) {
     btnBottle.addEventListener('click', () => {
       audio.playClick();
-      store.setView('BOTTLE');
-      window.location.hash = '#/BOTTLE';
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Spin the Bottle',
+        onComplete: () => {
+          store.setView('BOTTLE');
+          window.location.hash = '#/BOTTLE';
+        }
+      });
     });
   }
 
@@ -196,8 +203,14 @@ export function bindArcadeEvents() {
   if (btnNhie) {
     btnNhie.addEventListener('click', () => {
       audio.playClick();
-      store.setView('NHIE');
-      window.location.hash = '#/NHIE';
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Never Have I Ever',
+        onComplete: () => {
+          store.setView('NHIE');
+          window.location.hash = '#/NHIE';
+        }
+      });
     });
   }
 
@@ -206,8 +219,14 @@ export function bindArcadeEvents() {
   if (btnMlt) {
     btnMlt.addEventListener('click', () => {
       audio.playClick();
-      store.setView('MOST_LIKELY_TO');
-      window.location.hash = '#/MOST_LIKELY_TO';
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Most Likely To',
+        onComplete: () => {
+          store.setView('MOST_LIKELY_TO');
+          window.location.hash = '#/MOST_LIKELY_TO';
+        }
+      });
     });
   }
 
@@ -216,8 +235,14 @@ export function bindArcadeEvents() {
   if (btnWatch) {
     btnWatch.addEventListener('click', () => {
       audio.playClick();
-      store.setView('SHOWS');
-      window.location.hash = '#/SHOWS';
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Watch Party & Stream',
+        onComplete: () => {
+          store.setView('SHOWS');
+          window.location.hash = '#/SHOWS';
+        }
+      });
     });
   }
 }

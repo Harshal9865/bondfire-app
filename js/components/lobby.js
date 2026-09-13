@@ -11,6 +11,7 @@ import { generateDynamicGameDeck } from '../services/geminiService.js';
 import { p2pMesh } from '../services/webrtcService.js';
 import { renderSpotifyJukebox, bindSpotifyEvents } from './spotifyPlayer.js';
 import { syncRealtimeRoom, broadcastRoomAction } from '../services/supabaseClient.js';
+import { triggerGameCountdown } from './gameCountdownOverlay.js';
 
 export const ROOM_TEMPLATES = [
   {
@@ -429,9 +430,6 @@ export function renderLobby() {
         </div>
       </div>
 
-      <!-- Floating Squad Spotify Jukebox -->
-      ${renderSpotifyJukebox()}
-
     </div>
   `;
 }
@@ -472,19 +470,22 @@ export function bindLobbyEvents() {
               isAnswerRevealed: false,
               timeRemaining: 20,
             },
-            currentView: 'GAME',
           });
-          broadcastRoomAction('START_GAME', { gameMode: store.getState().activeRoom.selectedGameMode });
-          window.location.hash = '#/GAME';
-          return;
         }
       } catch (err) {
         console.warn('AI generation note, using standard deck:', err);
       }
 
-      store.setState({ currentView: 'GAME' });
-      broadcastRoomAction('START_GAME', { gameMode: store.getState().activeRoom.selectedGameMode });
-      window.location.hash = '#/GAME';
+      // Run visual rules example & 5-4-3-2-1 expanding circle countdown
+      triggerGameCountdown({
+        mode: 'SQUAD',
+        title: state.activeRoom?.podName || 'Squad Party Arena',
+        onComplete: () => {
+          store.setState({ currentView: 'GAME' });
+          broadcastRoomAction('START_GAME', { gameMode: store.getState().activeRoom.selectedGameMode });
+          window.location.hash = '#/GAME';
+        },
+      });
     });
   }
 

@@ -6,6 +6,7 @@
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { ConfettiEngine } from '../visuals/confetti.js';
+import { triggerGameCountdown } from './gameCountdownOverlay.js';
 
 let confetti = null;
 let activeSoloTab = 'DAILY'; // 'DAILY' | 'CAPSULE' | 'QUIZ'
@@ -314,8 +315,20 @@ export function bindSoloEvents() {
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       audio.playClick();
-      activeSoloTab = tab.dataset.tab;
-      store.setView('SOLO');
+      const targetTab = tab.dataset.tab;
+      if (targetTab === 'QUIZ') {
+        triggerGameCountdown({
+          mode: 'SOLO',
+          title: 'Solo Reflection & Lore Quiz',
+          onComplete: () => {
+            activeSoloTab = 'QUIZ';
+            store.setView('SOLO');
+          },
+        });
+      } else {
+        activeSoloTab = targetTab;
+        store.setView('SOLO');
+      }
     });
   });
 

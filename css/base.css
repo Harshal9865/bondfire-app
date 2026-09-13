@@ -234,6 +234,8 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
   #footer-mount,
   #toast-mount,
   #modal-mount,
+  #jukebox-mount,
+  #countdown-mount,
   button,
   .no-print,
   #bg-canvas,
@@ -270,3 +272,72 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
     margin: 1cm;
   }
 }
+
+/* ==============================================================================
+   FULL-SCREEN CENTER-TO-CORNER EXPANDING CIRCULAR COUNTDOWN ANIMATIONS
+   ============================================================================== */
+
+@keyframes expandingCircleWave {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 0.95;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes countdownNumberPunch {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  80% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ringRadialPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.9;
+    border-width: 14px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(6);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+.animate-circle-wave {
+  animation: expandingCircleWave 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: clip-path, transform, opacity;
+}
+
+.animate-countdown-punch {
+  animation: countdownNumberPunch 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-ring-pulse {
+  animation: ringRadialPulse 0.95s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
