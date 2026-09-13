@@ -164,7 +164,7 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
   padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   #app-mount {
     padding-bottom: 2rem;
   }

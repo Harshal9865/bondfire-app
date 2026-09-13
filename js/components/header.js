@@ -16,68 +16,74 @@ export function renderHeader() {
 
   return `
     <header class="sticky top-0 w-full z-50 bg-[#0B0E17]/85 backdrop-blur-2xl border-b border-[#262B40]/70 select-none transition-all duration-300">
-      <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-10 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+      <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Left: Brand Identity -->
-        <div class="flex items-center gap-3 sm:gap-4 cursor-pointer group shrink-0" id="nav-brand-logo">
-          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-gold via-sunset-coral to-duo-rose p-[1.5px] shadow-glow-coral flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
+        <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer group shrink-0" id="nav-brand-logo">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-gold via-sunset-coral to-duo-rose p-[1.5px] shadow-glow-coral flex items-center justify-center transition-transform group-hover:scale-105 duration-200 shrink-0">
             <div class="w-full h-full bg-[#0B0E17] rounded-[10px] flex items-center justify-center">
               <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-gold drop-shadow-[0_0_8px_rgba(255,183,3,0.8)]" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path>
               </svg>
             </div>
           </div>
-          <div class="flex flex-col">
-            <span class="font-display font-bold text-lg sm:text-2xl tracking-tight text-white flex items-center gap-1.5 sm:gap-2 leading-none">
+          <div class="flex flex-col shrink-0">
+            <span class="font-display font-bold text-base sm:text-xl md:text-2xl tracking-tight text-white flex items-center gap-1.5 leading-none whitespace-nowrap">
               Bondfire
               <span class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest px-1.5 sm:px-2 py-0.5 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30">Beta</span>
             </span>
-            <span class="hidden sm:block text-[11px] text-gray-400 mt-1 font-medium tracking-wide">formerly Huddle</span>
+            <span class="hidden sm:block text-[10px] sm:text-[11px] text-gray-400 mt-0.5 font-medium tracking-wide whitespace-nowrap">formerly Huddle</span>
           </div>
         </div>
 
-        <!-- Mode Switcher Pill (Desktop) -->
-        <div class="hidden xl:flex items-center p-1 rounded-full bg-[#10131C] border border-[#262B40] shadow-inner shrink-0" id="header-mode-switcher">
-          <button class="mode-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'bg-[#202538] text-white font-bold border border-amber-gold/40' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
-            Solo
-          </button>
-          <button class="mode-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${currentMode === 'US' || currentView === 'COUPLE' ? 'bg-[#202538] text-white font-bold border border-duo-rose/40' : 'text-gray-400 hover:text-white'}" data-mode="US">
-            Us Mode
-          </button>
-          <button class="mode-btn px-3 py-1 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${currentMode === 'PODS' || ['ROOMS', 'LOBBY', 'GAME', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="PODS">
-            <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-pulse"></span>
-            <span>Pods</span>
-          </button>
-        </div>
-
-        <!-- Center: 5-Pillar Navigation Capsule (Desktop & Tablets >= 768px) -->
+        <!-- Center: Curated Single-Deck Navigation Capsule (Desktop & Tablets >= 768px) -->
         <nav class="hidden md:flex items-center p-1 rounded-full glass-pill border border-border/80 shadow-lg shadow-black/40 shrink-0 select-none">
-          <div class="flex items-center gap-1 pr-1 pl-1 shrink-0" id="header-links">
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'MEMORIES' || currentView === 'VAULT' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold' : 'text-gray-400 hover:text-amber-gold'} transition-all" data-view="MEMORIES">
+          
+          <!-- Mode Switcher Section -->
+          <div class="flex items-center gap-0.5 p-0.5 bg-surface-dark/60 rounded-full border border-border/60 shrink-0" id="header-mode-switcher">
+            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'bg-surface-bright text-white shadow-sm border border-amber-gold/40 font-bold' : 'text-gray-400 hover:text-white'} transition-all" data-mode="SOLO">
+              <span class="material-symbols-outlined text-[15px] ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'text-amber-gold' : ''}">person</span>
+              <span>Solo</span>
+            </button>
+            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'US' || currentView === 'COUPLE' ? 'bg-surface-bright text-white shadow-sm border border-duo-rose/40 font-bold' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-mode="US">
+              <span class="material-symbols-outlined text-[15px] ${currentMode === 'US' || currentView === 'COUPLE' ? 'text-duo-rose' : ''}">favorite</span>
+              <span>Us Mode</span>
+            </button>
+            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${currentMode === 'PODS' || ['ROOMS', 'LOBBY', 'GAME', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 shadow-sm' : 'text-gray-400 hover:text-white'} relative transition-all" data-mode="PODS">
+              <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-pulse"></span>
+              <span class="material-symbols-outlined text-[15px]">groups</span>
+              <span>Pods</span>
+            </button>
+          </div>
+
+          <!-- Extended Direct Experience Links (Large Desktops >= 1280px) -->
+          <div class="hidden xl:flex items-center gap-0.5 pr-1 pl-1 shrink-0" id="header-links">
+            <div class="w-[1px] h-4 bg-border/80 mx-1.5 shrink-0"></div>
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'MEMORIES' || currentView === 'VAULT' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold' : 'text-gray-400 hover:text-amber-gold'} transition-all" data-view="MEMORIES">
               <span class="material-symbols-outlined text-[15px]">inventory_2</span>
-              <span class="whitespace-nowrap">Vault</span>
+              <span>Vault</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'YEARBOOK' || currentView === 'PHOTOBOOK' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="YEARBOOK">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'YEARBOOK' || currentView === 'PHOTOBOOK' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold' : 'text-gray-400 hover:text-sunset-coral'} transition-all" data-view="YEARBOOK">
               <span class="material-symbols-outlined text-[15px]">auto_stories</span>
-              <span class="whitespace-nowrap">Photobook</span>
+              <span>Photobook</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'FRIENDS' ? 'bg-tertiary/20 text-tertiary border border-tertiary/40 font-bold' : 'text-gray-400 hover:text-tertiary'} transition-all" data-view="FRIENDS">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'FRIENDS' ? 'bg-tertiary/20 text-tertiary border border-tertiary/40 font-bold' : 'text-gray-400 hover:text-tertiary'} transition-all" data-view="FRIENDS">
               <span class="material-symbols-outlined text-[15px]">group</span>
-              <span class="whitespace-nowrap">Friends</span>
+              <span>Friends</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${['ARCADE', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-view="ARCADE">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${['ARCADE', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-view="ARCADE">
               <span class="material-symbols-outlined text-[15px]">sports_esports</span>
-              <span class="whitespace-nowrap">Arcade</span>
+              <span>Arcade</span>
             </button>
-            <button class="nav-link-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'STORE' || currentView === 'EMPORIUM' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold' : 'text-gray-400 hover:text-secondary'} transition-all" data-view="STORE">
+            <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'STORE' || currentView === 'EMPORIUM' ? 'bg-secondary/20 text-secondary border border-secondary/40 font-bold' : 'text-gray-400 hover:text-secondary'} transition-all" data-view="STORE">
               <span class="material-symbols-outlined text-[15px]">shopping_bag</span>
-              <span class="whitespace-nowrap">Store</span>
+              <span>Store</span>
             </button>
           </div>
         </nav>
 
         <!-- Right: Action Suite -->
-        <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <!-- Audio Synthesizer Toggle -->
           <button class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface border border-border/80 text-gray-400 hover:text-white hover:border-amber-gold/50 flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 shrink-0" id="btn-sound-toggle" title="Toggle Procedural Audio">
             <span class="material-symbols-outlined text-[16px] sm:text-[18px]">${state.soundEnabled ? 'volume_up' : 'volume_off'}</span>
@@ -90,8 +96,8 @@ export function renderHeader() {
             </svg>
           </button>
 
-          <!-- Room Code Quick Pill (Tablet & Desktop) -->
-          <div class="hidden md:flex items-center p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/70 transition-colors shadow-inner">
+          <!-- Room Code Quick Pill (Large Desktops >= 1536px) -->
+          <div class="hidden 2xl:flex items-center p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/70 transition-colors shadow-inner shrink-0">
             <div class="pl-3 pr-1 text-xs font-mono text-sunset-coral font-bold flex items-center gap-1">
               <span>#</span>
               <input type="text" id="quick-join-input" placeholder="CODE" maxlength="4" class="w-14 bg-transparent text-xs font-room-code font-bold uppercase text-white placeholder:text-gray-600 focus:outline-none tracking-wider" />
@@ -101,8 +107,8 @@ export function renderHeader() {
             </button>
           </div>
 
-          <!-- Primary CTA Button (Desktop Only) -->
-          <button class="hidden lg:flex relative group overflow-hidden px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0" id="btn-header-create-room">
+          <!-- Primary CTA Button (Desktop >= 1024px) -->
+          <button class="hidden lg:flex relative group overflow-hidden px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs sm:text-sm shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0 whitespace-nowrap" id="btn-header-create-room">
             <span class="relative z-10 flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[16px]">add</span>
               <span>Create Room</span>
@@ -112,34 +118,34 @@ export function renderHeader() {
 
           <!-- Official Google Sign-In Button or User Profile -->
           ${user.isLoggedIn && user.email ? `
-            <div class="relative group cursor-pointer shrink-0 flex items-center gap-2" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
-              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white" style="width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 9999px;">
+            <div class="relative group cursor-pointer shrink-0 flex items-center gap-1.5 sm:gap-2" id="header-user-profile" title="${user.displayName || 'Citizen Profile'}">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-sunset-coral/50 overflow-hidden shrink-0 shadow hover:border-amber-gold transition-colors flex items-center justify-center bg-surface-bright text-xs font-bold text-white">
                 ${user.avatarUrl ? `
-                  <img src="${user.avatarUrl}" alt="${user.displayName || 'User'}" class="w-full h-full object-cover" style="width: 100%; height: 100%; object-fit: cover; border-radius: 9999px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  <img src="${user.avatarUrl}" alt="${user.displayName || 'User'}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                   <span style="display:none;" class="w-full h-full items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
                 ` : `
                   <span class="w-full h-full flex items-center justify-center font-bold text-xs bg-gradient-to-br from-sunset-coral to-amber-gold text-canvas">${(user.displayName || 'U').charAt(0).toUpperCase()}</span>
                 `}
               </div>
               <div class="w-2 h-2 rounded-full bg-mint-green shrink-0 shadow-sm" title="Verified Online"></div>
-              <span class="hidden xl:inline text-xs font-bold text-gray-200">${(user.displayName || 'User').split(' ')[0]}</span>
+              <span class="hidden 2xl:inline text-xs font-bold text-gray-200 whitespace-nowrap">${(user.displayName || 'User').split(' ')[0]}</span>
             </div>
           ` : `
-            <button class="btn-google-sign-in" id="btn-google-auth-header" title="Sign In with Google">
+            <button class="btn-google-sign-in flex items-center gap-1.5 px-3 py-1.5 rounded-full shrink-0" id="btn-google-auth-header" title="Sign In with Google">
               <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
-              <span class="hidden sm:inline">Sign In</span>
+              <span class="text-xs font-bold whitespace-nowrap hidden sm:inline">Sign In</span>
             </button>
           `}
         </div>
       </div>
 
-      <!-- Horizontal Scrolling Category & Mode Tabs (Mobile & Tablet < 1024px) -->
-      <div class="lg:hidden w-full overflow-x-auto no-scrollbar border-t border-[#262B40]/60 px-3 py-2 bg-[#0E121E]/75 backdrop-blur-md flex items-center gap-2 scroll-smooth">
+      <!-- Horizontal Scrolling Category & Mode Tabs (Mobile < 768px) -->
+      <div class="md:hidden w-full overflow-x-auto no-scrollbar border-t border-[#262B40]/60 px-3 py-2 bg-[#0E121E]/85 backdrop-blur-md flex items-center gap-2 scroll-smooth">
         <button class="mobile-filter-pill px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${currentView === 'MEMORIES' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="MEMORIES">
           <span class="material-symbols-outlined text-[14px] text-amber-gold">inventory_2</span>
           <span>Vault</span>
@@ -176,7 +182,7 @@ export function renderHeader() {
     </header>
 
     <!-- Mobile Bottom Command Dock with Hide/Show Capability -->
-    <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/95 backdrop-blur-2xl border-t border-[#262B40] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-1 px-3">
+    <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0B0E17]/95 backdrop-blur-2xl border-t border-[#262B40] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-1 px-3">
       <!-- Top header bar on dock with Title + Hide/Collapse button -->
       <div class="flex items-center justify-between px-2 pb-1 border-b border-white/5 mb-1.5">
         <div class="flex items-center gap-1.5">
@@ -228,13 +234,13 @@ export function renderHeader() {
     </nav>
 
     <!-- Floating Re-open Nav Pill (Shown when user has hidden the bottom nav) -->
-    <button id="btn-restore-bottom-nav" class="lg:hidden fixed bottom-4 right-4 z-40 hidden px-3.5 py-2 rounded-full bg-[#0B0E17]/95 border border-sunset-coral/50 text-white text-xs font-bold shadow-glow-coral backdrop-blur-md flex items-center gap-1.5 transition-all duration-300 active:scale-95 cursor-pointer" title="Show Navigation Menu">
+    <button id="btn-restore-bottom-nav" class="md:hidden fixed bottom-4 right-4 z-40 hidden px-3.5 py-2 rounded-full bg-[#0B0E17]/95 border border-sunset-coral/50 text-white text-xs font-bold shadow-glow-coral backdrop-blur-md flex items-center gap-1.5 transition-all duration-300 active:scale-95 cursor-pointer" title="Show Navigation Menu">
       <span class="material-symbols-outlined text-[16px] text-sunset-coral">local_fire_department</span>
       <span>Menu</span>
     </button>
 
     <!-- Mobile Slide-up Command Hub Sheet (Bottom Drawer with Modes, Arcade, TV Mode, Soundboard & Profile) -->
-    <div id="mobile-explore-sheet-backdrop" class="bottom-sheet-backdrop fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end lg:hidden select-none">
+    <div id="mobile-explore-sheet-backdrop" class="bottom-sheet-backdrop fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:hidden select-none">
       <div id="mobile-explore-sheet" class="bottom-sheet-panel relative w-full bg-[#0E121E] border-t border-border/80 rounded-t-[32px] p-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] shadow-2xl max-h-[85vh] overflow-y-auto text-on-surface">
         
         <!-- Grab Handle -->
