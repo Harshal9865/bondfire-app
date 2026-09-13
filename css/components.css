@@ -508,6 +508,16 @@
   will-change: transform;
 }
 
+@media (max-width: 768px) {
+  .hero-3d-card-stage {
+    perspective: none;
+  }
+  .hero-3d-tilted-card {
+    transform: none !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 174, 51, 0.12);
+  }
+}
+
 .hero-3d-tilted-card:hover,
 .hero-3d-tilted-card:focus-within {
   transform: perspective(1400px) rotateY(0deg) rotateX(0deg) rotateZ(0deg) scale(1.02);
