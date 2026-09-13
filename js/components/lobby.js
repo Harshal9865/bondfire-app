@@ -83,7 +83,7 @@ export function renderLobby() {
   const currentTemplate = ROOM_TEMPLATES.find((t) => t.id === (room.roomTemplate || 'SQUAD_NIGHT')) || ROOM_TEMPLATES[0];
 
   return `
-    <div class="flex flex-col w-full max-w-[680px] mx-auto px-4 pt-6 pb-32 relative select-none z-20">
+    <div class="flex flex-col w-full max-w-[680px] mx-auto px-4 pt-6 pb-44 relative select-none z-20">
       
       <!-- Ambient Glows -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-sunset-coral/5 rounded-full blur-[110px] pointer-events-none -z-10"></div>
@@ -309,8 +309,62 @@ export function renderLobby() {
         </div>
       </div>
 
-      <!-- Action Footer -->
-      <div class="fixed bottom-0 left-0 w-full bg-canvas/90 backdrop-blur-xl border-t border-border p-4 z-40">
+      <!-- Live Squad Pod Chat & Banter Feed -->
+      <div class="mb-6 p-5 rounded-2xl bg-surface border border-border shadow-lg flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-sunset-coral/20 flex items-center justify-center text-sunset-coral">
+              <span class="material-symbols-outlined text-[18px]">forum</span>
+            </div>
+            <div>
+              <h3 class="font-display text-base font-bold text-white">Live Squad Banter</h3>
+              <p class="text-[10px] text-gray-400 font-mono">Chat with campers &amp; turn funny messages into game cards</p>
+            </div>
+          </div>
+          <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full bg-mint-green/20 text-mint-green text-[10px] font-bold border border-mint-green/30 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-mint-green animate-pulse"></span>
+            <span>Realtime</span>
+          </span>
+        </div>
+
+        <!-- Banter Messages List -->
+        <div id="pod-chat-messages" class="flex flex-col gap-2 max-h-56 overflow-y-auto pr-1">
+          ${(state.podChatMessages && state.podChatMessages.length > 0) ? state.podChatMessages.map(msg => `
+            <div class="p-2.5 rounded-xl bg-canvas border border-border/80 flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5 min-w-0">
+                <img src="${msg.avatar}" class="w-7 h-7 rounded-full bg-surface-bright object-cover shrink-0 mt-0.5" />
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-sunset-coral truncate">${msg.senderName}</span>
+                    <span class="text-[9px] font-mono text-gray-500">${msg.timestamp}</span>
+                  </div>
+                  <p class="text-xs text-gray-200 break-words mt-0.5">${msg.text}</p>
+                </div>
+              </div>
+              <button type="button" class="btn-chat-to-card opacity-80 hover:opacity-100 text-[10px] font-bold px-2 py-1 rounded bg-amber-gold/15 hover:bg-amber-gold/25 border border-amber-gold/40 text-amber-gold flex items-center gap-1 shrink-0 active:scale-95 transition-all" data-text="${encodeURIComponent(msg.text)}" data-author="${encodeURIComponent(msg.senderName)}" title="Turn this joke into a playable question">
+                <span class="material-symbols-outlined text-[13px]">add_card</span>
+                <span>+ Card</span>
+              </button>
+            </div>
+          `).join('') : `
+            <div class="p-4 rounded-xl bg-canvas border border-dashed border-border/80 text-center text-xs text-gray-400">
+              No chat messages yet. Crack a joke or send a message below to start the banter!
+            </div>
+          `}
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="flex items-center gap-2 pt-2 border-t border-border/80">
+          <input type="text" id="input-pod-chat" placeholder="Say something funny to the squad..." class="flex-1 px-3.5 py-2.5 rounded-xl bg-surface-bright border border-border text-white text-xs focus:outline-none focus:border-sunset-coral placeholder:text-gray-500" />
+          <button type="button" id="btn-send-pod-chat" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs flex items-center gap-1.5 shadow active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-[15px]">send</span>
+            <span>Send</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Footer (Floating above mobile bottom nav) -->
+      <div class="fixed bottom-[68px] lg:bottom-0 left-0 w-full bg-canvas/90 backdrop-blur-xl border-t border-border p-3.5 z-30">
         <div class="max-w-[680px] mx-auto flex gap-3">
           <button id="btn-lobby-vault" class="flex-1 py-3.5 rounded-full bg-surface-bright border border-border text-white font-bold text-xs shadow-sm hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
             <span class="material-symbols-outlined text-[18px] text-amber-gold">inventory_2</span>
@@ -678,6 +732,65 @@ export function bindLobbyEvents() {
         avatarEl.classList.remove('ring-2', 'ring-mint-green', 'shadow-glow-mint');
       }
     }
+  });
+
+  // --- LIVE SQUAD POD CHAT EVENTS ---
+  const inputChat = document.getElementById('input-pod-chat');
+  const btnSendChat = document.getElementById('btn-send-pod-chat');
+
+  const handleSendChat = () => {
+    if (!inputChat) return;
+    const text = inputChat.value.trim();
+    if (!text) {
+      inputChat.focus();
+      return;
+    }
+    audio.playBip();
+    const currUser = store.getState().currentUser;
+    const senderName = (currUser && currUser.displayName && currUser.displayName !== 'Guest Citizen')
+      ? currUser.displayName.split(' ')[0]
+      : 'Camper';
+
+    store.addPodChatMessage({
+      senderName,
+      text,
+    });
+    inputChat.value = '';
+    store.setView('ROOMS');
+  };
+
+  if (btnSendChat) btnSendChat.addEventListener('click', handleSendChat);
+  if (inputChat) {
+    inputChat.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSendChat();
+    });
+  }
+
+  // Convert Chat message to Custom Squad Card
+  const toCardBtns = document.querySelectorAll('.btn-chat-to-card');
+  toCardBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const text = decodeURIComponent(btn.dataset.text || '');
+      const author = decodeURIComponent(btn.dataset.author || 'Camper');
+      audio.playCorrect();
+      confetti.burst(30);
+      store.addCustomRoomCard({
+        title: `${author}'s Inside Joke`,
+        prompt: text,
+        quote: text,
+        author,
+      });
+      const toastMount = document.getElementById('toast-mount');
+      if (toastMount) {
+        toastMount.innerHTML = `
+          <div class="toast toast-mint show">
+            <span class="material-symbols-outlined text-sm">add_circle</span>
+            <span>Inside joke added to tonight's playable trivia deck!</span>
+          </div>
+        `;
+        setTimeout(() => (toastMount.innerHTML = ''), 3000);
+      }
+    });
   });
 
   // --- SPOTIFY SQUAD JUKEBOX EVENTS ---

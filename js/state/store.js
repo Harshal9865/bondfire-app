@@ -226,6 +226,9 @@ class ReactiveStore {
       },
       customGameDeck: [],
       vaultMemories: [],
+      podChatMessages: [],
+      duoWhisperNotes: [],
+      duoVoiceNotes: [],
     };
   }
 
@@ -330,7 +333,7 @@ class ReactiveStore {
     const myPlayer = {
       id: myId,
       name: myName,
-      role: isAlreadyHost ? 'HOST' : 'Player',
+      role: isAlreadyHost ? 'HOST' : (isDuo ? 'PARTNER' : 'Player'),
       isReady: true,
       avatar: myAvatar,
     };
@@ -339,8 +342,29 @@ class ReactiveStore {
     let updatedPlayers;
     if (isAlreadyHost) {
       updatedPlayers = currentPlayers.length > 0 ? currentPlayers : [myPlayer];
+    } else if (isDuo) {
+      // Find or create the host placeholder so the partner sees both slots immediately
+      const host = currentPlayers.find((p) => p.role === 'HOST') || {
+        id: 'usr_host',
+        name: 'Host',
+        role: 'HOST',
+        isReady: true,
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host',
+      };
+      updatedPlayers = [host, myPlayer];
     } else {
-      updatedPlayers = [myPlayer];
+      // For Squad, append if not already in list
+      const existing = currentPlayers.filter((p) => p.id !== myId && p.name.toLowerCase() !== myName.toLowerCase());
+      updatedPlayers = [...existing, myPlayer];
+      if (updatedPlayers.length === 1 && !updatedPlayers.some((p) => p.role === 'HOST')) {
+        updatedPlayers.unshift({
+          id: 'usr_host',
+          name: 'Host',
+          role: 'HOST',
+          isReady: true,
+          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host',
+        });
+      }
     }
 
     const activeRoom = {
@@ -349,24 +373,122 @@ class ReactiveStore {
       mode: isDuo ? 'US' : (this.state.activeRoom?.mode || 'PODS'),
       roomType: isDuo ? 'DUO' : (this.state.activeRoom?.roomType || 'SQUAD'),
       isHost: isAlreadyHost,
+      sessionStarted: false,
       players: updatedPlayers,
     };
     this.setState({ activeRoom, currentMode: isDuo ? 'US' : (this.state.currentMode || 'PODS') });
 
-    // Sync with Supabase Realtime across devices
+    // Sync with Supabase Realtime across devices and broadcast join event
     if (typeof window !== 'undefined') {
-      import('../services/supabaseClient.js').then(({ syncRealtimeRoom }) => {
+      import('../services/supabaseClient.js').then(({ syncRealtimeRoom, broadcastRoomAction }) => {
         syncRealtimeRoom(cleanCode, {
           id: myId,
           name: myName,
           avatar: myAvatar,
           isHost: isAlreadyHost,
+          role: myPlayer.role,
           mode: isDuo ? 'US' : 'PODS',
+        });
+        broadcastRoomAction(isDuo ? 'PARTNER_JOINED' : 'CAMPER_JOINED', {
+          player: myPlayer,
+          roomCode: cleanCode,
         });
       }).catch((err) => console.warn('Realtime sync notice:', err));
     }
 
     return activeRoom;
+  }
+
+  addPodChatMessage(msg, shouldBroadcast = true) {
+    const user = this.state.currentUser;
+    const authorName = msg.senderName || (user && user.displayName ? user.displayName.split(' ')[0] : 'Camper');
+    const avatar = msg.avatar || user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(authorName)}`;
+    const newMsg = {
+      id: msg.id || `msg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      senderId: msg.senderId || user?.id || `usr_${Date.now()}`,
+      senderName: authorName,
+      text: msg.text || '',
+      timestamp: msg.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      avatar,
+    };
+
+    const currentList = this.state.podChatMessages || [];
+    this.setState({ podChatMessages: [...currentList, newMsg] });
+
+    if (shouldBroadcast && typeof window !== 'undefined') {
+      import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+        broadcastRoomAction('POD_CHAT_MESSAGE', { message: newMsg });
+      }).catch((e) => console.warn(e));
+    }
+    return newMsg;
+  }
+
+  addDuoWhisperNote(note, shouldBroadcast = true) {
+    const user = this.state.currentUser;
+    const authorName = note.author || (user && user.displayName ? user.displayName.split(' ')[0] : 'Partner');
+    const newNote = {
+      id: note.id || `wh_${Date.now()}`,
+      author: authorName,
+      text: note.text || '',
+      timestamp: note.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      unsealed: false,
+    };
+
+    const currentNotes = this.state.duoWhisperNotes || [];
+    this.setState({ duoWhisperNotes: [...currentNotes, newNote] });
+
+    this.addCustomMemory({
+      title: `Secret Whisper Note from ${authorName}`,
+      quote: note.text,
+      type: 'WHISPER',
+      category: 'LOVE',
+    });
+
+    if (shouldBroadcast && typeof window !== 'undefined') {
+      import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+        broadcastRoomAction('WHISPER_NOTE_SENT', { note: newNote });
+      }).catch((e) => console.warn(e));
+    }
+    return newNote;
+  }
+
+  addDuoVoiceNote(vn, shouldBroadcast = true) {
+    const user = this.state.currentUser;
+    const authorName = vn.author || (user && user.displayName ? user.displayName.split(' ')[0] : 'Partner');
+    const newVn = {
+      id: vn.id || `vn_${Date.now()}`,
+      author: authorName,
+      audioUrl: vn.audioUrl || '',
+      duration: vn.duration || '0:15',
+      timestamp: vn.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    const currentVns = this.state.duoVoiceNotes || [];
+    this.setState({ duoVoiceNotes: [...currentVns, newVn] });
+
+    this.addCustomMemory({
+      title: `Voice Note from ${authorName} (${newVn.duration})`,
+      quote: `[Voice Note: ${newVn.duration}] - Recorded during Date Night`,
+      type: 'AUDIO',
+      category: 'LOVE',
+    });
+
+    if (shouldBroadcast && typeof window !== 'undefined') {
+      import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+        broadcastRoomAction('VOICE_NOTE_SENT', { voiceNote: newVn });
+      }).catch((e) => console.warn(e));
+    }
+    return newVn;
+  }
+
+  unsealDuoWhisperNote(noteId) {
+    const notes = (this.state.duoWhisperNotes || []).map((n) => {
+      if (n.id === noteId) {
+        return { ...n, unsealed: true };
+      }
+      return n;
+    });
+    this.setState({ duoWhisperNotes: notes });
   }
 
   createDuoRoom(customName) {

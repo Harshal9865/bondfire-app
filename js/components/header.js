@@ -83,6 +83,11 @@ export function renderHeader() {
             <span class="material-symbols-outlined text-[16px] sm:text-[18px]">${state.soundEnabled ? 'volume_up' : 'volume_off'}</span>
           </button>
 
+          <!-- Campfire Jukebox Quick Toggle -->
+          <button class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface border border-border/80 text-amber-gold hover:text-white hover:border-amber-gold flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 shrink-0" id="btn-header-jukebox" title="Campfire Jukebox (Full Songs &amp; Radio)">
+            <span class="material-symbols-outlined text-[16px] sm:text-[18px]">music_note</span>
+          </button>
+
           <!-- Room Code Quick Pill (Tablet & Desktop) -->
           <div class="hidden md:flex items-center p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/70 transition-colors shadow-inner">
             <div class="pl-3 pr-1 text-xs font-mono text-sunset-coral font-bold flex items-center gap-1">
@@ -481,6 +486,37 @@ export function bindHeaderEvents() {
     });
   }
 
+  // Header Quick Jukebox Toggle
+  const headerJukeboxBtn = document.getElementById('btn-header-jukebox');
+  if (headerJukeboxBtn) {
+    headerJukeboxBtn.addEventListener('click', () => {
+      audio.playClick();
+      const jukeboxModal = document.getElementById('spotify-jukebox-modal');
+      if (jukeboxModal) {
+        jukeboxModal.classList.toggle('hidden');
+      } else {
+        // Open lobby with jukebox
+        store.setView('LOBBY');
+        window.location.hash = '#/LOBBY';
+      }
+    });
+  }
+
+  // Mobile Filter Pills Click (Vault, Photobook, Friends, Arcade, Store, Squad, Solo, Us Mode)
+  const filterPills = document.querySelectorAll('.mobile-filter-pill');
+  filterPills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      audio.playClick();
+      const view = pill.dataset.view;
+      const mode = pill.dataset.mode;
+      if (mode) store.setMode(mode);
+      if (view) {
+        store.setView(view);
+        window.location.hash = `#/${view}`;
+      }
+    });
+  });
+
   // Mobile Bottom Navigation Tabs Click
   const bottomTabs = document.querySelectorAll('.mobile-bottom-tab');
   bottomTabs.forEach((tab) => {
@@ -576,18 +612,6 @@ export function bindHeaderEvents() {
       else if (sound === 'rimshot') audio.playRimshot();
       else if (sound === 'cheer') audio.playCrowdCheer();
       else if (sound === 'crickets') audio.playCrickets();
-    });
-  });
-
-  // Horizontal Scrolling Filter Pills (Swipeable Tabs)
-  const filterPills = document.querySelectorAll('.mobile-filter-pill');
-  filterPills.forEach((pill) => {
-    pill.addEventListener('click', () => {
-      audio.playClick();
-      const mode = pill.dataset.mode;
-      const view = pill.dataset.view;
-      if (mode) store.setMode(mode);
-      if (view) store.setView(view);
     });
   });
 

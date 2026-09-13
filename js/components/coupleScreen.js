@@ -11,6 +11,14 @@ let currentQuizIndex = 0;
 let isFlippedThen = false;
 let isFlippedNow = false;
 let confetti = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recordTimer = null;
+let recordSeconds = 0;
+let recordedVoiceBlobUrl = null;
+let isRecording = false;
+let activeAudioPlayer = null;
+let activeAudioUrl = null;
 
 const DATE_NIGHT_QUESTIONS = [
   {
@@ -294,11 +302,23 @@ export function renderCoupleScreen() {
             </div>
           </div>
 
-          <!-- Launch Button -->
-          <button id="btn-start-duo-session" class="w-full py-4 rounded-full bg-gradient-to-r from-duo-rose via-sunset-coral to-amber-gold text-canvas font-extrabold text-sm sm:text-base shadow-glow-rose hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
-            <span>Start Date Night Session</span>
-          </button>
+          <!-- Host Authority: Only Host Can Launch Session -->
+          ${activeRoom.isHost ? `
+            <button id="btn-start-duo-session" class="w-full py-4 rounded-full bg-gradient-to-r from-duo-rose via-sunset-coral to-amber-gold text-canvas font-extrabold text-sm sm:text-base shadow-glow-rose hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+              <span>Start Date Night Session (Host)</span>
+            </button>
+          ` : `
+            <div class="p-4 rounded-2xl bg-surface-bright/70 border border-duo-rose/40 text-center space-y-2">
+              <div class="flex items-center justify-center gap-2 text-duo-rose font-bold text-xs font-mono">
+                <span class="w-2 h-2 rounded-full bg-duo-rose animate-ping"></span>
+                <span>Connected with ${hostPlayer.name} (Host)</span>
+              </div>
+              <p class="text-xs text-gray-300">
+                You are in the room! Waiting for <strong class="text-white font-bold">${hostPlayer.name}</strong> to start Date Night...
+              </p>
+            </div>
+          `}
         </div>
       </div>
     `;
@@ -310,7 +330,7 @@ export function renderCoupleScreen() {
   const partnerTwo = partnerPlayer ? partnerPlayer.name : 'Partner';
 
   return `
-    <div class="flex flex-col w-full max-w-[640px] mx-auto px-4 pt-6 pb-28 gap-5 relative select-none text-on-surface">
+    <div class="flex flex-col w-full max-w-[640px] mx-auto px-4 pt-6 pb-44 gap-5 relative select-none text-on-surface">
       <!-- Glows -->
       <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-72 h-72 bg-sunset-coral/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
       <div class="absolute top-[380px] -right-20 w-64 h-64 bg-amber-gold/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
@@ -423,7 +443,59 @@ export function renderCoupleScreen() {
         </div>
 
         <div class="pt-1 text-center">
-          <span class="text-xs text-gray-400 font-mono">Tap either polaroid to flip and listen to the voice note</span>
+          <span class="text-xs text-gray-400 font-mono">Tap either polaroid to flip and view memory notes</span>
+        </div>
+
+        <!-- Real Interactive Voice Note Recording Strip -->
+        <div class="mt-2 p-3.5 rounded-2xl bg-canvas border border-border/80 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-gold text-[18px]">mic</span>
+              <span class="text-xs font-bold text-white">Record a Voice Memory for Us</span>
+            </div>
+            <span id="voice-record-timer" class="text-xs font-mono font-bold text-duo-rose hidden">0:00</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center gap-2">
+            <button id="btn-record-duo-voice" type="button" class="flex-1 py-2.5 px-4 rounded-xl bg-duo-rose/20 hover:bg-duo-rose/30 border border-duo-rose/40 text-duo-rose font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all">
+              <span class="w-2.5 h-2.5 rounded-full bg-duo-rose" id="record-dot"></span>
+              <span id="record-btn-text">Tap to Record Voice Note</span>
+            </button>
+
+            <button id="btn-play-preview-voice" type="button" class="hidden py-2.5 px-3.5 rounded-xl bg-surface-bright hover:bg-surface border border-border text-gray-200 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              <span>Preview</span>
+            </button>
+
+            <button id="btn-send-voice-note" type="button" class="hidden py-2.5 px-4 rounded-xl bg-gradient-to-r from-duo-rose to-sunset-coral text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all">
+              <span class="material-symbols-outlined text-[16px]">send</span>
+              <span>Save &amp; Send</span>
+            </button>
+          </div>
+
+          <!-- Exchanged Voice Notes -->
+          <div class="flex flex-col gap-2 pt-1 border-t border-border/60">
+            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider">Voice Notes in Us Vault (${(state.duoVoiceNotes || []).length})</span>
+            ${(state.duoVoiceNotes && state.duoVoiceNotes.length > 0) ? state.duoVoiceNotes.map(vn => `
+              <div class="p-2.5 rounded-xl bg-surface border border-border/80 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <button type="button" class="btn-play-voice-note w-8 h-8 rounded-full bg-duo-rose/20 text-duo-rose border border-duo-rose/40 flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-transform" data-audio="${vn.audioUrl || ''}">
+                    <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                  </button>
+                  <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-bold text-white truncate">${vn.author}</span>
+                    <span class="text-[10px] text-gray-400 font-mono">${vn.timestamp} · ${vn.duration || '0:15'}</span>
+                  </div>
+                </div>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-bright text-mint-green border border-mint-green/30">Vault Synced</span>
+              </div>
+            `).join('') : `
+              <div class="text-[11px] text-gray-400 text-center py-2 italic font-mono">
+                No voice notes yet. Record a real memory together above!
+              </div>
+            `}
+          </div>
         </div>
       </div>
 
@@ -492,38 +564,83 @@ export function renderCoupleScreen() {
         </div>
       </div>
 
-      <!-- Activity 3: "Whisper Note" -->
+      <!-- Activity 3: "Whisper Note" with Wax Seal -->
       <div class="relative bg-surface rounded-2xl p-5 shadow-xl border border-border flex flex-col gap-3 overflow-hidden">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-duo-rose/20 flex items-center justify-center text-duo-rose">
               <span class="material-symbols-outlined text-[18px]">favorite</span>
             </div>
-            <h3 class="font-headline-sm text-base text-white font-bold">Secret Whisper Note</h3>
+            <h3 class="font-headline-sm text-base text-white font-bold">Secret Whisper Notes</h3>
           </div>
-          <span class="px-2.5 py-0.5 rounded-full bg-duo-rose/20 text-duo-rose text-[11px] font-bold border border-duo-rose/30">Tonight's Seal</span>
+          <span class="px-2.5 py-0.5 rounded-full bg-duo-rose/20 text-duo-rose text-[11px] font-bold border border-duo-rose/30">Wax Seal Vault</span>
         </div>
         <p class="text-xs text-gray-300">
-          Leave an affectionate note for <span class="text-amber-gold font-semibold">${partnerTwo}</span>. It will be sealed into your private vault.
+          Leave an affectionate note for <span class="text-amber-gold font-semibold">${partnerTwo}</span>. It sends to their screen as a wax-sealed envelope!
         </p>
 
         <div class="relative rounded-xl bg-canvas p-3.5 flex flex-col gap-2 border border-border">
-          <textarea id="whisper-input" class="w-full bg-transparent border-none text-white placeholder:text-gray-500 text-sm focus:outline-none resize-none" placeholder="Write something sweet or funny..." rows="3"></textarea>
+          <textarea id="whisper-input" class="w-full bg-transparent border-none text-white placeholder:text-gray-500 text-sm focus:outline-none resize-none" placeholder="Write something sweet, spicy, or memorable..." rows="3"></textarea>
           <div class="flex items-center justify-between pt-1 border-t border-border/40">
             <span class="text-[11px] text-amber-gold font-mono flex items-center gap-1">
               <span class="material-symbols-outlined text-[15px]">lock</span>
               Seals into Vault
             </span>
             <button class="px-4 py-1.5 rounded-full bg-gradient-to-r from-duo-rose to-sunset-coral text-white font-bold text-xs active:scale-95 transition-transform flex items-center gap-1 shadow" id="btn-seal-whisper" type="button">
-              <span>Seal Note</span>
+              <span>Seal with Wax</span>
               <span class="material-symbols-outlined text-[14px]">done_all</span>
             </button>
           </div>
         </div>
+
+        <!-- Exchanged Secret Whisper Notes (Wax Seal Style) -->
+        <div class="flex flex-col gap-2.5 pt-2">
+          <span class="text-xs font-bold text-gray-300 font-mono uppercase tracking-wider">Tonight's Sealed Notes (${(state.duoWhisperNotes || []).length})</span>
+          ${(state.duoWhisperNotes && state.duoWhisperNotes.length > 0) ? state.duoWhisperNotes.map(note => note.unsealed ? `
+            <!-- Unsealed note (revealed) -->
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-gold/10 via-surface to-surface border border-amber-gold/50 shadow-md flex flex-col gap-2 transition-all">
+              <div class="flex items-center justify-between border-b border-amber-gold/20 pb-1.5">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-gold font-mono">
+                  <span class="material-symbols-outlined text-[16px]">drafts</span>
+                  <span>From ${note.author}</span>
+                </div>
+                <span class="text-[10px] font-mono text-gray-400">${note.timestamp}</span>
+              </div>
+              <p class="text-xs sm:text-sm text-gray-100 font-serif italic leading-relaxed py-1">
+                "${note.text}"
+              </p>
+              <div class="flex items-center justify-between pt-1 text-[10px] font-mono text-duo-rose">
+                <span>Sealed in Vault</span>
+                <span class="material-symbols-outlined text-[14px]">lock_open</span>
+              </div>
+            </div>
+          ` : `
+            <!-- Sealed note with wax seal -->
+            <div class="p-4 rounded-2xl bg-surface border-2 border-duo-rose/60 shadow-lg flex items-center justify-between gap-3 hover:border-duo-rose transition-all">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-duo-rose/20 border border-duo-rose/50 flex items-center justify-center text-duo-rose shrink-0">
+                  <span class="material-symbols-outlined text-2xl">mail</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs font-bold text-white truncate">Sealed Note from ${note.author}</span>
+                  <span class="text-[10px] text-gray-400 font-mono">${note.timestamp} · Private &amp; Encrypted</span>
+                </div>
+              </div>
+              <button type="button" class="btn-unseal-whisper px-3.5 py-1.5 rounded-full bg-gradient-to-r from-duo-rose to-amber-gold text-canvas font-black text-xs shadow hover:brightness-110 active:scale-95 transition-all flex items-center gap-1 shrink-0" data-id="${note.id}">
+                <span class="material-symbols-outlined text-[15px]">lock_open</span>
+                <span>Break Seal</span>
+              </button>
+            </div>
+          `).join('') : `
+            <div class="p-3.5 rounded-xl bg-canvas border border-dashed border-border/80 text-center text-xs text-gray-400">
+              No whisper notes sealed yet. Write a surprise note for your partner above!
+            </div>
+          `}
+        </div>
       </div>
 
-      <!-- Bottom Floating Nav Bar -->
-      <div class="fixed bottom-0 inset-x-0 z-40 bg-surface/90 backdrop-blur-xl px-4 py-3 border-t border-border">
+      <!-- Bottom Floating Nav Bar (Raised above mobile bottom dock) -->
+      <div class="fixed bottom-[68px] lg:bottom-0 inset-x-0 z-30 bg-surface/90 backdrop-blur-xl px-4 py-3 border-t border-border">
         <div class="max-w-[640px] mx-auto flex items-center justify-between gap-3">
           <button class="px-4 py-2.5 rounded-full bg-surface-bright text-xs font-bold text-gray-300 hover:text-white border border-border transition-colors" id="btn-exit-duo-session">
             Exit Session
@@ -600,7 +717,7 @@ export function bindCoupleEvents() {
   if (btnLeaveDuo) btnLeaveDuo.addEventListener('click', handleExit);
   if (btnExitSession) btnExitSession.addEventListener('click', handleExit);
 
-  // 5. Start Duo Session (When both connected)
+  // 5. Start Duo Session (Host only authority)
   const btnStartSession = document.getElementById('btn-start-duo-session');
   if (btnStartSession) {
     btnStartSession.addEventListener('click', () => {
@@ -682,7 +799,140 @@ export function bindCoupleEvents() {
     });
   }
 
-  // 9. Seal Whisper Note
+  // 9. Real Voice Note Recording & Playback
+  const recordBtn = document.getElementById('btn-record-duo-voice');
+  const recordDot = document.getElementById('record-dot');
+  const recordText = document.getElementById('record-btn-text');
+  const timerEl = document.getElementById('voice-record-timer');
+  const previewBtn = document.getElementById('btn-play-preview-voice');
+  const sendVnBtn = document.getElementById('btn-send-voice-note');
+
+  if (recordBtn) {
+    recordBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        // Start Recording
+        try {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('MediaDevices not supported in this browser.');
+          }
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) audioChunks.push(e.data);
+          };
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            recordedVoiceBlobUrl = URL.createObjectURL(audioBlob);
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = () => {
+              activeAudioUrl = reader.result;
+            };
+            stream.getTracks().forEach((track) => track.stop());
+            if (previewBtn) previewBtn.classList.remove('hidden');
+            if (sendVnBtn) sendVnBtn.classList.remove('hidden');
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recordSeconds = 0;
+          if (recordDot) recordDot.classList.add('animate-ping');
+          if (recordText) recordText.textContent = 'Recording... Tap to Stop';
+          if (timerEl) {
+            timerEl.classList.remove('hidden');
+            timerEl.textContent = '0:00';
+          }
+          if (recordTimer) clearInterval(recordTimer);
+          recordTimer = setInterval(() => {
+            recordSeconds++;
+            const mins = Math.floor(recordSeconds / 60);
+            const secs = (recordSeconds % 60).toString().padStart(2, '0');
+            if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+          }, 1000);
+          audio.playClick();
+        } catch (err) {
+          console.warn('Microphone error or permission denied:', err);
+          showToast('Microphone permission required for voice notes.', 'rose');
+          // Provide lightweight synthetic audio fallback note
+          recordedVoiceBlobUrl = null;
+          activeAudioUrl = '';
+          recordSeconds = 8;
+          if (sendVnBtn) sendVnBtn.classList.remove('hidden');
+          if (recordText) recordText.textContent = 'Synthetic Audio Note Ready';
+        }
+      } else {
+        // Stop Recording
+        isRecording = false;
+        if (recordTimer) clearInterval(recordTimer);
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        if (recordDot) recordDot.classList.remove('animate-ping');
+        if (recordText) recordText.textContent = 'Record Another';
+        audio.playClick();
+      }
+    });
+  }
+
+  if (previewBtn) {
+    previewBtn.addEventListener('click', () => {
+      if (recordedVoiceBlobUrl) {
+        const tempAudio = new Audio(recordedVoiceBlobUrl);
+        tempAudio.play().catch(() => audio.playChime());
+      } else {
+        audio.playChime();
+      }
+    });
+  }
+
+  if (sendVnBtn) {
+    sendVnBtn.addEventListener('click', () => {
+      const mins = Math.floor(recordSeconds / 60);
+      const secs = (recordSeconds % 60).toString().padStart(2, '0');
+      const durationStr = `${mins}:${secs}`;
+      const user = store.getState().currentUser;
+      const author = (user && user.displayName && user.displayName !== 'Guest Citizen')
+        ? user.displayName.split(' ')[0]
+        : 'Partner';
+
+      store.addDuoVoiceNote({
+        author,
+        audioUrl: activeAudioUrl || recordedVoiceBlobUrl || '',
+        duration: durationStr || '0:10',
+      });
+
+      audio.playCorrect();
+      confetti.burst(35);
+      showToast('Voice note sealed and saved to Vault!', 'mint');
+      recordedVoiceBlobUrl = null;
+      activeAudioUrl = null;
+      store.setView('COUPLE');
+    });
+  }
+
+  // Play voice notes in vault
+  const vnPlayBtns = document.querySelectorAll('.btn-play-voice-note');
+  vnPlayBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const audioUrl = btn.dataset.audio;
+      if (audioUrl) {
+        if (activeAudioPlayer) {
+          activeAudioPlayer.pause();
+          activeAudioPlayer = null;
+        }
+        activeAudioPlayer = new Audio(audioUrl);
+        activeAudioPlayer.play().catch((e) => {
+          console.warn('Audio play notice:', e);
+          audio.playChime();
+        });
+      } else {
+        audio.playChime();
+      }
+    });
+  });
+
+  // 10. Seal Whisper Note
   const sealWhisperBtn = document.getElementById('btn-seal-whisper');
   const whisperInput = document.getElementById('whisper-input');
   if (sealWhisperBtn && whisperInput) {
@@ -694,19 +944,36 @@ export function bindCoupleEvents() {
         return;
       }
       audio.playCorrect();
-      confetti.burst(40);
-      store.addCustomMemory({
-        title: 'Date Night Whisper Note',
-        quote: text,
-        type: 'WHISPER',
-        category: 'LOVE',
+      confetti.burst(50);
+      const user = store.getState().currentUser;
+      const author = (user && user.displayName && user.displayName !== 'Guest Citizen')
+        ? user.displayName.split(' ')[0]
+        : 'Partner';
+
+      store.addDuoWhisperNote({
+        author,
+        text,
       });
+
       whisperInput.value = '';
-      showToast('Whisper note sealed into your private vault!', 'mint');
+      showToast('Whisper note wax-sealed and delivered!', 'mint');
+      store.setView('COUPLE');
     });
   }
 
-  // 10. Us Album header button
+  // 11. Unseal Whisper Note (Break Seal)
+  const unsealBtns = document.querySelectorAll('.btn-unseal-whisper');
+  unsealBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const noteId = btn.dataset.id;
+      audio.playChime();
+      confetti.burst(45);
+      store.unsealDuoWhisperNote(noteId);
+      store.setView('COUPLE');
+    });
+  });
+
+  // 12. Us Album header button
   const albumBtn = document.getElementById('btn-couple-header-book');
   if (albumBtn) {
     albumBtn.addEventListener('click', () => {

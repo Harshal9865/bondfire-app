@@ -387,6 +387,31 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
           },
         });
         window.location.hash = '#/COUPLE';
+      } else if (payload.action === 'PARTNER_JOINED' || payload.action === 'CAMPER_JOINED') {
+        if (payload.player) {
+          const currentRoom = store.getState().activeRoom;
+          const existing = currentRoom.players || [];
+          if (!existing.some((p) => p.id === payload.player.id || p.name.toLowerCase() === payload.player.name.toLowerCase())) {
+            store.setState({
+              activeRoom: {
+                ...currentRoom,
+                players: [...existing, payload.player],
+              },
+            });
+          }
+        }
+      } else if (payload.action === 'POD_CHAT_MESSAGE' && payload.message) {
+        if (typeof store.addPodChatMessage === 'function') {
+          store.addPodChatMessage(payload.message, false);
+        }
+      } else if (payload.action === 'WHISPER_NOTE_SENT' && payload.note) {
+        if (typeof store.addDuoWhisperNote === 'function') {
+          store.addDuoWhisperNote(payload.note, false);
+        }
+      } else if (payload.action === 'VOICE_NOTE_SENT' && payload.voiceNote) {
+        if (typeof store.addDuoVoiceNote === 'function') {
+          store.addDuoVoiceNote(payload.voiceNote, false);
+        }
       } else if (payload.action === 'SYNC_STREAM' && payload.url) {
         window.dispatchEvent(new CustomEvent('bondfire:sync-stream', { detail: { url: payload.url } }));
       }
