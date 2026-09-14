@@ -7,6 +7,7 @@ import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { GoogleAuthService } from '../services/googleAuth.js';
 import { openAuthModal } from './authModal.js';
+import { openSettingsModal } from './settingsModal.js';
 
 export function renderHeader() {
   const state = store.getState();
@@ -126,6 +127,11 @@ export function renderHeader() {
             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current text-[#1DB954] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
               <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
             </svg>
+          </button>
+
+          <!-- System Settings Trigger -->
+          <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-surface border border-border/80 text-gray-400 hover:text-white hover:border-amber-gold/50 flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 shrink-0 cursor-pointer" id="btn-header-settings" title="System Settings &amp; Preferences">
+            <span class="material-symbols-outlined text-[15px] sm:text-[17px]">settings</span>
           </button>
 
 
@@ -352,6 +358,16 @@ export function renderHeader() {
               <div class="min-w-0">
                 <div class="text-xs font-bold text-white truncate">Passport</div>
                 <div class="text-[10px] text-gray-400 truncate">Stats & Account</div>
+              </div>
+            </button>
+
+            <button class="sheet-settings-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-amber-gold/60 text-left flex items-center gap-3 transition-all active:scale-95 cursor-pointer" id="btn-sheet-settings">
+              <div class="w-9 h-9 rounded-xl bg-amber-gold/10 border border-amber-gold/30 flex items-center justify-center text-amber-gold shrink-0">
+                <span class="material-symbols-outlined text-[20px]">settings</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-white truncate">Settings</div>
+                <div class="text-[10px] text-gray-400 truncate">Audio & Preferences</div>
               </div>
             </button>
           </div>
@@ -586,6 +602,26 @@ export function bindHeaderEvents() {
       if (jukeboxModal) {
         jukeboxModal.classList.toggle('hidden');
       }
+    });
+  }
+
+  // System Settings Trigger (Header Bar)
+  const headerSettingsBtn = document.getElementById('btn-header-settings');
+  if (headerSettingsBtn) {
+    headerSettingsBtn.addEventListener('click', () => {
+      audio.playClick();
+      openSettingsModal();
+    });
+  }
+
+  // Mobile Explore Sheet Settings Button
+  const sheetSettingsBtn = document.getElementById('btn-sheet-settings');
+  if (sheetSettingsBtn) {
+    sheetSettingsBtn.addEventListener('click', () => {
+      audio.playClick();
+      const sheet = document.getElementById('mobile-explore-sheet-backdrop');
+      if (sheet) sheet.classList.remove('open');
+      openSettingsModal();
     });
   }
 

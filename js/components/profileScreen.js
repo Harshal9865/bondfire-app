@@ -7,6 +7,7 @@ import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { openPaymentModal } from './demoPaymentModal.js';
 import { openAuthModal } from './authModal.js';
+import { openSettingsModal } from './settingsModal.js';
 
 const AVATAR_PRESETS = [
   { id: 'av_1', name: 'Flame Sprite', icon: 'local_fire_department', color: 'from-[#FF5A5F] to-[#FFB703]' },
@@ -53,6 +54,10 @@ export function renderProfileScreen() {
 
         <!-- Quick Top Actions -->
         <div class="flex items-center gap-2.5">
+          <button type="button" id="btn-profile-settings" class="px-3.5 py-2 rounded-full bg-surface border border-border hover:border-amber-gold/50 text-gray-300 hover:text-white font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer" title="System Settings &amp; Preferences">
+            <span class="material-symbols-outlined text-[16px] text-amber-gold">settings</span>
+            <span>Settings</span>
+          </button>
           <button type="button" id="btn-profile-to-pricing" class="px-4 py-2 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral transition-transform active:scale-95 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px]">stars</span>
             <span>Manage Subscription</span>
@@ -321,6 +326,14 @@ export function renderProfileScreen() {
                 </div>
                 <input type="checkbox" id="toggle-blur" class="w-5 h-5 accent-sunset-coral rounded cursor-pointer" ${privacy.faceBlur ? 'checked' : ''} />
               </div>
+
+              <!-- Universal Settings Launcher -->
+              <div class="pt-2">
+                <button type="button" id="btn-profile-open-settings" class="w-full py-2.5 px-4 rounded-2xl bg-surface-bright hover:bg-surface border border-border hover:border-amber-gold/50 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px] text-amber-gold">tune</span>
+                  <span>Open Universal Settings &amp; Audio Calibration Hub</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -458,4 +471,16 @@ export function bindProfileEvents() {
   if (piiToggle) piiToggle.addEventListener('change', updatePrivacy);
   if (vaultToggle) vaultToggle.addEventListener('change', updatePrivacy);
   if (blurToggle) blurToggle.addEventListener('change', updatePrivacy);
+
+  // Settings Modal Triggers
+  const topSettingsBtn = document.getElementById('btn-profile-settings');
+  const bottomSettingsBtn = document.getElementById('btn-profile-open-settings');
+
+  const handleOpenSettings = () => {
+    audio.playClick();
+    openSettingsModal('audio');
+  };
+
+  if (topSettingsBtn) topSettingsBtn.addEventListener('click', handleOpenSettings);
+  if (bottomSettingsBtn) bottomSettingsBtn.addEventListener('click', handleOpenSettings);
 }

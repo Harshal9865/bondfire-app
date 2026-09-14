@@ -16,13 +16,25 @@ class ReactiveStore {
         if (e.key === CONFIG.STORAGE_KEY_SESSION && e.newValue) {
           try {
             this.state = JSON.parse(e.newValue);
+            this.applySettingsEffects();
             this.notify();
           } catch (err) {
             console.error('Cross-tab sync error:', err);
           }
+        } else if (e.key === CONFIG.STORAGE_KEY_SETTINGS && e.newValue) {
+          try {
+            const newSettings = JSON.parse(e.newValue);
+            this.state = { ...this.state, settings: { ...this.getDefaultSettings(), ...newSettings } };
+            this.applySettingsEffects();
+            this.notify();
+          } catch (err) {
+            console.error('Cross-tab settings sync error:', err);
+          }
         }
       });
     }
+
+    this.applySettingsEffects();
   }
 
   getDefaultGuestUser() {
@@ -80,11 +92,39 @@ class ReactiveStore {
     };
   }
 
+  getDefaultSettings() {
+    return {
+      masterVolume: 80, // 0 - 100
+      sfxEnabled: true,
+      musicEnabled: true,
+      hapticsEnabled: true,
+      cyberGlowIntensity: 'FULL', // 'FULL' | 'BALANCED' | 'MINIMAL'
+      reducedMotion: false,
+      keepScreenAwake: false,
+      themeAccent: 'AMBER_GOLD', // 'AMBER_GOLD' | 'SUNSET_CORAL' | 'MINT_GREEN' | 'CYBER_NEON' | 'VIOLET_DREAM'
+      defaultShotClock: 20, // 15 | 20 | 30 | 45
+      autoAdvanceRounds: true,
+      humorSensitivity: 'FRIENDLY_ROAST', // 'FAMILY_SAFE' | 'FRIENDLY_ROAST' | 'SAVAGE_ROAST'
+      profanityFilter: false,
+      ephemeralRoomMode: false,
+      piiRedaction: true,
+      language: 'en-US', // 'en-US' | 'hi-IN' | 'hinglish'
+    };
+  }
+
   getDefaultAlbumMemories() {
     return [];
   }
 
   loadInitialState() {
+    let savedSettings = null;
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const rawSettings = localStorage.getItem(CONFIG.STORAGE_KEY_SETTINGS);
+        if (rawSettings) savedSettings = JSON.parse(rawSettings);
+      } catch (_) {}
+    }
+
     if (typeof localStorage !== 'undefined') {
       try {
         const saved = localStorage.getItem(CONFIG.STORAGE_KEY_SESSION);
@@ -167,6 +207,7 @@ class ReactiveStore {
           } else {
             parsed.albumMemories = parsed.albumMemories.filter((m) => !['mem_1', 'mem_2', 'mem_3', 'mem_4'].includes(m.id));
           }
+          parsed.settings = { ...this.getDefaultSettings(), ...(parsed.settings || {}), ...(savedSettings || {}) };
           return parsed;
         }
       } catch (e) {
@@ -214,6 +255,7 @@ class ReactiveStore {
       podChatMessages: [],
       duoWhisperNotes: [],
       duoVoiceNotes: [],
+      settings: { ...this.getDefaultSettings(), ...(savedSettings || {}) },
     };
   }
 
@@ -285,6 +327,129 @@ class ReactiveStore {
   updateUserProfile(updates) {
     const currentUser = { ...this.state.currentUser, ...updates };
     this.setState({ currentUser });
+  }
+
+  getSettings() {
+    return this.state.settings || this.getDefaultSettings();
+  }
+
+  updateSettings(partial) {
+    if (!partial || typeof partial !== 'object') return this.state.settings;
+    const newSettings = { ...(this.state.settings || this.getDefaultSettings()), ...partial };
+    this.state = { ...this.state, settings: newSettings };
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(CONFIG.STORAGE_KEY_SETTINGS, JSON.stringify(newSettings));
+      }
+    } catch (_) {}
+    this.persist();
+    this.applySettingsEffects();
+    this.notify();
+    return newSettings;
+  }
+
+  resetSettingsToDefault() {
+    const defaultSettings = this.getDefaultSettings();
+    return this.updateSettings(defaultSettings);
+  }
+
+  applySettingsEffects() {
+    if (typeof document === 'undefined' || !this.state.settings) return;
+    try {
+      const s = this.state.settings;
+      const body = document.body;
+      if (body) {
+        body.classList.toggle('reduce-motion', !!s.reducedMotion);
+        body.setAttribute('data-glow-intensity', s.cyberGlowIntensity || 'FULL');
+        body.setAttribute('data-theme-accent', s.themeAccent || 'AMBER_GOLD');
+      }
+      if (typeof window !== 'undefined' && window.__bondfireAudio) {
+        window.__bondfireAudio.setMasterVolume(s.masterVolume);
+      }
+      if (typeof window !== 'undefined' && window.__bondfireWakeLock) {
+        if (s.keepScreenAwake) {
+          window.__bondfireWakeLock.request();
+        } else {
+          window.__bondfireWakeLock.release();
+        }
+      }
+    } catch (e) {
+      console.warn('Could not apply settings effects:', e);
+    }
+  }
+
+  exportUserData() {
+    const exportData = {
+      exportVersion: '2.4.0',
+      exportedAt: new Date().toISOString(),
+      app: 'Bondfire Social Memory Engine',
+      user: this.state.currentUser,
+      settings: this.state.settings,
+      stats: this.state.currentUser?.stats,
+      friends: this.state.friendsList,
+      squads: this.state.squadsList,
+      vaultMemories: this.state.vaultMemories,
+      customDeck: this.state.customGameDeck,
+      albumMemories: this.state.albumMemories,
+    };
+
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      try {
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().split('T')[0];
+        a.download = `bondfire-data-backup-${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Export download error:', err);
+      }
+    }
+    return exportData;
+  }
+
+  clearUserCache() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(CONFIG.STORAGE_KEY_SESSION);
+      }
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
+    } catch (_) {}
+
+    const cleanGuest = this.getDefaultGuestUser();
+    this.state = {
+      ...this.state,
+      currentUser: cleanGuest,
+      activeRoom: {
+        roomCode: generateRoomCode(),
+        podName: 'My Squad Room',
+        roomTemplate: 'SQUAD_NIGHT',
+        humorTone: 'FRIENDLY_ROAST',
+        language: 'hi-IN',
+        isHost: true,
+        selectedGameMode: 'RED_FLAG_COURT',
+        players: [
+          { id: cleanGuest.id, name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost' },
+        ],
+      },
+      friendsList: [],
+      squadsList: [],
+      friendRequests: { incoming: [], outgoing: [] },
+      customGameDeck: [],
+      vaultMemories: [],
+      albumMemories: [],
+      currentView: 'HOME',
+    };
+    this.persist();
+    this.notify();
+    return true;
   }
 
   setSparks(sparks) {
@@ -888,6 +1053,9 @@ class ReactiveStore {
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(CONFIG.STORAGE_KEY_SESSION, JSON.stringify(this.state));
+        if (this.state.settings) {
+          localStorage.setItem(CONFIG.STORAGE_KEY_SETTINGS, JSON.stringify(this.state.settings));
+        }
       }
     } catch (e) {
       console.warn('Unable to persist session to localStorage', e);

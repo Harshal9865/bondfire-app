@@ -87,13 +87,14 @@ async function runTests() {
     ['PricingScreen', () => import('../js/components/pricingScreen.js').then((m) => m.renderPricingScreen())],
     ['DemoPaymentModal', () => import('../js/components/demoPaymentModal.js').then((m) => m.renderPaymentModal())],
     ['AuthModal', () => import('../js/components/authModal.js').then((m) => m.renderAuthModal())],
+    ['SettingsModal', () => import('../js/components/settingsModal.js').then((m) => m.renderSettingsModal())],
   ];
 
   for (const [name, fn] of screenRenderers) {
     const markup = await fn();
     assert.ok(markup && markup.length > 50, `Render failed for ${name}`);
   }
-  console.log('✅ Suite 5 Passed: All 15 UI/UX Screen & Modal Renderers Verified');
+  console.log('✅ Suite 5 Passed: All 16 UI/UX Screen & Modal Renderers Verified');
 
   // ------------------------------------------------------------------------------
   // TEST SUITE 6: CREATIVE FEATURE — PIXEL GRAFFITI CANVAS (32x32)

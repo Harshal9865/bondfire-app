@@ -1198,3 +1198,51 @@ body[data-view="GATE"] #spotify-jukebox-container,
   }
 }
 
+/* ==============================================================================
+   UNIVERSAL SETTINGS & ACCESSIBILITY OVERRIDES
+   ============================================================================== */
+
+/* Reduced Motion Mode */
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+body.reduce-motion #bg-canvas-container {
+  display: none !important;
+}
+
+/* Glow Intensity Modifiers */
+body[data-glow-intensity="MINIMAL"] .shadow-glow-amber,
+body[data-glow-intensity="MINIMAL"] .shadow-glow-coral,
+body[data-glow-intensity="MINIMAL"] [class*="shadow-glow-"] {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+body[data-glow-intensity="BALANCED"] .shadow-glow-amber,
+body[data-glow-intensity="BALANCED"] .shadow-glow-coral {
+  box-shadow: 0 0 12px rgba(255, 183, 3, 0.3) !important;
+}
+
+/* Atmosphere Theme Accent Modifiers */
+body[data-theme-accent="SUNSET_CORAL"] {
+  --theme-accent: #FF5A5F;
+}
+
+body[data-theme-accent="MINT_GREEN"] {
+  --theme-accent: #4ADE80;
+}
+
+body[data-theme-accent="CYBER_NEON"] {
+  --theme-accent: #00F0FF;
+}
+
+body[data-theme-accent="VIOLET_DREAM"] {
+  --theme-accent: #7C4DFF;
+}
+

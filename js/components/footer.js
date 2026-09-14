@@ -8,6 +8,7 @@ import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { openAuthModal } from './authModal.js';
 import { openLegalModal } from './legalModal.js';
+import { openSettingsModal } from './settingsModal.js';
 
 export function renderFooter() {
   return `
@@ -189,6 +190,12 @@ export function renderFooter() {
                   <span>DevOps Runbook</span>
                 </a>
               </li>
+              <li>
+                <button id="btn-footer-open-settings" class="text-xs text-amber-gold hover:text-amber-gold/80 flex items-center gap-2 py-0.5 transition-colors group cursor-pointer">
+                  <span class="material-symbols-outlined text-[15px] text-amber-gold">tune</span>
+                  <span>System Preferences Hub</span>
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -206,6 +213,11 @@ export function renderFooter() {
             <span class="hover:text-gray-300 cursor-pointer transition-colors" id="btn-footer-privacy">Privacy Policy</span>
             <span class="text-gray-700">•</span>
             <span class="hover:text-gray-300 cursor-pointer transition-colors" id="btn-footer-compliance">Streaming & DMCA</span>
+            <span class="text-gray-700">•</span>
+            <span class="hover:text-amber-gold cursor-pointer transition-colors inline-flex items-center gap-1" id="btn-footer-settings">
+              <span class="material-symbols-outlined text-[13px]">settings</span>
+              <span>Preferences</span>
+            </span>
             <span class="text-gray-700">•</span>
             <span class="font-mono text-gray-500">WebRTC P2P Mesh</span>
             <span class="text-gray-700">•</span>
@@ -266,4 +278,13 @@ export function bindFooterEvents() {
   if (termsBtn) termsBtn.addEventListener('click', () => openLegalModal('terms'));
   if (privacyBtn) privacyBtn.addEventListener('click', () => openLegalModal('privacy'));
   if (complianceBtn) complianceBtn.addEventListener('click', () => openLegalModal('platforms'));
+
+  const footerSettingsBtn = document.getElementById('btn-footer-settings');
+  const footerOpenSettingsBtn = document.getElementById('btn-footer-open-settings');
+  const handleOpenSettings = () => {
+    audio.playClick();
+    openSettingsModal('audio');
+  };
+  if (footerSettingsBtn) footerSettingsBtn.addEventListener('click', handleOpenSettings);
+  if (footerOpenSettingsBtn) footerOpenSettingsBtn.addEventListener('click', handleOpenSettings);
 }

@@ -8,19 +8,63 @@ import { store } from '../state/store.js';
 class AudioSynthesizer {
   constructor() {
     this.ctx = null;
+    this.masterGain = null;
+    if (typeof window !== 'undefined') {
+      window.__bondfireAudio = this;
+      this.setupMobileUnlock();
+    }
+  }
+
+  setupMobileUnlock() {
+    if (typeof window === 'undefined') return;
+    const unlock = () => {
+      this.init();
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    };
+    ['touchstart', 'touchend', 'click', 'keydown'].forEach((ev) => {
+      window.addEventListener(ev, unlock, { once: true, passive: true });
+    });
   }
 
   init() {
-    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+    if (!this.ctx && typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AudioCtx();
+    }
+    if (this.ctx && !this.masterGain) {
+      try {
+        this.masterGain = this.ctx.createGain();
+        const settings = store.getState().settings;
+        const volumePercent = (settings && typeof settings.masterVolume === 'number') ? settings.masterVolume : 80;
+        this.masterGain.gain.setValueAtTime(volumePercent / 100, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+      } catch (_) {}
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
   }
 
+  getDestination() {
+    this.init();
+    return this.masterGain || (this.ctx ? this.ctx.destination : null);
+  }
+
+  setMasterVolume(percent) {
+    const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
+    if (this.ctx && this.masterGain) {
+      try {
+        this.masterGain.gain.setValueAtTime(clamped / 100, this.ctx.currentTime);
+      } catch (_) {}
+    }
+  }
+
   triggerHaptic(duration = 15) {
+    const state = store.getState();
+    const hapticsEnabled = state.settings ? (state.settings.hapticsEnabled !== false) : true;
+    if (!hapticsEnabled) return;
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       try {
         navigator.vibrate(duration);
@@ -29,7 +73,11 @@ class AudioSynthesizer {
   }
 
   isEnabled() {
-    return store.getState().soundEnabled;
+    const state = store.getState();
+    const sfxEnabled = state.settings ? (state.settings.sfxEnabled !== false) : true;
+    const soundEnabled = state.soundEnabled !== false;
+    const masterVolume = state.settings ? (state.settings.masterVolume ?? 80) : 80;
+    return soundEnabled && sfxEnabled && masterVolume > 0;
   }
 
   /**
@@ -53,7 +101,7 @@ class AudioSynthesizer {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.getDestination());
 
     osc.start(now);
     osc.stop(now + 0.3);
@@ -78,7 +126,7 @@ class AudioSynthesizer {
     gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.getDestination());
 
     osc.start();
     osc.stop(this.ctx.currentTime + 0.04);
@@ -102,7 +150,7 @@ class AudioSynthesizer {
     gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.getDestination());
 
     osc.start();
     osc.stop(this.ctx.currentTime + 0.03);
@@ -127,7 +175,7 @@ class AudioSynthesizer {
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.getDestination());
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.05);
@@ -157,7 +205,7 @@ class AudioSynthesizer {
       gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.25);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.getDestination());
 
       osc.start(now + idx * 0.07);
       osc.stop(now + idx * 0.07 + 0.25);
@@ -191,7 +239,7 @@ class AudioSynthesizer {
         gain.gain.exponentialRampToValueAtTime(0.001, now + time + 0.4);
 
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        gain.connect(this.getDestination());
 
         osc.start(now + time);
         osc.stop(now + time + 0.4);
@@ -225,7 +273,7 @@ class AudioSynthesizer {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.getDestination());
 
       osc.start(now);
       osc.stop(now + 0.35);
@@ -255,7 +303,7 @@ class AudioSynthesizer {
         gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.1);
 
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        gain.connect(this.getDestination());
 
         osc.start(now + offset);
         osc.stop(now + offset + 0.1);
@@ -282,7 +330,7 @@ class AudioSynthesizer {
     gain1.gain.setValueAtTime(0.2, now);
     gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
     osc1.connect(gain1);
-    gain1.connect(this.ctx.destination);
+    gain1.connect(this.getDestination());
     osc1.start(now);
     osc1.stop(now + 0.08);
 
@@ -295,7 +343,7 @@ class AudioSynthesizer {
     gain2.gain.setValueAtTime(0.25, now + 0.12);
     gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
     osc2.connect(gain2);
-    gain2.connect(this.ctx.destination);
+    gain2.connect(this.getDestination());
     osc2.start(now + 0.12);
     osc2.stop(now + 0.2);
 
@@ -318,7 +366,7 @@ class AudioSynthesizer {
 
     noise.connect(filter);
     filter.connect(gain3);
-    gain3.connect(this.ctx.destination);
+    gain3.connect(this.getDestination());
     noise.start(now + 0.26);
     noise.stop(now + 0.48);
   }
@@ -353,7 +401,7 @@ class AudioSynthesizer {
 
     noise.connect(filter);
     filter.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.getDestination());
 
     noise.start(now);
     noise.stop(now + duration);
@@ -379,7 +427,7 @@ class AudioSynthesizer {
       gain.gain.exponentialRampToValueAtTime(0.001, now + t + 0.04);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.getDestination());
 
       osc.start(now + t);
       osc.stop(now + t + 0.04);
@@ -425,7 +473,7 @@ class AudioSynthesizer {
     osc2.connect(gain2);
     gain1.connect(masterGain);
     gain2.connect(masterGain);
-    masterGain.connect(this.ctx.destination);
+    masterGain.connect(this.getDestination());
 
     osc1.start(now);
     osc2.start(now);
@@ -479,9 +527,9 @@ class AudioSynthesizer {
     oscRim.connect(gainRim);
     oscSub.connect(gainSub);
 
-    gainRoot.connect(this.ctx.destination);
-    gainRim.connect(this.ctx.destination);
-    gainSub.connect(this.ctx.destination);
+    gainRoot.connect(this.getDestination());
+    gainRim.connect(this.getDestination());
+    gainSub.connect(this.getDestination());
 
     oscRoot.start(now);
     oscRim.start(now);
@@ -524,7 +572,7 @@ class AudioSynthesizer {
 
     osc.connect(filter);
     filter.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.getDestination());
 
     osc.start(now);
     osc.stop(now + duration);
@@ -555,7 +603,7 @@ class AudioSynthesizer {
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.getDestination());
 
       osc.start(startTime);
       osc.stop(startTime + 0.35);
@@ -583,7 +631,7 @@ class AudioSynthesizer {
     gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
 
     osc1.connect(gain1);
-    gain1.connect(this.ctx.destination);
+    gain1.connect(this.getDestination());
     osc1.start(now);
     osc1.stop(now + 0.035);
 
@@ -597,7 +645,7 @@ class AudioSynthesizer {
     gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
 
     osc2.connect(gain2);
-    gain2.connect(this.ctx.destination);
+    gain2.connect(this.getDestination());
     osc2.start(now + 0.04);
     osc2.stop(now + 0.25);
   }
@@ -621,7 +669,7 @@ class AudioSynthesizer {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.getDestination());
 
     osc.start(now);
     osc.stop(now + 0.015);

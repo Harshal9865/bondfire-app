@@ -34,6 +34,7 @@ import { renderGateScreen, bindGateScreenEvents } from './components/gateScreen.
 import { renderRajaMantriGame, bindRajaMantriEvents } from './components/rajaMantriGame.js';
 import { renderBollywoodGame, bindBollywoodEvents } from './components/bollywoodGame.js';
 import { renderTambolaGame, bindTambolaEvents } from './components/tambolaGame.js';
+import { openSettingsModal } from './components/settingsModal.js';
 
 class BondfireApp {
   constructor() {
@@ -132,6 +133,9 @@ class BondfireApp {
       ? window.location.hash.replace(/^#\/?/, '').split('?')[0] 
       : '';
     const hash = (rawHash || '').toUpperCase();
+    if (hash === 'SETTINGS' || hash === 'PREFERENCES') {
+      openSettingsModal();
+    }
     const aliasMap = {
       'VAULT': 'MEMORIES',
       'PHOTOBOOK': 'YEARBOOK',
