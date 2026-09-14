@@ -1,13 +1,14 @@
 // ==============================================================================
 // CYBERPUNK CHINESE NEON TORII / PAIFANG GATE ENTRY PORTAL
-// Immersive full-screen entrance sanctuary with interactive talisman string curtain,
-// ceremonial dragon brazier, resonant wind gong, and cinematic warp entry.
+// Immersive full-screen entrance sanctuary with authentic 3D cyberpunk scene,
+// interactive talisman string curtain, ceremonial dragon brazier, resonant wind gong,
+// and cinematic warp entry sequence into Bondfire.
 // ==============================================================================
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 
-// Designer Talisman Runes for Paper Tags
+// Designer Talisman Runes for Paper Tags (isolated with notranslate)
 const TALISMAN_RUNES = ['篝', '火', '契', '灵', '龙', '梦', '心', '缘', '幻', '光', '影', '永', '恒', '福', '禧', '界'];
 
 export function renderGateScreen() {
@@ -29,9 +30,9 @@ export function renderGateScreen() {
         <!-- Designer Charm 1: Top Jade Bi Ring or Flame Bead -->
         ${hasBiTop ? '<div class="cyber-talisman-charm talisman-jade-bi" title="Jade Bi Charm"></div>' : '<div class="cyber-talisman-charm talisman-flame-bead" title="Cyber Flame Bead"></div>'}
 
-        <!-- Designer Charm 2: Mid Taoist Cyber-Talisman Paper Tag -->
-        <div class="cyber-talisman-charm talisman-paper-tag" title="Cyber Talisman: ${rune}">
-          <span>${rune}</span>
+        <!-- Designer Charm 2: Mid Taoist Cyber-Talisman Paper Tag (notranslate protected) -->
+        <div class="cyber-talisman-charm talisman-paper-tag notranslate" translate="no" title="Cyber Talisman: ${rune}">
+          <span class="notranslate select-none" translate="no">${rune}</span>
         </div>
 
         <!-- Designer Charm 3: Mid/Lower Flame Bead or Bi -->
@@ -48,112 +49,73 @@ export function renderGateScreen() {
   }
 
   return `
-    <div id="cyber-gate-screen" class="cyber-gate-universe select-none">
+    <div id="cyber-gate-screen" class="cyber-gate-universe select-none notranslate" translate="no">
       
-      <!-- Top Ambient Cyber Starfield / Scanline Layer -->
-      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,90,95,0.18)_0%,_rgba(11,14,25,0.92)_60%,_#05070d_100%)] pointer-events-none z-0"></div>
+      <!-- Authentic Cyberpunk Torii Paifang 3D Scene Backdrop (Reference Images 1 & 2) -->
+      <div class="absolute inset-0 bg-cover bg-center sm:bg-bottom bg-no-repeat pointer-events-none z-0" style="background-image: url('assets/cyber_gate_scene.jpg');"></div>
       
-      <!-- Horizontal Cyber Wall: Left Side with Blue Neon Pagoda Pillar & Vertical Signs -->
-      <aside class="cyber-wall-left hidden sm:flex">
-        <!-- Vertical Holographic Chinese Neon Sign -->
-        <div class="neon-chinese-sign neon-sign-red ml-4 sm:ml-6 mb-16 shadow-2xl">
-          <span>赛博·篝火</span>
-        </div>
-        <div class="neon-chinese-sign neon-sign-cyan ml-4 sm:ml-6 text-xs opacity-80">
-          <span>数码回忆</span>
-        </div>
+      <!-- Atmospheric Darkness & Vignette Gradients -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#0B0E17] via-transparent to-[#0B0E17]/85 pointer-events-none z-1"></div>
 
-        <!-- Flanking Pagoda Lantern Tower (Reference Image 2) -->
-        <div class="cyber-pillar-tower ml-auto mr-2">
-          <div class="cyber-pillar-roof"></div>
-          <div class="cyber-pillar-shaft">
-            <div class="cyber-pillar-glow-ring"></div>
-            <div class="cyber-pillar-glow-ring"></div>
-            <div class="cyber-pillar-glow-ring"></div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Horizontal Cyber Wall: Right Side with Blue Neon Pagoda Pillar & Vertical Signs -->
-      <aside class="cyber-wall-right hidden sm:flex">
-        <!-- Flanking Pagoda Lantern Tower (Reference Image 2) -->
-        <div class="cyber-pillar-tower mr-auto ml-2">
-          <div class="cyber-pillar-roof"></div>
-          <div class="cyber-pillar-shaft">
-            <div class="cyber-pillar-glow-ring"></div>
-            <div class="cyber-pillar-glow-ring"></div>
-            <div class="cyber-pillar-glow-ring"></div>
-          </div>
-        </div>
-
-        <!-- Vertical Holographic Chinese Neon Sign -->
-        <div class="neon-chinese-sign neon-sign-cyan mr-4 sm:mr-6 mb-16 shadow-2xl">
-          <span>魂灵之契</span>
-        </div>
-        <div class="neon-chinese-sign neon-sign-gold mr-4 sm:mr-6 text-xs opacity-80">
-          <span>永恒光影</span>
-        </div>
-      </aside>
-
-      <!-- Wet Reflective Stone Floor with Animated Ground Mist / Fog -->
+      <!-- Wet Floor Reflection Grid Overlay -->
       <div class="cyber-wet-floor">
         <div class="cyber-floor-grid"></div>
         <div class="cyber-ground-fog-layer"></div>
       </div>
 
+      <!-- Horizontal Cyber Wall: Left Side Vertical Holographic Signs -->
+      <aside class="cyber-wall-left hidden lg:flex notranslate" translate="no">
+        <div class="neon-chinese-sign neon-sign-red ml-6 mb-12 shadow-2xl">
+          <span class="notranslate" translate="no">赛博·篝火</span>
+        </div>
+        <div class="neon-chinese-sign neon-sign-cyan ml-6 text-xs opacity-85">
+          <span class="notranslate" translate="no">数码回忆</span>
+        </div>
+        <div class="cyber-pillar-tower ml-auto mr-2 opacity-60">
+          <div class="cyber-pillar-roof"></div>
+        </div>
+      </aside>
+
+      <!-- Horizontal Cyber Wall: Right Side Vertical Holographic Signs -->
+      <aside class="cyber-wall-right hidden lg:flex notranslate" translate="no">
+        <div class="cyber-pillar-tower mr-auto ml-2 opacity-60">
+          <div class="cyber-pillar-roof"></div>
+        </div>
+        <div class="neon-chinese-sign neon-sign-cyan mr-6 mb-12 shadow-2xl">
+          <span class="notranslate" translate="no">魂灵之契</span>
+        </div>
+        <div class="neon-chinese-sign neon-sign-gold mr-6 text-xs opacity-85">
+          <span class="notranslate" translate="no">永恒光影</span>
+        </div>
+      </aside>
+
       <!-- Top Header Title: Animated Cyberpunk Welcome Neon Typography -->
-      <header class="w-full max-w-4xl mx-auto pt-6 sm:pt-8 md:pt-10 px-4 text-center z-30 flex flex-col items-center">
+      <header class="w-full max-w-3xl mx-auto pt-5 sm:pt-7 px-4 text-center z-30 flex flex-col items-center notranslate" translate="no">
         <!-- Holographic Cyber Seal Badge -->
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#161a29]/90 border border-sunset-coral/50 shadow-[0_0_15px_rgba(255,90,95,0.4)] mb-3">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#10131c]/85 border border-sunset-coral/50 shadow-[0_0_18px_rgba(255,90,95,0.4)] mb-2 backdrop-blur-sm">
           <span class="w-2 h-2 rounded-full bg-sunset-coral animate-ping"></span>
-          <span class="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-sunset-coral uppercase">
+          <span class="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-sunset-coral uppercase notranslate" translate="no">
             ⛩️ DIGITAL SANCTUARY GATE // 篝火传送门
           </span>
         </div>
 
         <!-- Master Animated Welcome Heading (User Request) -->
-        <h1 class="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-white uppercase drop-shadow-[0_0_20px_rgba(255,90,95,0.85)] leading-tight">
+        <h1 class="font-display font-black text-2xl sm:text-4xl md:text-5xl tracking-tight text-white uppercase drop-shadow-[0_0_22px_rgba(255,90,95,0.9)] leading-tight notranslate" translate="no">
           WELCOME TO <span class="bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold bg-clip-text text-transparent underline decoration-sunset-coral/50 decoration-wavy">BONDFIRE</span>
         </h1>
 
         <!-- Cyberpunk Chinese Subtitle -->
-        <p class="font-mono text-xs sm:text-sm text-gray-300 mt-2 flex items-center justify-center gap-2">
-          <span class="text-amber-gold">「 踏入赛博篝火 · 开启真实回忆 」</span>
-          <span class="text-gray-500 hidden sm:inline">— Touch strings to part the veil —</span>
+        <p class="font-mono text-xs sm:text-sm text-gray-200 mt-1.5 flex items-center justify-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] notranslate" translate="no">
+          <span class="text-amber-gold font-bold">「 踏入赛博篝火 · 开启真实回忆 」</span>
+          <span class="text-gray-400 hidden sm:inline">— Brush strings to part the veil —</span>
         </p>
       </header>
 
-      <!-- Centerpiece: Grand Cyberpunk Torii / Paifang Gate (Reference Images 1 & 2) -->
-      <section class="cyber-torii-frame w-full px-2 my-auto" id="cyber-gate-portal-frame">
+      <!-- Centerpiece: Torii Portal Archway with Interactive Talisman String Curtain -->
+      <section class="cyber-torii-frame w-full px-2 my-auto flex flex-col items-center justify-center" id="cyber-gate-portal-frame">
         
-        <!-- Multi-tier Sweeping Pagoda Roof (Top Tier) -->
-        <div class="cyber-roof-tier-top mx-auto relative flex justify-center items-end">
-          <svg viewBox="0 0 500 60" class="w-full h-full overflow-visible" fill="none">
-            <!-- Sweeping curved roof ridge -->
-            <path d="M 10 50 Q 150 15 250 12 Q 350 15 490 50" stroke="#ff5a5f" stroke-width="4" filter="drop-shadow(0 0 10px #ff5a5f)" stroke-linecap="round"/>
-            <path d="M 40 46 Q 160 22 250 18 Q 340 22 460 46" stroke="#ffb703" stroke-width="2" opacity="0.85"/>
-            <!-- Flying Eaves Dragon Tips -->
-            <path d="M 10 50 C -10 40 5 15 25 15" stroke="#ff5a5f" stroke-width="3" filter="drop-shadow(0 0 8px #ff5a5f)"/>
-            <path d="M 490 50 C 510 40 495 15 475 15" stroke="#ff5a5f" stroke-width="3" filter="drop-shadow(0 0 8px #ff5a5f)"/>
-          </svg>
-        </div>
-
-        <!-- Multi-tier Sweeping Pagoda Roof (Main Middle Tier with Dougong brackets) -->
-        <div class="cyber-roof-tier-main mx-auto relative flex justify-center items-end">
-          <svg viewBox="0 0 700 70" class="w-full h-full overflow-visible" fill="none">
-            <!-- Main wide sweeping curved roof ridge -->
-            <path d="M 10 58 Q 200 12 350 10 Q 500 12 690 58" stroke="#ff5a5f" stroke-width="5" filter="drop-shadow(0 0 14px #ff5a5f)" stroke-linecap="round"/>
-            <path d="M 50 52 Q 220 20 350 16 Q 480 20 650 52" stroke="#ffdea9" stroke-width="2.5" opacity="0.9"/>
-            <!-- Sweeping Eaves Up-turns -->
-            <path d="M 10 58 C -15 45 5 10 35 12" stroke="#ff5a5f" stroke-width="4" filter="drop-shadow(0 0 10px #ff5a5f)"/>
-            <path d="M 690 58 C 715 45 695 10 665 12" stroke="#ff5a5f" stroke-width="4" filter="drop-shadow(0 0 10px #ff5a5f)"/>
-            <!-- Central Pagoda Crest / Jewel -->
-            <circle cx="350" cy="8" r="8" fill="#ffb703" filter="drop-shadow(0 0 10px #ffb703)"/>
-          </svg>
-        </div>
-
-        <!-- Center Glowing Signboard -->
-        <div class="relative -mt-3 mb-1 px-5 py-1.5 rounded-lg bg-[#0E121E]/95 border-2 border-sunset-coral shadow-[0_0_20px_rgba(255,90,95,0.8)] z-30 flex items-center gap-2">
+        <!-- Center Glowing Signboard over the gate portal -->
+        <div class="relative mb-2 px-5 py-1.5 rounded-lg bg-[#0E121E]/95 border border-sunset-coral shadow-[0_0_20px_rgba(255,90,95,0.8)] z-30 flex items-center gap-2 notranslate" translate="no">
           <span class="text-sunset-coral font-bold text-xs sm:text-sm tracking-widest font-mono">⛩️ 篝火神殿 // BONDFIRE ⛩️</span>
         </div>
 
@@ -170,7 +132,7 @@ export function renderGateScreen() {
             <!-- Brass Mounting Pole -->
             <div class="cyber-curtain-pole">
               <div class="cyber-curtain-pole-finial"></div>
-              <div class="text-[9px] font-mono font-bold tracking-widest text-amber-gold uppercase opacity-80">
+              <div class="text-[9px] font-mono font-bold tracking-widest text-amber-gold uppercase opacity-90 notranslate" translate="no">
                 · · · TALISMAN VEIL · · ·
               </div>
               <div class="cyber-curtain-pole-finial"></div>
@@ -187,7 +149,7 @@ export function renderGateScreen() {
             <div class="brazier-cauldron">
               <div class="brazier-flame" id="brazier-flame-core"></div>
             </div>
-            <div class="mt-1 px-1.5 py-0.5 rounded bg-black/60 border border-sunset-coral/40 text-[8px] font-mono text-sunset-coral uppercase tracking-wider">
+            <div class="mt-1 px-1.5 py-0.5 rounded bg-black/70 border border-sunset-coral/40 text-[8px] font-mono text-sunset-coral uppercase tracking-wider notranslate" translate="no">
               龙火 🔥
             </div>
           </div>
@@ -198,7 +160,7 @@ export function renderGateScreen() {
               <div class="gong-ripple" id="gong-ripple-ring"></div>
               <span class="material-symbols-outlined text-[20px] text-amber-gold drop-shadow-[0_0_6px_#fff]">notifications_active</span>
             </div>
-            <div class="mt-1 px-1.5 py-0.5 rounded bg-black/60 border border-amber-gold/40 text-[8px] font-mono text-amber-gold uppercase tracking-wider">
+            <div class="mt-1 px-1.5 py-0.5 rounded bg-black/70 border border-amber-gold/40 text-[8px] font-mono text-amber-gold uppercase tracking-wider notranslate" translate="no">
               祈愿钟 🔔
             </div>
           </div>
@@ -208,16 +170,16 @@ export function renderGateScreen() {
       </section>
 
       <!-- Bottom Enter Prompt & Action Bar -->
-      <footer class="w-full max-w-lg mx-auto pb-6 sm:pb-8 px-4 text-center z-30 flex flex-col items-center">
+      <footer class="w-full max-w-lg mx-auto pb-5 sm:pb-7 px-4 text-center z-30 flex flex-col items-center notranslate" translate="no">
         <!-- Main Enter Button -->
-        <button id="btn-enter-gate" class="relative group overflow-hidden px-7 sm:px-10 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-[#0B0E17] font-black text-sm sm:text-base tracking-wide shadow-[0_0_35px_rgba(255,90,95,0.75)] hover:shadow-[0_0_55px_rgba(255,183,3,0.9)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 cursor-pointer">
+        <button id="btn-enter-gate" class="relative group overflow-hidden px-7 sm:px-10 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-[#0B0E17] font-black text-sm sm:text-base tracking-wide shadow-[0_0_35px_rgba(255,90,95,0.85)] hover:shadow-[0_0_55px_rgba(255,183,3,0.95)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 cursor-pointer">
           <span class="material-symbols-outlined text-[22px] group-hover:rotate-45 transition-transform duration-300">vpn_key</span>
-          <span>踏入篝火 // ENTER BONDFIRE</span>
+          <span class="notranslate" translate="no">踏入篝火 // ENTER BONDFIRE</span>
           <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
 
         <!-- Hint -->
-        <span class="text-[11px] text-gray-400 font-mono mt-2 tracking-wide">
+        <span class="text-[11px] text-gray-300 font-mono mt-2 tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] notranslate" translate="no">
           Click the gate, strings, brazier or enter button to proceed
         </span>
       </footer>
@@ -239,6 +201,12 @@ export function bindGateScreenEvents() {
 
   if (!container) return;
 
+  // Temporarily hide the floating Jukebox container on the gate screen to prevent any overlap
+  const jukebox = document.getElementById('spotify-jukebox-container');
+  if (jukebox) {
+    jukebox.classList.add('hidden');
+  }
+
   // Track if entering sequence has been triggered
   let hasEntered = false;
 
@@ -252,14 +220,19 @@ export function bindGateScreenEvents() {
     // 2. Add visual warp sequence classes
     container.classList.add('is-entering');
 
-    // 3. Mark session flag so navigating between games won't re-trap user
+    // 3. Restore jukebox visibility for the rest of the application
+    if (jukebox) {
+      jukebox.classList.remove('hidden');
+    }
+
+    // 4. Mark session flag so navigating between games won't re-trap user
     if (typeof sessionStorage !== 'undefined') {
       try {
         sessionStorage.setItem('bondfire_gate_entered', 'true');
       } catch (_) {}
     }
 
-    // 4. Smoothly transition to HOME view
+    // 5. Smoothly transition to HOME view
     setTimeout(() => {
       store.setState({ currentView: 'HOME' });
       if (typeof window !== 'undefined') {
