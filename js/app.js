@@ -92,7 +92,8 @@ class BondfireApp {
       this.handleHashChange();
     });
 
-    // 7. Initial Route Resolution
+    // 7. Initial Route Resolution (Gate is always first front door when opening the website)
+    this.isInitialBoot = true;
     this.handleHashChange();
   }
 
@@ -147,17 +148,32 @@ class BondfireApp {
     const resolvedHash = aliasMap[hash] || hash;
     const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE'];
     
-    // Check if user has already passed through the Gate in this session
-    const hasEnteredGate = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('bondfire_gate_entered') === 'true');
-    const defaultLandingView = hasEnteredGate ? 'HOME' : 'GATE';
+    // Check if this is the initial boot of opening the website
+    const isBoot = this.isInitialBoot;
+    this.isInitialBoot = false;
 
     let targetView;
-    if (resolvedHash === 'GATE') {
-      targetView = 'GATE';
-    } else if (hash === '' || hash === '#' || !rawHash) {
-      targetView = defaultLandingView;
+    if (isBoot) {
+      // Whenever someone opens / clicks on this website, it ALWAYS first takes them to the Torii gate page!
+      // (Unless joining an active room code via invite link)
+      if (roomCodeFromUrl && roomCodeFromUrl.length >= 3) {
+        targetView = resolvedHash === 'COUPLE' ? 'COUPLE' : 'LOBBY';
+      } else {
+        targetView = 'GATE';
+        if (typeof window !== 'undefined' && window.location.hash !== '#/GATE') {
+          try {
+            window.history.replaceState(null, '', '#/GATE');
+          } catch (_) {}
+        }
+      }
     } else {
-      targetView = validViews.includes(resolvedHash) ? resolvedHash : defaultLandingView;
+      if (resolvedHash === 'GATE') {
+        targetView = 'GATE';
+      } else if (hash === '' || hash === '#' || !rawHash) {
+        targetView = 'HOME';
+      } else {
+        targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
+      }
     }
 
     // If an invite code was present, automatically join that room!

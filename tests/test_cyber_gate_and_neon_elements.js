@@ -56,8 +56,8 @@ assert(appCode.includes("'TORII': 'GATE'"), 'app.js must alias TORII to GATE');
 assert(appCode.includes("case 'GATE':"), 'app.js must handle case GATE in render switch');
 assert(appCode.includes('renderGateScreen()'), 'app.js must call renderGateScreen()');
 assert(appCode.includes('bindGateScreenEvents()'), 'app.js must call bindGateScreenEvents()');
-assert(appCode.includes('bondfire_gate_entered'), 'app.js must check bondfire_gate_entered for initial landing');
-console.log('  ✅ PASS: app.js routes GATE view and defaults first-time visitors to the Cyber Gate');
+assert(appCode.includes("targetView = 'GATE'"), 'app.js must default targetView = GATE whenever opening the website');
+console.log('  ✅ PASS: app.js routes GATE view and defaults visitors to the Cyber Gate on opening the site');
 
 // 6. Validate header.js navbar is clean: NO Torii gate emoji, NO gate buttons in navbar
 const headerCode = fs.readFileSync(path.join(rootDir, 'js/components/header.js'), 'utf-8');
