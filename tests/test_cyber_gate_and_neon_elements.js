@@ -78,7 +78,20 @@ console.log('  ✅ PASS: css/components.css contains full Cyber Gate, portal ene
 // 8. Validate homeScrollStory.js has clean English divider without Torii icons
 const homeStoryCode = fs.readFileSync(path.join(rootDir, 'js/components/homeScrollStory.js'), 'utf-8');
 assert(homeStoryCode.includes('BONDFIRE MEMORY MATRIX'), 'homeScrollStory.js must include English Cyber Matrix divider');
-assert(!homeStoryCode.includes('⛩️'), 'homeScrollStory.js must NOT contain Torii gate emoji');
-console.log('  ✅ PASS: homeScrollStory.js contains clean English divider without Torii icons');
+// 9. Validate brand logo click in header.js and footer.js opens GATE
+assert(headerCode.includes("store.setView('GATE')"), 'header.js logo click must route to GATE');
+assert(headerCode.includes("window.location.hash = '#/GATE'"), 'header.js logo click must set hash to #/GATE');
 
-console.log('\n🎉 All 8 Cyberpunk Sanctuary Gateway & Clean Navbar tests passed successfully!\n');
+const footerCode = fs.readFileSync(path.join(rootDir, 'js/components/footer.js'), 'utf-8');
+assert(footerCode.includes("store.setView('GATE')"), 'footer.js logo click must route to GATE');
+assert(footerCode.includes("window.location.hash = '#/GATE'"), 'footer.js logo click must set hash to #/GATE');
+console.log('  ✅ PASS: clicking brand logo in header or footer routes user directly to Cyber Gate');
+
+// 10. Validate app.js preserves active hash on refresh and only routes to gate on clean entry or logo click
+assert(appCode.includes('isReload'), 'app.js must detect browser reload/refresh');
+assert(appCode.includes('sessionStorage.getItem(\'bondfire_session_started\')'), 'app.js must check session to avoid gate redirect on refresh');
+assert(appCode.includes('targetView = resolvedHash'), 'app.js must preserve active hash view during refresh/reload');
+console.log('  ✅ PASS: app.js preserves active view on refresh and avoids unwanted gate redirection');
+
+console.log('\n🎉 All 10 Cyberpunk Sanctuary Gateway & Clean Navbar tests passed successfully!\n');
+

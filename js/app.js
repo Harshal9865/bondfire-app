@@ -158,17 +158,60 @@ class BondfireApp {
     const resolvedHash = aliasMap[hash] || hash;
     const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE', 'RAJA_MANTRI', 'BOLLYWOOD', 'TAMBOLA'];
     
+    // Check if the current page load is a browser reload/refresh
+    const isReload = (typeof performance !== 'undefined' && typeof performance.getEntriesByType === 'function')
+      ? performance.getEntriesByType('navigation')[0]?.type === 'reload'
+      : (typeof performance !== 'undefined' && performance.navigation)
+        ? performance.navigation.type === 1
+        : false;
+
+    // Check if user has an active session in this browser tab
+    let hasSession = false;
+    try {
+      hasSession = !!sessionStorage.getItem('bondfire_session_started');
+    } catch (_) {}
+
     // Check if this is the initial boot of opening the website
     const isBoot = this.isInitialBoot;
     this.isInitialBoot = false;
 
     let targetView;
     if (isBoot) {
-      // Whenever someone opens / clicks on this website, it ALWAYS first takes them to the Torii gate page!
-      // (Unless joining an active room code via invite link)
+      try {
+        sessionStorage.setItem('bondfire_session_started', 'true');
+      } catch (_) {}
+
+      // Case A: Opening via room invite link (?join=CODE or ?room=CODE)
       if (roomCodeFromUrl && roomCodeFromUrl.length >= 3) {
         targetView = resolvedHash === 'COUPLE' ? 'COUPLE' : 'LOBBY';
-      } else {
+      }
+      // Case B: Explicitly requested GATE view (e.g. #/GATE)
+      else if (resolvedHash === 'GATE') {
+        targetView = 'GATE';
+        if (typeof window !== 'undefined' && window.location.hash !== '#/GATE') {
+          try { window.history.replaceState(null, '', '#/GATE'); } catch (_) {}
+        }
+      }
+      // Case C: Page Refresh / Reload while browsing
+      // If user refreshed the browser and has an active view, KEEP them on that view!
+      else if ((isReload || hasSession) && rawHash && validViews.includes(resolvedHash)) {
+        targetView = resolvedHash;
+      }
+      // Case D: Opening the website from link / clean visit for the first time
+      else if (!isReload && (!hasSession || !rawHash || hash === '' || hash === '#')) {
+        targetView = 'GATE';
+        if (typeof window !== 'undefined' && window.location.hash !== '#/GATE') {
+          try {
+            window.history.replaceState(null, '', '#/GATE');
+          } catch (_) {}
+        }
+      }
+      // Case E: Direct link with a specific valid view
+      else if (validViews.includes(resolvedHash)) {
+        targetView = resolvedHash;
+      }
+      // Fallback: Default to GATE
+      else {
         targetView = 'GATE';
         if (typeof window !== 'undefined' && window.location.hash !== '#/GATE') {
           try {

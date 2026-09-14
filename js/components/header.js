@@ -396,12 +396,13 @@ export function renderHeader() {
 }
 
 export function bindHeaderEvents() {
-  // Brand Logo Click -> Go Home
+  // Brand Logo Click -> Open Cyber Gate Portal
   const logo = document.getElementById('nav-brand-logo');
   if (logo) {
     logo.addEventListener('click', () => {
       audio.playClick();
-      store.setView('HERO');
+      store.setView('GATE');
+      window.location.hash = '#/GATE';
     });
   }
 

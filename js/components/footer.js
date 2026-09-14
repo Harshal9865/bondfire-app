@@ -235,7 +235,8 @@ export function bindFooterEvents() {
   if (footerLogo) {
     footerLogo.addEventListener('click', () => {
       audio.playClick();
-      store.setView('HERO');
+      store.setView('GATE');
+      window.location.hash = '#/GATE';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
