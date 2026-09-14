@@ -99,35 +99,43 @@ assert(rajaMantriCode.includes('DHOKHA'), 'Must penalize wrong accusation and st
 assert(rajaMantriCode.includes('scores'), 'Must maintain multi-round royal court leaderboard');
 console.log('  ✅ PASS: rajaMantriGame.js implements 100% authentic Raja Mantri Chor Sipahi rules and fanfare');
 
-// 7. Check bollywoodGame.js for Bollywood Antakshari & Filmi Masala
-const bollywoodPath = path.join(rootDir, 'js/components/bollywoodGame.js');
-const bollywoodCode = fs.readFileSync(bollywoodPath, 'utf8');
+// 7. Check tambolaGame.js for authentic Desi Tambola / Indian Housie
+const tambolaPath = path.join(rootDir, 'js/components/tambolaGame.js');
+const tambolaCode = fs.readFileSync(tambolaPath, 'utf8');
 
-assert(bollywoodCode.includes('renderBollywoodGame'), 'bollywoodGame.js must export renderBollywoodGame');
-assert(bollywoodCode.includes('bindBollywoodEvents'), 'bollywoodGame.js must export bindBollywoodEvents');
-assert(bollywoodCode.includes('Mogambo khush hua'), 'Must include iconic dialogues');
-assert(bollywoodCode.includes('ANTAKSHARI'), 'Must include Antakshari letter chain');
-assert(bollywoodCode.includes('bolly-timer-display'), 'Must include shot clock timer');
-console.log('  ✅ PASS: bollywoodGame.js implements Bollywood Antakshari letter relay and dialogue decode');
+assert(tambolaCode.includes('renderTambolaGame'), 'tambolaGame.js must export renderTambolaGame');
+assert(tambolaCode.includes('bindTambolaEvents'), 'tambolaGame.js must export bindTambolaEvents');
+assert(tambolaCode.includes('TAMBOLA_NICKNAMES'), 'Must include authentic Hindi & English rhymes');
+assert(tambolaCode.includes('generateTambolaTicket'), 'Must generate 3x9 authentic tickets (15 numbers)');
+assert(tambolaCode.includes('drawNextNumber'), 'Must include 1-90 token caller machine');
+assert(tambolaCode.includes('Jaldi 5') || tambolaCode.includes('jaldi5'), 'Must support Jaldi 5 claim');
+assert(tambolaCode.includes('Full House') || tambolaCode.includes('fullHouse'), 'Must support Full House claim');
+console.log('  ✅ PASS: tambolaGame.js implements authentic 1-90 caller machine, 3x9 tickets, and winning claims');
 
-// 8. Check arcadeScreen.js for spotlighting Raja Mantri and Bollywood
+// 8. Check arcadeScreen.js for 6 complete party games and restored original colors
 const arcadePath = path.join(rootDir, 'js/components/arcadeScreen.js');
 const arcadeCode = fs.readFileSync(arcadePath, 'utf8');
 
 assert(arcadeCode.includes('arcade-launch-raja'), 'arcadeScreen.js must have launch button for Raja Mantri');
-assert(arcadeCode.includes('arcade-launch-bollywood'), 'arcadeScreen.js must have launch button for Bollywood Antakshari');
-assert(arcadeCode.includes('RAJA_MANTRI'), 'arcadeScreen.js must navigate to RAJA_MANTRI view');
-console.log('  ✅ PASS: arcadeScreen.js spotlights Raja Mantri Chor Sipahi and Bollywood Antakshari');
+assert(arcadeCode.includes('arcade-launch-tambola'), 'arcadeScreen.js must have launch button for Desi Tambola');
+assert(arcadeCode.includes('arcade-launch-bottle'), 'arcadeScreen.js must retain Spin the Bottle');
+assert(arcadeCode.includes('arcade-launch-nhie'), 'arcadeScreen.js must retain Never Have I Ever');
+assert(arcadeCode.includes('arcade-launch-mlt'), 'arcadeScreen.js must retain Most Likely To');
+assert(arcadeCode.includes('arcade-launch-watch'), 'arcadeScreen.js must retain Watch Party');
+assert(arcadeCode.includes('border-sunset-coral'), 'Original sunset-coral color preserved for Bottle');
+assert(arcadeCode.includes('border-duo-rose'), 'Original duo-rose color preserved for NHIE');
+assert(arcadeCode.includes('border-amber-gold'), 'Original amber-gold color preserved for MLT');
+console.log('  ✅ PASS: arcadeScreen.js contains 6 complete party games with original color palettes restored');
 
 // 9. Check app.js for routing support
 const appPath = path.join(rootDir, 'js/app.js');
 const appCode = fs.readFileSync(appPath, 'utf8');
 
 assert(appCode.includes('renderRajaMantriGame'), 'app.js must import renderRajaMantriGame');
-assert(appCode.includes('renderBollywoodGame'), 'app.js must import renderBollywoodGame');
-assert(appCode.includes('case \'RAJA_MANTRI\':'), 'app.js must route RAJA_MANTRI');
-assert(appCode.includes('case \'BOLLYWOOD\':'), 'app.js must route BOLLYWOOD');
-console.log('  ✅ PASS: app.js routes all new Indian arcade games and keeps existing routing solid');
+assert(appCode.includes('renderTambolaGame'), 'app.js must import renderTambolaGame');
+assert(appCode.includes("case 'RAJA_MANTRI':"), 'app.js must route RAJA_MANTRI');
+assert(appCode.includes("case 'TAMBOLA':") || appCode.includes("case 'HOUSIE':"), 'app.js must route TAMBOLA / HOUSIE');
+console.log('  ✅ PASS: app.js routes all 6 arcade games and keeps existing routing solid');
 
 // 10. Check audioSynth.js for new sound synthesizers
 const audioPath = path.join(rootDir, 'js/visuals/audioSynth.js');

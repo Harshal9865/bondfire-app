@@ -83,8 +83,9 @@ export class WatchPartyPlayer {
           <!-- Synchronized Pause & Predict Banner Overlay -->
           <div id="predict-overlay" class="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-[#0B141A]/95 backdrop-blur-xl border border-amber-gold/50 shadow-2xl hidden flex-col gap-2.5 z-30 animate-scaleUp">
             <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold uppercase">
-                ⏱️ PAUSE & PREDICT
+              <span class="px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold uppercase flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">timer</span>
+                <span>PAUSE & PREDICT</span>
               </span>
               <span class="text-xs text-mint-green font-mono font-bold" id="predict-timer">15s</span>
             </div>

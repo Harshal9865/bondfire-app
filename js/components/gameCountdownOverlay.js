@@ -28,9 +28,38 @@ export function getExampleForMode(modeKey, customTitle) {
   const normalized = (modeKey || 'SQUAD').toUpperCase();
 
   switch (normalized) {
+    case 'RAJA_MANTRI':
+      return {
+        badge: 'Raja Mantri Chor Sipahi · Imperial Chits',
+        title: 'How Raja Mantri Works',
+        summary: 'Secret royal chits are shuffled: Raja (1000 pts), Mantri (800 pts), Chor (0 pts), Sipahi (500 pts). The Mantri must deduce and identify the Chor!',
+        sampleCard: {
+          tag: 'Royal Court · Royal Dilemma',
+          question: 'Mantri ji, inspect the room campers! Who is the Chor hiding among us?',
+          options: [p1, p2, p3, 'Sneaky Camper'],
+          correctIndex: 0,
+        },
+        scoringHint: 'Correct identification awards the Mantri 800 pts. A wrong guess transfers the bounty to the Chor!',
+      };
+
+    case 'TAMBOLA':
+    case 'HOUSIE':
+      return {
+        badge: 'Desi Tambola · Indian Housie 1-90',
+        title: 'How Desi Tambola Works',
+        summary: 'Numbers 1 to 90 are called live with authentic Hindi & English rhymes. Tap your 3x9 ticket numbers to daub them and claim Early 5, Lines, Corners, or Full House!',
+        sampleCard: {
+          tag: 'Live Token Caller · Next Draw',
+          question: 'Caller shouts: "Sweet Sixteen · Sone Pe Suhaga · Number 16!" Daub your ticket!',
+          options: ['Mark Number 16', 'Claim Jaldi 5', 'Claim Corners', 'Claim Full House'],
+          correctIndex: 0,
+        },
+        scoringHint: 'Be the first to claim authentic winning combinations to claim the room jackpot!',
+      };
+
     case 'RED_FLAG_COURT':
       return {
-        badge: '⚖️ The Red Flag Courtroom · Party Trial',
+        badge: 'The Red Flag Courtroom · Party Trial',
         title: 'How The Courtroom Works',
         summary: 'A petty crime or red flag is brought to the bench. The jury hears the exhibit, examines the defendant, and casts a verdict: Guilty, Innocent, or Community Service!',
         sampleCard: {
@@ -39,12 +68,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: ['Guilty: 20 Squats / Pushups', 'Innocent: There was 1 drop left', 'Sentence: Make Chai For All', 'Mistrial: We all did this'],
           correctIndex: 0,
         },
-        scoringHint: '⚖️ Majority vote passes the binding squad sentence and earns 100+ Sparks!',
+        scoringHint: 'Majority vote passes the binding squad sentence and earns 100+ Sparks!',
       };
 
     case 'CONFESSION_VAULT':
       return {
-        badge: '🕵️ Anonymous Confession Vault · Secret Whodunit',
+        badge: 'Anonymous Confession Vault · Secret Whodunit',
         title: 'How Confession Vault Works',
         summary: 'A spicy, funny, or chaotic secret appears on all screens completely anonymously. Everyone must guess which squad camper wrote it!',
         sampleCard: {
@@ -53,12 +82,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: [p1, p2, p3, 'A Mysterious Guest'],
           correctIndex: 1,
         },
-        scoringHint: '🕵️ Guess the real culprit! Accurate detective votes earn 150 Sparks.',
+        scoringHint: 'Guess the real culprit! Accurate detective votes earn 150 Sparks.',
       };
 
     case 'HOT_SEAT':
       return {
-        badge: '🎯 Hot Seat Roulette · Deep & Unfiltered',
+        badge: 'Hot Seat Roulette · Deep & Unfiltered',
         title: 'How Hot Seat Roulette Works',
         summary: 'The wheel picks one camper for the hot seat. The squad fires an unfiltered dilemma. The hot seat camper has 30 seconds to answer or take a penalty!',
         sampleCard: {
@@ -67,12 +96,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: ['The Over-Confident Architect', 'The One Who Gets Tired in 5 Mins', 'The Group Chat Lurker', 'Take a Sip / Pass'],
           correctIndex: 0,
         },
-        scoringHint: '🎯 30 seconds on the hot seat. No dodging, 100% real bonding!',
+        scoringHint: '30 seconds on the hot seat. No dodging, 100% real bonding!',
       };
 
     case 'MOST_LIKELY_TO':
       return {
-        badge: '🎭 Most Likely To... · Savage Ballot',
+        badge: 'Most Likely To... · Savage Ballot',
         title: 'How Most Likely To Works',
         summary: 'A wild superlative appears on all screens simultaneously. Everyone votes for the squad member who fits the description best!',
         sampleCard: {
@@ -81,12 +110,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: [p1, p2, p3, 'The Whole Squad'],
           correctIndex: 0,
         },
-        scoringHint: '⚡ Fastest matching votes earn combo multiplier fire and Sparks!',
+        scoringHint: 'Fastest matching votes earn combo multiplier fire and Sparks!',
       };
 
     case 'INSIDE_JOKES':
       return {
-        badge: '🎙️ Inside Joke Mystery · Vault Flashback',
+        badge: 'Inside Joke Mystery · Vault Flashback',
         title: 'How Inside Joke Mystery Works',
         summary: 'Memories, quotes, and funny inside jokes from your shared vault are turned into playable trivia rounds with real photos and voice notes.',
         sampleCard: {
@@ -95,12 +124,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: [p1, p2, p3, 'Nobody Admits It'],
           correctIndex: 0,
         },
-        scoringHint: '🎙️ Guess the author or the trip date to unlock custom yearbook superlatives!',
+        scoringHint: 'Guess the author or the trip date to unlock custom yearbook superlatives!',
       };
 
     case 'BOTTLE':
       return {
-        badge: '🍾 Spin The Bottle · Party Arcade',
+        badge: 'Spin The Bottle · Party Arcade',
         title: 'How Spin The Bottle Works',
         summary: 'A digital 3D retro bottle spins with real physics synced across all phones and laptops. Whoever the bottle points to faces Truth, Dare, or Roast!',
         sampleCard: {
@@ -109,27 +138,27 @@ export function getExampleForMode(modeKey, customTitle) {
           options: ['Confess your most embarrassing search query', 'Do your best 10s impression of the host', 'Show your last 3 camera roll photos'],
           correctIndex: 0,
         },
-        scoringHint: '🍾 Real-time synced physics across all devices. Zero bots, pure laughter!',
+        scoringHint: 'Real-time synced physics across all devices. Zero bots, pure laughter!',
       };
 
     case 'NHIE':
       return {
-        badge: '🍷 Never Have I Ever · 5 Fingers Up',
+        badge: 'Never Have I Ever · 5 Fingers Up',
         title: 'How Never Have I Ever Works',
         summary: 'Everyone holds up 5 fingers. When a prompt applies to you, tap \'I Have\' to drop a finger and take a sip! Last camper standing wins.',
         sampleCard: {
           tag: 'Sample Statement · 5 Fingers Up',
           question: 'Never Have I Ever re-gifted a birthday present to someone in this very friend group.',
-          options: ['I Have (Drop 1 Finger 🍷)', 'Never In My Life 😇'],
+          options: ['I Have (Drop 1 Finger)', 'Never In My Life'],
           correctIndex: 0,
         },
-        scoringHint: '🍷 Clean, unfiltered, synced live across all phones in the room.',
+        scoringHint: 'Clean, unfiltered, synced live across all phones in the room.',
       };
 
     case 'US':
     case 'COUPLE':
       return {
-        badge: '❤️ Us Mode · Couples Date Night',
+        badge: 'Us Mode · Couples Date Night',
         title: 'How Couples Date Night Works',
         summary: 'Answer personalized questions about your relationship lore. Lock in your choices privately to see if your answers match when revealed!',
         sampleCard: {
@@ -138,12 +167,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: [p1, p2],
           correctIndex: 1,
         },
-        scoringHint: '❤️ Matching answers unlock Compatibility Sparks and unseal secret vault notes!',
+        scoringHint: 'Matching answers unlock Compatibility Sparks and unseal secret vault notes!',
       };
 
     case 'SOLO':
       return {
-        badge: '🏆 Solo Mode · Memory Quest',
+        badge: 'Solo Mode · Memory Quest',
         title: 'How Solo Reflection Works',
         summary: 'Journey through your personal memory archives, past adventures, and daily reflection prompts at your own pace.',
         sampleCard: {
@@ -152,12 +181,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: ['Midnight Road Trip', 'Surprise Concert', 'New Career Pivot', 'Random Weekend Stay'],
           correctIndex: 0,
         },
-        scoringHint: '🏆 Complete daily prompts to level up your Citizen tier and unlock custom yearbook covers!',
+        scoringHint: 'Complete daily prompts to level up your Citizen tier and unlock custom yearbook covers!',
       };
 
     case 'ARCADE':
       return {
-        badge: '🕹️ Retro Pixel Glade · Arcade Party',
+        badge: 'Retro Pixel Glade · Arcade Party',
         title: 'How Pixel Arcade Works',
         summary: 'Multiplayer party spinners, rapid buzzers, and retro mini-games synced with zero latency across all devices.',
         sampleCard: {
@@ -166,12 +195,12 @@ export function getExampleForMode(modeKey, customTitle) {
           options: ['Buzzer 1 (Ready)', 'Buzzer 2 (Locked In)'],
           correctIndex: 0,
         },
-        scoringHint: '🎉 Tap the buzzer first to win bonus combo multipliers!',
+        scoringHint: 'Tap the buzzer first to win bonus combo multipliers!',
       };
 
     default:
       return {
-        badge: '🔥 Squad Party Mode · Real-time Multiplayer',
+        badge: 'Squad Party Mode · Real-time Multiplayer',
         title: customTitle || 'How Squad Games Work',
         summary: 'Questions and dilemma cards appear on all connected screens at the exact same moment. Lock in your choice before the timer expires!',
         sampleCard: {
@@ -180,7 +209,7 @@ export function getExampleForMode(modeKey, customTitle) {
           options: [p1, p2, p3, 'The Whole Squad'],
           correctIndex: 0,
         },
-        scoringHint: '⚡ Fastest matching votes earn 100+ Sparks and combo multiplier fire!',
+        scoringHint: 'Fastest matching votes earn 100+ Sparks and combo multiplier fire!',
       };
   }
 }

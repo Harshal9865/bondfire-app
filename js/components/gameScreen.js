@@ -152,7 +152,7 @@ export function renderGameScreen() {
 
         <!-- Center: Split-Flap Countdown Timer -->
         <div class="split-flap-container shadow-glow-amber" title="Mechanical Split-Flap Countdown">
-          <span class="text-[12px] mr-1">⏱️</span>
+          <span class="material-symbols-outlined text-[15px] text-amber-gold mr-1">timer</span>
           <div class="split-flap-digit" id="game-flap-m">0</div>
           <span class="font-mono text-amber-gold font-bold">:</span>
           <div class="split-flap-digit" id="game-flap-s1">${Math.floor(game.timeRemaining / 10)}</div>

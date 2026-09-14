@@ -152,10 +152,22 @@ export function renderSoloScreen() {
             <!-- Mood Selector -->
             <div class="flex items-center justify-between flex-wrap gap-2 pt-1">
               <div class="flex items-center gap-1.5" id="solo-mood-selector">
-                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-amber-gold/20 text-amber-gold border-amber-gold" data-mood="Fun">😄 Fun</button>
-                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-mood="Peaceful">🌿 Peaceful</button>
-                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-mood="Grateful">✨ Grateful</button>
-                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border" data-mood="Milestone">🎯 Milestone</button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-amber-gold/20 text-amber-gold border-amber-gold flex items-center gap-1" data-mood="Fun">
+                  <span class="material-symbols-outlined text-[14px]">sentiment_very_satisfied</span>
+                  <span>Fun</span>
+                </button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border flex items-center gap-1" data-mood="Peaceful">
+                  <span class="material-symbols-outlined text-[14px]">spa</span>
+                  <span>Peaceful</span>
+                </button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border flex items-center gap-1" data-mood="Grateful">
+                  <span class="material-symbols-outlined text-[14px]">volunteer_activism</span>
+                  <span>Grateful</span>
+                </button>
+                <button class="mood-pill px-3 py-1 rounded-full text-xs font-bold border transition-all bg-surface-bright text-gray-400 border-border flex items-center gap-1" data-mood="Milestone">
+                  <span class="material-symbols-outlined text-[14px]">flag</span>
+                  <span>Milestone</span>
+                </button>
               </div>
 
               <button id="btn-save-solo-reflection" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral text-canvas font-bold text-xs shadow-glow-amber active:scale-95 transition-all flex items-center gap-1.5">

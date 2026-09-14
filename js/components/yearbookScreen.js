@@ -44,13 +44,13 @@ export function renderYearbookScreen() {
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold tracking-widest uppercase mb-3">
             <span class="material-symbols-outlined text-[15px]">auto_stories</span>
-            <span>GENERATED PHOTOBOOK STUDIO // 100% REAL MEMORIES</span>
+            <span>SQUAD PHOTOBOOK STUDIO</span>
           </div>
           <h1 class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             ${albumTitle}
           </h1>
           <p class="text-xs sm:text-sm text-gray-400 mt-1 font-mono">
-            ${memories.length} Photos Assembled · Archival 240GSM Luster · Write stories &amp; stamp memories
+            ${memories.length} photos curated · Double-page 3D layflat &amp; polaroid wall
           </p>
         </div>
         
@@ -236,16 +236,47 @@ function renderUploadOnboarding(state) {
       <div class="text-center mb-8">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold tracking-widest uppercase mb-4">
           <span class="material-symbols-outlined text-[16px]">auto_stories</span>
-          <span>PHOTOBOOK STUDIO // 100% USER GENERATED</span>
+          <span>SQUAD PHOTOBOOK STUDIO</span>
         </div>
         
         <h1 class="font-display text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
-          Upload Photos to Generate Your Photobook
+          Create Your Squad Photobook
         </h1>
         
         <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto font-sans leading-relaxed">
-          No hardcoded mockups. Select photos from your device — Bondfire will automatically arrange your 3D layflat spreads, polaroid wall, and let you write stories for every memory.
+          Select photos from your device. Bondfire automatically curates them into an elegant 3D layflat album and polaroid pinboard, ready for your stories and keepsakes.
         </p>
+
+        <!-- 3-Step Simple Flow Guide -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto mt-6 text-left">
+          <div class="p-3 rounded-2xl bg-surface border border-border/80 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-gold/15 text-amber-gold border border-amber-gold/30 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">add_photo_alternate</span>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">1. Select Photos</div>
+              <div class="text-[10px] text-gray-400">Add any pictures from your device</div>
+            </div>
+          </div>
+          <div class="p-3 rounded-2xl bg-surface border border-border/80 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-sunset-coral/15 text-sunset-coral border border-sunset-coral/30 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">auto_stories</span>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">2. Auto-Arrangement</div>
+              <div class="text-[10px] text-gray-400">3D layflat book &amp; polaroid wall</div>
+            </div>
+          </div>
+          <div class="p-3 rounded-2xl bg-surface border border-border/80 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-mint-green/15 text-mint-green border border-mint-green/30 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">edit_note</span>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">3. Write Stories</div>
+              <div class="text-[10px] text-gray-400">Add inside jokes &amp; print PDF</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Upload Generator Card -->
@@ -409,15 +440,16 @@ function renderBookPage(mem, pageNum) {
           ` : `
             <div class="text-center py-2">
               <p class="text-xs text-gray-400 font-mono mb-2">No story written yet for this photo.</p>
-              <button class="btn-trigger-edit-story px-3 py-1.5 rounded-lg bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-mono font-bold hover:bg-amber-gold/25 transition-colors cursor-pointer" data-id="${mem.id}">
-                ✍️ Write About This Memory
+              <button class="btn-trigger-edit-story px-3.5 py-1.5 rounded-xl bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-mono font-bold hover:bg-amber-gold/25 transition-colors cursor-pointer flex items-center justify-center gap-1.5 mx-auto" data-id="${mem.id}">
+                <span class="material-symbols-outlined text-[16px]">edit_note</span>
+                <span>Write Memory Story</span>
               </button>
             </div>
           `}
           
           <div class="flex items-center justify-between mt-3 text-[10px] font-mono text-gray-400 border-t border-white/5 pt-2">
             <span>Author: <strong class="text-white">${mem.author || 'Host'}</strong></span>
-            <span class="text-amber-gold font-bold">100% REAL MEMORY</span>
+            <span class="text-amber-gold font-bold">Archived Keepsake</span>
           </div>
         </div>
 
@@ -434,7 +466,7 @@ function renderBookPage(mem, pageNum) {
           </div>
 
           <button class="btn-like-memory flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold transition-all cursor-pointer active:scale-90" data-id="${mem.id}">
-            <span>❤️</span>
+            <span class="material-symbols-outlined text-[15px]">favorite</span>
             <span>${mem.likes || 0}</span>
           </button>
         </div>
@@ -499,10 +531,11 @@ function renderPinboardWall(memories) {
               <!-- Footer with stamps & likes -->
               <div class="flex items-center justify-between mt-3 pt-2 border-t border-black/10 text-[10px] font-mono">
                 <div class="flex items-center gap-1">
-                  ${(mem.stickers || []).slice(0, 3).map(s => `<span>${s}</span>`).join('')}
+                  ${(mem.stickers || []).slice(0, 3).map(s => `<span class="material-symbols-outlined text-[13px] text-amber-gold">${s}</span>`).join('')}
                 </div>
                 <div class="flex items-center gap-1 text-rose-500 font-bold">
-                  <span>❤️ ${mem.likes || 0}</span>
+                  <span class="material-symbols-outlined text-[13px] text-rose-500">favorite</span>
+                  <span>${mem.likes || 0}</span>
                 </div>
               </div>
             </div>
@@ -871,7 +904,7 @@ export function bindYearbookEvents() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      const stickers = ['🔥', '💖', '💀', '🏆', '🤫', '🎉'];
+      const stickers = ['local_fire_department', 'favorite', 'emoji_events', 'verified', 'star', 'celebration'];
       const randomSticker = stickers[Math.floor(Math.random() * stickers.length)];
       audio.playClick();
       store.addAlbumMemorySticker(id, randomSticker);

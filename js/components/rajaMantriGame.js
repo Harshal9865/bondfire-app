@@ -13,10 +13,10 @@ import { ConfettiEngine } from '../visuals/confetti.js';
 let confettiInstance = null;
 
 const ROLES = {
-  RAJA: { name: 'Raja', hindi: 'राजा', points: 1000, icon: '👑', color: 'text-amber-gold border-amber-gold/50 bg-amber-gold/15' },
-  MANTRI: { name: 'Mantri', hindi: 'मंत्री', points: 800, icon: '📜', color: 'text-sky-400 border-sky-400/50 bg-sky-400/15' },
-  SIPAHI: { name: 'Sipahi', hindi: 'सिपाही', points: 500, icon: '🛡️', color: 'text-mint-green border-mint-green/50 bg-mint-green/15' },
-  CHOR: { name: 'Chor', hindi: 'चोर', points: 0, icon: '🥷', color: 'text-rose-500 border-rose-500/50 bg-rose-500/15' }
+  RAJA: { name: 'Raja', hindi: 'राजा', points: 1000, icon: 'crown', color: 'text-amber-gold border-amber-gold/50 bg-amber-gold/15', textColor: 'text-amber-gold' },
+  MANTRI: { name: 'Mantri', hindi: 'मंत्री', points: 800, icon: 'history_edu', color: 'text-sky-400 border-sky-400/50 bg-sky-400/15', textColor: 'text-sky-400' },
+  SIPAHI: { name: 'Sipahi', hindi: 'सिपाही', points: 500, icon: 'shield', color: 'text-mint-green border-mint-green/50 bg-mint-green/15', textColor: 'text-mint-green' },
+  CHOR: { name: 'Chor', hindi: 'चोर', points: 0, icon: 'mask', color: 'text-rose-500 border-rose-500/50 bg-rose-500/15', textColor: 'text-rose-500' }
 };
 
 let gameState = {
@@ -93,7 +93,7 @@ export function renderRajaMantriGame() {
       <div class="flex items-center justify-between pb-6 mb-8 border-b border-[#262B40]/70 flex-wrap gap-4">
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold uppercase mb-2">
-            <span class="text-base">👑</span>
+            <span class="material-symbols-outlined text-[16px] text-amber-gold">crown</span>
             <span>INDIAN ARCADE SPOTLIGHT // राजा मंत्री चोर सिपाही</span>
           </div>
           <h1 class="font-display text-2xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
@@ -156,7 +156,7 @@ export function renderRajaMantriGame() {
             ` : ''}
 
             ${gameState.phase === 'RAJA_PROCLAIM' ? `
-              <div class="animate-bounce mb-2 text-2xl">👑</div>
+              <div class="animate-bounce mb-2 flex justify-center"><span class="material-symbols-outlined text-4xl text-amber-gold">crown</span></div>
               <h2 class="font-display text-xl sm:text-3xl font-black text-amber-gold mb-2">
                 "${raja.name}: Mera Mantri Kaun?!"
               </h2>
@@ -192,16 +192,18 @@ export function renderRajaMantriGame() {
             ` : ''}
 
             ${gameState.phase === 'VERDICT' ? `
-              <h2 class="font-display text-2xl sm:text-3xl font-black ${gameState.isGuessCorrect ? 'text-mint-green' : 'text-rose-500'} mb-2">
-                ${gameState.isGuessCorrect ? '🎉 CHOR PAKDA GAYA! (Thief Caught!)' : '💀 DHOKHA! SIPAHI WAS WRONGLY ACCUSED!'}
+              <h2 class="font-display text-2xl sm:text-3xl font-black ${gameState.isGuessCorrect ? 'text-mint-green' : 'text-rose-500'} mb-2 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-2xl">${gameState.isGuessCorrect ? 'celebration' : 'gpp_bad'}</span>
+                <span>${gameState.isGuessCorrect ? 'CHOR PAKDA GAYA! (Thief Caught!)' : 'DHOKHA! SIPAHI WAS WRONGLY ACCUSED!'}</span>
               </h2>
               <p class="text-xs sm:text-sm text-gray-300 font-sans max-w-md mx-auto mb-4">
                 ${gameState.isGuessCorrect ? 
                   `Mantri ${mantri.name} correctly identified the Chor! Mantri scores 800 pts, Sipahi gets 500 pts!` : 
                   `The Chor fooled the court! The Chor steals the Mantri's 800 points and Mantri gets 0 pts!`}
               </p>
-              <button id="btn-next-round" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral text-dark font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
-                ${gameState.round >= gameState.totalRounds ? 'Finish & Crown Maharaja 👑' : 'Next Round ➔'}
+              <button id="btn-next-round" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-gold to-sunset-coral text-dark font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5 mx-auto">
+                <span>${gameState.round >= gameState.totalRounds ? 'Finish & Crown Maharaja' : 'Next Round'}</span>
+                <span class="material-symbols-outlined text-[16px]">${gameState.round >= gameState.totalRounds ? 'crown' : 'arrow_forward'}</span>
               </button>
             ` : ''}
 
@@ -224,7 +226,9 @@ export function renderRajaMantriGame() {
                   <!-- Chit Graphic -->
                   <div class="my-3">
                     ${isChitRevealed ? `
-                      <div class="text-4xl sm:text-5xl mb-2 animate-bounce">${roleInfo.icon}</div>
+                      <div class="mb-2 animate-bounce flex justify-center">
+                        <span class="material-symbols-outlined text-5xl ${roleInfo.textColor}">${roleInfo.icon}</span>
+                      </div>
                       <div class="font-display font-black text-base text-white">${roleInfo.hindi}</div>
                       <div class="text-xs font-mono font-bold opacity-80 uppercase">${roleInfo.name}</div>
                       <div class="mt-1 text-xs font-mono font-black text-amber-gold">+${roleInfo.points} Pts</div>
@@ -268,7 +272,7 @@ export function renderRajaMantriGame() {
                       <div>
                         <div class="text-sm font-bold text-white flex items-center gap-1.5">
                           <span>${name}</span>
-                          ${idx === 0 ? '👑' : ''}
+                          ${idx === 0 ? '<span class="material-symbols-outlined text-[15px] text-amber-gold">crown</span>' : ''}
                         </div>
                         <span class="text-[9.5px] font-mono text-gray-400">
                           ${idx === 0 ? 'Maharaja Candidate' : 'Royal Courtier'}
@@ -285,12 +289,24 @@ export function renderRajaMantriGame() {
             </div>
 
             <!-- Rules Summary -->
-            <div class="mt-8 p-4 rounded-2xl bg-[#0E111D] border border-white/5 text-[11px] font-mono text-gray-400 space-y-1.5">
+            <div class="mt-8 p-4 rounded-2xl bg-[#0E111D] border border-white/5 text-[11px] font-mono text-gray-400 space-y-2">
               <div class="text-amber-gold font-bold uppercase mb-1">Traditional Points Guide:</div>
-              <div>👑 Raja: 1000 Points (Always secure)</div>
-              <div>📜 Mantri: 800 Points (If correct)</div>
-              <div>🛡️ Sipahi: 500 Points (Always innocent)</div>
-              <div>🥷 Chor: 0 Points (Or steals Mantri's 800 pts!)</div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[15px] text-amber-gold">crown</span>
+                <span>Raja: 1000 Points (Always secure)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[15px] text-sky-400">history_edu</span>
+                <span>Mantri: 800 Points (If correct)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[15px] text-mint-green">shield</span>
+                <span>Sipahi: 500 Points (Always innocent)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[15px] text-rose-500">mask</span>
+                <span>Chor: 0 Points (Or steals Mantri's 800 pts!)</span>
+              </div>
             </div>
           </div>
 

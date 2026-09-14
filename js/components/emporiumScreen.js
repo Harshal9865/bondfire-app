@@ -269,7 +269,10 @@ function renderCatalog(sparks, unlocked) {
               <div class="pt-3 border-t border-[#262B40] flex items-center justify-between gap-2">
                 <div>
                   <span class="text-[10px] font-mono text-gray-400">Price</span>
-                  <div class="text-base font-display font-black text-amber-gold">🔥 ${perk.costSparks}</div>
+                  <div class="text-base font-display font-black text-amber-gold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px] text-amber-gold">local_fire_department</span>
+                    <span>${perk.costSparks}</span>
+                  </div>
                 </div>
 
                 ${isOwned ? `

@@ -1,9 +1,9 @@
 // ==============================================================================
-// BONDFIRE SERVICE WORKER (v30)
+// BONDFIRE SERVICE WORKER (v31)
 // Network-first for dynamic code and navigation, with resilient offline fallback
 // ==============================================================================
 
-const CACHE_NAME = 'bondfire-v30';
+const CACHE_NAME = 'bondfire-v31';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -23,7 +23,9 @@ const PRECACHE_ASSETS = [
   '/js/components/roomsHubScreen.js',
   '/js/components/gameCountdownOverlay.js',
   '/js/components/rajaMantriGame.js',
-  '/js/components/bollywoodGame.js',
+  '/js/components/tambolaGame.js',
+  '/js/components/vaultScreen.js',
+  '/js/components/spotifyPlayer.js',
   '/js/visuals/fluidCanvas.js',
   '/js/visuals/audioSynth.js',
   '/js/visuals/confetti.js',

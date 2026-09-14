@@ -513,6 +513,10 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
         }
       } else if (payload.action === 'SYNC_STREAM' && payload.url) {
         window.dispatchEvent(new CustomEvent('bondfire:sync-stream', { detail: { url: payload.url } }));
+      } else if (payload.action === 'SYNC_ROOM_MUSIC') {
+        import('../components/spotifyPlayer.js').then(({ applyRemoteMusicSync }) => {
+          applyRemoteMusicSync(payload);
+        }).catch(() => {});
       }
     })
     .subscribe(async (status) => {

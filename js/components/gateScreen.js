@@ -115,7 +115,7 @@ export function renderGateScreen() {
               <div class="cyber-card-corner-tl"></div>
               <div class="cyber-card-corner-br"></div>
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xl">💖</span>
+                <span class="material-symbols-outlined text-xl text-rose-400">favorite</span>
                 <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-mint-green">
                   <span class="w-1.5 h-1.5 rounded-full bg-mint-green animate-ping"></span>
                   <span>28 ONLINE</span>
@@ -125,7 +125,7 @@ export function renderGateScreen() {
               <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">2-Player Synapse Link</div>
               <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
                 <span>INTIMACY 99%</span>
-                <span>WARP ➔</span>
+                <span class="flex items-center gap-0.5">WARP <span class="material-symbols-outlined text-[10px]">arrow_forward</span></span>
               </div>
             </div>
 
@@ -135,7 +135,7 @@ export function renderGateScreen() {
               <div class="cyber-card-corner-tl"></div>
               <div class="cyber-card-corner-br"></div>
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xl">🔥</span>
+                <span class="material-symbols-outlined text-xl text-sunset-coral">local_fire_department</span>
                 <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-sunset-coral">
                   <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-ping"></span>
                   <span>94 ONLINE</span>
@@ -145,7 +145,7 @@ export function renderGateScreen() {
               <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">4-Player Overdrive</div>
               <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
                 <span>HEARTH 100%</span>
-                <span>WARP ➔</span>
+                <span class="flex items-center gap-0.5">WARP <span class="material-symbols-outlined text-[10px]">arrow_forward</span></span>
               </div>
             </div>
 
@@ -155,7 +155,7 @@ export function renderGateScreen() {
               <div class="cyber-card-corner-tl"></div>
               <div class="cyber-card-corner-br"></div>
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xl">👑</span>
+                <span class="material-symbols-outlined text-xl text-amber-gold">crown</span>
                 <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-amber-gold">
                   <span class="w-1.5 h-1.5 rounded-full bg-amber-gold animate-ping"></span>
                   <span>52 PLAYING</span>
@@ -165,7 +165,7 @@ export function renderGateScreen() {
               <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">Raja Mantri &amp; Filmi</div>
               <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
                 <span>ROYAL HEIST</span>
-                <span>WARP ➔</span>
+                <span class="flex items-center gap-0.5">WARP <span class="material-symbols-outlined text-[10px]">arrow_forward</span></span>
               </div>
             </div>
 
@@ -175,7 +175,7 @@ export function renderGateScreen() {
               <div class="cyber-card-corner-tl"></div>
               <div class="cyber-card-corner-br"></div>
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xl">⚡</span>
+                <span class="material-symbols-outlined text-xl text-[#C084FC]">auto_awesome</span>
                 <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-[#C084FC]">
                   <span class="w-1.5 h-1.5 rounded-full bg-[#C084FC] animate-ping"></span>
                   <span>140 SAVED</span>
@@ -185,7 +185,7 @@ export function renderGateScreen() {
               <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">Real Layflat Album</div>
               <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
                 <span>STUDIO 4K</span>
-                <span>WARP ➔</span>
+                <span class="flex items-center gap-0.5">WARP <span class="material-symbols-outlined text-[10px]">arrow_forward</span></span>
               </div>
             </div>
 

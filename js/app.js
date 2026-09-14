@@ -33,6 +33,7 @@ import { renderRoomsHub, bindRoomsHubEvents } from './components/roomsHubScreen.
 import { renderGateScreen, bindGateScreenEvents } from './components/gateScreen.js';
 import { renderRajaMantriGame, bindRajaMantriEvents } from './components/rajaMantriGame.js';
 import { renderBollywoodGame, bindBollywoodEvents } from './components/bollywoodGame.js';
+import { renderTambolaGame, bindTambolaEvents } from './components/tambolaGame.js';
 
 class BondfireApp {
   constructor() {
@@ -151,9 +152,11 @@ class BondfireApp {
       'MANTRI': 'RAJA_MANTRI',
       'ANTAKSHARI': 'BOLLYWOOD',
       'FILMI': 'BOLLYWOOD',
+      'HOUSIE': 'TAMBOLA',
+      'TAMBOLA': 'TAMBOLA',
     };
     const resolvedHash = aliasMap[hash] || hash;
-    const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE', 'RAJA_MANTRI', 'BOLLYWOOD'];
+    const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE', 'RAJA_MANTRI', 'BOLLYWOOD', 'TAMBOLA'];
     
     // Check if this is the initial boot of opening the website
     const isBoot = this.isInitialBoot;
@@ -250,6 +253,12 @@ class BondfireApp {
       case 'ANTAKSHARI':
         this.appMount.innerHTML = renderBollywoodGame();
         bindBollywoodEvents();
+        break;
+
+      case 'TAMBOLA':
+      case 'HOUSIE':
+        this.appMount.innerHTML = renderTambolaGame();
+        bindTambolaEvents();
         break;
 
       case 'ROOMS':

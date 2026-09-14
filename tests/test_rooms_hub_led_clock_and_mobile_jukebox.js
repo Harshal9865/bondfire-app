@@ -31,15 +31,22 @@ function test(name, fn) {
 }
 
 // -----------------------------------------------------------------------------
-// Suite 1: Campfire Music Icon Elevation on Mobile
+// Suite 1: Navbar Spotify Jukebox Dropdown & Room Sync
 // -----------------------------------------------------------------------------
-test('spotifyPlayer.js elevates jukebox container above mobile bottom navigation bar', () => {
+test('spotifyPlayer.js anchors jukebox modal to navbar Spotify icon with room sync and removes floating bottom button', () => {
   const jukeboxHtml = renderSpotifyJukebox();
   assert.ok(
-    jukeboxHtml.includes('bottom-[104px]') || jukeboxHtml.includes('bottom-[108px]') || jukeboxHtml.includes('bottom-[110px]'),
-    'Jukebox container must be elevated above mobile dock (~90px) and hide button to prevent overlap'
+    !jukeboxHtml.includes('id="btn-toggle-jukebox"'),
+    'Bottom floating jukebox toggle button must be completely removed'
   );
-  assert.ok(jukeboxHtml.includes('hidden sm:inline'), 'Text label must be compact on small mobile screens');
+  assert.ok(
+    jukeboxHtml.includes('top-14') || jukeboxHtml.includes('top: calc'),
+    'Jukebox container must be anchored to top navbar under Spotify icon'
+  );
+  assert.ok(
+    jukeboxHtml.includes('Party In-Sync') || jukeboxHtml.includes('broadcastMusicSync'),
+    'Must support real-time room audio synchronization'
+  );
   assert.ok(jukeboxHtml.includes('w-[calc(100vw-24px)]'), 'Jukebox modal must fit cleanly on mobile screens');
 });
 

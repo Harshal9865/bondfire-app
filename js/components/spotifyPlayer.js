@@ -64,27 +64,29 @@ export function renderSpotifyJukebox() {
   const activeUrl = playerMode === 'FULL_SONG' ? currentPreset.ytEmbed : currentPreset.spotifyEmbed;
 
   return `
-    <!-- Floating Campfire Jukebox Widget (Full Song Player) -->
-    <div id="spotify-jukebox-container" class="fixed bottom-[104px] sm:bottom-[108px] md:bottom-6 right-3 sm:right-5 z-40 md:z-50 flex flex-col items-end pointer-events-auto">
+    <!-- Top-Right Jukebox Dropdown (Triggered from Navbar Spotify Button) -->
+    <div id="spotify-jukebox-container" class="fixed top-14 sm:top-16 right-3 sm:right-6 z-50 flex flex-col items-end pointer-events-auto">
       
       <!-- Collapsible Jukebox Panel -->
-      <div id="spotify-jukebox-modal" class="w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-3xl bg-[#0e121e]/95 backdrop-blur-2xl border-2 border-amber-gold/50 shadow-2xl p-3.5 sm:p-4 mb-2 flex flex-col gap-3 transition-all duration-300 max-h-[72vh] overflow-y-auto ${isJukeboxOpen ? '' : 'hidden'}">
+      <div id="spotify-jukebox-modal" class="w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-3xl bg-[#0e121e]/98 backdrop-blur-2xl border-2 border-[#1DB954]/50 shadow-[0_10px_40px_rgba(0,0,0,0.85)] p-3.5 sm:p-4 mb-2 flex flex-col gap-3 transition-all duration-300 max-h-[75vh] overflow-y-auto ${isJukeboxOpen ? '' : 'hidden'}">
         
-        <!-- Header with Mode Switcher -->
+        <!-- Header with Mode Switcher & Room Sync Badge -->
         <div class="flex items-center justify-between pb-2 border-b border-white/10">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-amber-gold/20 text-amber-gold border border-amber-gold/40 flex items-center justify-center">
-              <span class="material-symbols-outlined text-lg">music_note</span>
+            <div class="w-8 h-8 rounded-xl bg-[#1DB954]/20 text-[#1DB954] border border-[#1DB954]/40 flex items-center justify-center">
+              <svg class="w-4 h-4 fill-current text-[#1DB954]" viewBox="0 0 24 24">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
             </div>
             <div>
               <span class="text-xs font-bold text-white tracking-wide uppercase font-mono">Campfire Jukebox</span>
-              <span class="text-[9px] text-mint-green block font-mono font-bold flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-mint-green animate-pulse"></span>
-                <span>${playerMode === 'FULL_SONG' ? 'Full Songs · 100% Free & Legal' : 'Spotify Mode'}</span>
+              <span class="text-[9.5px] text-[#1DB954] block font-mono font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#1DB954] animate-pulse"></span>
+                <span>Room Audio Synced Live</span>
               </span>
             </div>
           </div>
-          <button id="btn-close-jukebox" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 flex items-center justify-center transition-colors">
+          <button id="btn-close-jukebox" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 flex items-center justify-center transition-colors cursor-pointer">
             <span class="material-symbols-outlined text-sm">close</span>
           </button>
         </div>
@@ -115,50 +117,44 @@ export function renderSpotifyJukebox() {
           <iframe id="jukebox-embed-iframe" src="${activeUrl}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" class="w-full h-full"></iframe>
         </div>
 
-        <!-- Info & Custom Song Search -->
+        <!-- Info & Sync Notice -->
         <div class="flex items-center justify-between text-[10px] text-gray-400 font-mono px-1">
           <span>${currentPreset.tagline}</span>
-          <span class="text-amber-gold font-bold">Volume: System / Player</span>
+          <span class="text-[#1DB954] font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">group</span>
+            <span>Party In-Sync</span>
+          </span>
         </div>
       </div>
-
-      <!-- Floating Launch Button -->
-      <button id="btn-toggle-jukebox" class="p-2.5 sm:px-3.5 sm:py-2 rounded-full bg-[#0E121E]/95 border-2 border-amber-gold/60 shadow-[0_4px_25px_rgba(255,183,3,0.35)] hover:scale-105 active:scale-95 text-white flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer group backdrop-blur-md" title="Open Campfire Jukebox">
-        <span class="material-symbols-outlined text-amber-gold text-[20px] sm:text-[18px] group-hover:rotate-12 transition-transform">music_note</span>
-        <span class="hidden sm:inline text-xs font-bold text-gray-200" id="jukebox-toggle-label">Campfire Music</span>
-        <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
-      </button>
     </div>
   `;
 }
 
+function updateHeaderMusicIndicator(isPlaying) {
+  const headerBtn = document.getElementById('btn-header-jukebox');
+  if (headerBtn) {
+    if (isPlaying) {
+      headerBtn.classList.add('ring-2', 'ring-[#1DB954]', 'shadow-[0_0_16px_rgba(29,185,84,0.6)]');
+    } else {
+      headerBtn.classList.remove('ring-2', 'ring-[#1DB954]', 'shadow-[0_0_16px_rgba(29,185,84,0.6)]');
+    }
+  }
+}
+
 export function bindSpotifyEvents() {
-  const toggleBtn = document.getElementById('btn-toggle-jukebox');
   const closeBtn = document.getElementById('btn-close-jukebox');
   const modal = document.getElementById('spotify-jukebox-modal');
   const iframe = document.getElementById('jukebox-embed-iframe');
   const presetBtns = document.querySelectorAll('.btn-jukebox-preset');
   const modeFullSongBtn = document.getElementById('btn-mode-full-song');
   const modeSpotifyBtn = document.getElementById('btn-mode-spotify');
-  const toggleLabel = document.getElementById('jukebox-toggle-label');
 
-  if (toggleBtn && modal) {
-    toggleBtn.addEventListener('click', () => {
-      audio.playClick();
-      isJukeboxOpen = !isJukeboxOpen;
-      modal.classList.toggle('hidden', !isJukeboxOpen);
-      if (toggleLabel) {
-        toggleLabel.textContent = isJukeboxOpen ? 'Hide Music' : 'Campfire Music';
-      }
-    });
-  }
-
-  if (closeBtn && modal && toggleBtn) {
+  if (closeBtn && modal) {
     closeBtn.addEventListener('click', () => {
       audio.playClick();
       isJukeboxOpen = false;
       modal.classList.add('hidden');
-      if (toggleLabel) toggleLabel.textContent = 'Campfire Music';
+      updateHeaderMusicIndicator(false);
     });
   }
 
@@ -169,7 +165,7 @@ export function bindSpotifyEvents() {
       playerMode = 'FULL_SONG';
       const preset = FULL_SONG_PRESETS.find((p) => p.id === activePresetId) || FULL_SONG_PRESETS[0];
       iframe.src = preset.ytEmbed;
-      store.setView('ROOMS');
+      broadcastMusicSync(activePresetId, playerMode, true);
     });
   }
 
@@ -179,7 +175,7 @@ export function bindSpotifyEvents() {
       playerMode = 'SPOTIFY';
       const preset = FULL_SONG_PRESETS.find((p) => p.id === activePresetId) || FULL_SONG_PRESETS[0];
       iframe.src = preset.spotifyEmbed;
-      store.setView('ROOMS');
+      broadcastMusicSync(activePresetId, playerMode, true);
     });
   }
 
@@ -197,7 +193,53 @@ export function bindSpotifyEvents() {
         b.className = 'btn-jukebox-preset px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 transition-all bg-surface-bright text-gray-300 hover:bg-surface border border-border';
       });
       btn.className = 'btn-jukebox-preset px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 transition-all bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas shadow font-extrabold';
+
+      updateHeaderMusicIndicator(true);
+      broadcastMusicSync(presetId, playerMode, true);
     });
+  });
+}
+
+function broadcastMusicSync(presetId, mode, isPlaying) {
+  const roomCode = store.getState().activeRoom?.roomCode;
+  if (roomCode) {
+    import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+      broadcastRoomAction('SYNC_ROOM_MUSIC', {
+        presetId,
+        mode,
+        isPlaying,
+        roomCode,
+        timestamp: Date.now()
+      });
+    }).catch(() => {});
+  }
+}
+
+export function applyRemoteMusicSync(payload) {
+  if (!payload || !payload.presetId) return;
+  activePresetId = payload.presetId;
+  if (payload.mode) playerMode = payload.mode;
+
+  const preset = FULL_SONG_PRESETS.find((p) => p.id === activePresetId) || FULL_SONG_PRESETS[0];
+  const targetUrl = playerMode === 'FULL_SONG' ? preset.ytEmbed : preset.spotifyEmbed;
+
+  const modal = document.getElementById('spotify-jukebox-modal');
+  const iframe = document.getElementById('jukebox-embed-iframe');
+  if (iframe) iframe.src = targetUrl;
+  if (payload.isPlaying && modal) {
+    isJukeboxOpen = true;
+    modal.classList.remove('hidden');
+    updateHeaderMusicIndicator(true);
+  }
+
+  // Update preset buttons UI if modal is rendered
+  const presetBtns = document.querySelectorAll('.btn-jukebox-preset');
+  presetBtns.forEach((b) => {
+    if (b.dataset.presetId === activePresetId) {
+      b.className = 'btn-jukebox-preset px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 transition-all bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas shadow font-extrabold';
+    } else {
+      b.className = 'btn-jukebox-preset px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 transition-all bg-surface-bright text-gray-300 hover:bg-surface border border-border';
+    }
   });
 }
 
@@ -218,4 +260,6 @@ export function playSongOnSpotify(queryOrUrl) {
 
   activePresetId = matched.id;
   iframe.src = playerMode === 'FULL_SONG' ? matched.ytEmbed : matched.spotifyEmbed;
+  updateHeaderMusicIndicator(true);
+  broadcastMusicSync(matched.id, playerMode, true);
 }

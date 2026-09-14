@@ -706,18 +706,12 @@ body[data-view="GATE"] #spotify-jukebox-container,
   display: none !important;
 }
 
-/* Responsive positioning for floating jukebox to guarantee zero overlap with mobile navigation dock & hide button */
-@media (max-width: 767px) {
-  #spotify-jukebox-container {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 104px) !important;
-    right: 14px !important;
-    z-index: 45 !important;
-    transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  body.has-nav-hidden #spotify-jukebox-container {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 68px) !important;
-  }
+/* Jukebox dropdown positioning from header */
+#spotify-jukebox-container {
+  top: calc(env(safe-area-inset-top, 0px) + 3.75rem);
+  right: 1rem;
+  z-index: 50;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 /* Cyber Floor & Wet Street Reflection */
