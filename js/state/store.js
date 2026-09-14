@@ -401,6 +401,7 @@ class ReactiveStore {
       humorTone: 'FRIENDLY_ROAST',
       language: 'hi-IN',
       isHost: true,
+      hasActiveSession: false,
       selectedGameMode: 'RED_FLAG_COURT',
       players: [
         { id: user?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
@@ -446,6 +447,7 @@ class ReactiveStore {
 
     const activeRoom = {
       ...this.state.activeRoom,
+      hasActiveSession: remaining.length > 0,
       players: remaining,
     };
     this.setState({ activeRoom });
@@ -453,6 +455,45 @@ class ReactiveStore {
     if (remaining.length === 0) {
       this.handleEmptyRoomDetected();
     }
+    return activeRoom;
+  }
+
+  cancelActiveRoom() {
+    this.cancelEmptyRoomTimer();
+    const oldCode = this.state.activeRoom?.roomCode;
+    const user = this.state.currentUser;
+    const userId = user?.id || 'usr_host';
+
+    if (typeof window !== 'undefined' && oldCode) {
+      try {
+        fetch(`/api/rooms/${encodeURIComponent(oldCode)}/leave`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }).catch(() => {});
+      } catch (_) {}
+    }
+
+    const newCode = generateRoomCode();
+    const hostName = (user && user.displayName) ? `${user.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+    const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost';
+
+    const activeRoom = {
+      roomCode: newCode,
+      podName: 'My Squad Room',
+      roomTemplate: 'SQUAD_NIGHT',
+      humorTone: 'FRIENDLY_ROAST',
+      language: 'hi-IN',
+      isHost: true,
+      hasActiveSession: false,
+      selectedGameMode: 'RED_FLAG_COURT',
+      players: [
+        { id: user?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
+      ],
+      emptySince: null,
+      scheduledDeletionAt: null,
+    };
+    this.setState({ activeRoom });
     return activeRoom;
   }
 
@@ -678,6 +719,7 @@ class ReactiveStore {
       mode: isDuo ? 'US' : (this.state.activeRoom?.mode || 'PODS'),
       roomType: isDuo ? 'DUO' : (this.state.activeRoom?.roomType || 'SQUAD'),
       isHost: isAlreadyHost,
+      hasActiveSession: true,
       sessionStarted: false,
       players: updatedPlayers,
     };
@@ -808,6 +850,7 @@ class ReactiveStore {
       roomType: 'DUO',
       podName: customName || `${hostName}'s Duo Room ❤️`,
       isHost: true,
+      hasActiveSession: true,
       sessionStarted: false,
       players: [
         { id: user?.id || `usr_host_${Date.now()}`, name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
@@ -842,6 +885,7 @@ class ReactiveStore {
         humorTone: 'FRIENDLY_ROAST',
         language: 'hi-IN',
         isHost: true,
+        hasActiveSession: false,
         selectedGameMode: 'RED_FLAG_COURT',
         players: [
           { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost' },
@@ -863,6 +907,7 @@ class ReactiveStore {
       roomCode,
       podName: podName || `${(user && user.displayName) ? user.displayName.split(' ')[0] : 'Campfire'}'s Squad Pod 🔥`,
       isHost: true,
+      hasActiveSession: true,
       selectedGameMode: this.state.activeRoom?.selectedGameMode || 'RED_FLAG_COURT',
       players: [
         { id: user?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },

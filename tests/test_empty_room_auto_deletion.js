@@ -58,6 +58,7 @@ async function runTests() {
 
   const { store } = await import('../js/state/store.js');
   const { renderLobby } = await import('../js/components/lobby.js');
+  const { renderRoomsHub } = await import('../js/components/roomsHubScreen.js');
 
   // Test 1: Active room initialized with default timeout of 2 minutes (120,000 ms)
   console.log('Test 1: Verifying default emptyTimeoutMs configuration...');
@@ -151,7 +152,21 @@ async function runTests() {
   assert.ok(html.includes('btn-lobby-leave-room'), 'Lobby must contain Leave Room button');
   console.log('✅ Test 7 Passed: Lobby UI displays empty warning banner and action buttons.\n');
 
-  console.log('🎉 ALL 7 TESTS PASSED SUCCESSFULLY! The 2-minute active room auto-deletion system is rock solid.\n');
+  // Test 8: Rooms Hub UI renders Cancel Room button and store.cancelActiveRoom() dismisses session
+  console.log('Test 8: renderRoomsHub() displays Cancel Room button on active session banner...');
+  store.createNewRoom('Active Squad Pod');
+  const hubHtmlWithActiveRoom = renderRoomsHub();
+  assert.ok(hubHtmlWithActiveRoom.includes('btn-cancel-active-room'), 'Rooms Hub banner must include Cancel Room button');
+  assert.ok(hubHtmlWithActiveRoom.includes('Cancel Room'), 'Rooms Hub banner must have Cancel Room label');
+  assert.ok(hubHtmlWithActiveRoom.includes('btn-resume-active-room'), 'Rooms Hub banner must include Resume Current Room button');
+
+  // Cancel the active room
+  store.cancelActiveRoom();
+  const hubHtmlAfterCancel = renderRoomsHub();
+  assert.ok(!hubHtmlAfterCancel.includes('id="active-room-banner"'), 'Banner must be dismissed after cancelActiveRoom()');
+  console.log('✅ Test 8 Passed: Cancel Room button verified and active session banner cleanly dismissed.\n');
+
+  console.log('🎉 ALL 8 TESTS PASSED SUCCESSFULLY! The active room lifecycle & cancel controls are rock solid.\n');
 }
 
 runTests().catch((err) => {

@@ -9,7 +9,7 @@ import { audio } from '../visuals/audioSynth.js';
 export function renderRoomsHub() {
   const state = store.getState();
   const currentRoom = state.activeRoom || {};
-  const hasActiveRoom = Boolean(currentRoom.roomCode);
+  const hasActiveRoom = Boolean(currentRoom.roomCode && currentRoom.hasActiveSession !== false);
   const activeRoomCode = currentRoom.roomCode || '';
   const activeRoomName = currentRoom.podName || 'Campfire Room';
   const isDuoActive = currentRoom.selectedGameMode === 'US' || state.currentMode === 'US';
@@ -23,7 +23,7 @@ export function renderRoomsHub() {
 
       <!-- Active Room Resume Banner (If user has joined/created a room) -->
       ${hasActiveRoom ? `
-        <div class="w-full mb-8 p-4 rounded-3xl bg-surface/90 border-2 border-mint-green/50 shadow-glow-mint backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-fade-in">
+        <div id="active-room-banner" class="w-full mb-8 p-4 rounded-3xl bg-surface/90 border-2 border-mint-green/50 shadow-glow-mint backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-fade-in">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-mint-green/20 text-mint-green border border-mint-green/40 flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-2xl animate-pulse">sensors</span>
@@ -38,8 +38,12 @@ export function renderRoomsHub() {
               </h3>
             </div>
           </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <button id="btn-resume-active-room" class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-mint-green text-canvas font-extrabold text-xs shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+          <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <button id="btn-cancel-active-room" class="w-full sm:w-auto px-4 py-2.5 rounded-full bg-surface-bright/90 hover:bg-sunset-coral/20 border border-border/80 hover:border-sunset-coral/50 text-gray-300 hover:text-sunset-coral font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95" title="Cancel or Leave Active Room">
+              <span class="material-symbols-outlined text-[16px]">close</span>
+              <span>Cancel Room</span>
+            </button>
+            <button id="btn-resume-active-room" class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-mint-green hover:bg-[#05be8d] text-canvas font-extrabold text-xs shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
               <span>Resume Current Room</span>
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
@@ -242,7 +246,30 @@ export function bindRoomsHubEvents() {
     });
   }
 
-  // 3. Resume Active Session
+  // 3. Cancel / Leave Active Session
+  const btnCancel = document.getElementById('btn-cancel-active-room');
+  if (btnCancel) {
+    btnCancel.addEventListener('click', () => {
+      audio.playClick();
+      store.cancelActiveRoom();
+      const banner = document.getElementById('active-room-banner');
+      if (banner) {
+        banner.style.transition = 'all 0.25s ease';
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(-10px)';
+        setTimeout(() => banner.remove(), 260);
+      }
+      const toastMount = document.getElementById('toast-mount');
+      if (toastMount) {
+        toastMount.innerHTML = `<div class="toast toast-coral show"><span class="material-symbols-outlined text-sm mr-1 text-sunset-coral">close</span><span>Active room session cancelled.</span></div>`;
+        setTimeout(() => (toastMount.innerHTML = ''), 3000);
+      } else if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        window.showToast('Active room session cancelled.', 'info');
+      }
+    });
+  }
+
+  // 4. Resume Active Session
   if (btnResume) {
     btnResume.addEventListener('click', () => {
       audio.playChime();
