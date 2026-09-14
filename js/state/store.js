@@ -235,6 +235,7 @@ class ReactiveStore {
           } else {
             parsed.albumMemories = parsed.albumMemories.filter((m) => !['mem_1', 'mem_2', 'mem_3', 'mem_4'].includes(m.id));
           }
+          parsed.arcadePlayMode = ['GROUP', 'DUOS', 'SOLO'].includes(parsed.arcadePlayMode) ? parsed.arcadePlayMode : 'GROUP';
           parsed.settings = { ...this.getDefaultSettings(), ...(parsed.settings || {}), ...(savedSettings || {}) };
           return parsed;
         }
@@ -246,6 +247,7 @@ class ReactiveStore {
     return {
       currentView: 'HERO',
       activeMode: 'PODS', // 'SOLO' | 'US' | 'PODS'
+      arcadePlayMode: 'GROUP', // 'GROUP' | 'DUOS' | 'SOLO'
       soundEnabled: true,
       currentUser: this.getDefaultGuestUser(),
       userSparks: 750,
@@ -946,6 +948,12 @@ class ReactiveStore {
   setGameMode(gameMode) {
     const activeRoom = { ...this.state.activeRoom, selectedGameMode: gameMode };
     this.setState({ activeRoom });
+  }
+
+  setArcadePlayMode(mode) {
+    const validModes = ['GROUP', 'DUOS', 'SOLO'];
+    const normalized = validModes.includes(mode) ? mode : 'GROUP';
+    this.setState({ arcadePlayMode: normalized });
   }
 
   logoutUser() {

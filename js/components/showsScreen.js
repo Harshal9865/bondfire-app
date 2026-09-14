@@ -15,6 +15,7 @@ let watchPartyInstance = null;
 
 export function renderShowsScreen() {
   const state = store.getState();
+  const currentPlayMode = state.arcadePlayMode || 'GROUP';
   const user = state.currentUser;
   const userName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'Guest';
 
@@ -33,24 +34,48 @@ export function renderShowsScreen() {
       <div class="absolute top-80 right-10 w-80 h-80 bg-amber-gold/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
       <!-- Top Header & Creator Live Bar -->
-      <div class="w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 rounded-3xl bg-surface border border-border shadow-2xl mb-6 relative overflow-hidden">
+      <div class="w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 rounded-3xl bg-surface border border-border shadow-2xl mb-4 relative overflow-hidden">
         <div>
           <div class="flex items-center gap-2 mb-1.5">
             <span class="w-2.5 h-2.5 rounded-full bg-sunset-coral animate-ping"></span>
             <span class="text-xs font-mono font-bold text-sunset-coral uppercase tracking-wider">Mode 3 · Bondfire Shows</span>
           </div>
-          <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Watch & Play Stream Stage</h1>
+          <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Watch &amp; Play Stream Stage</h1>
           <p class="text-xs sm:text-sm text-gray-300 mt-1">
-            Watch together in real-time. Drop reactions, trigger Pause & Predict, or paste any YouTube video.
+            Watch together in real-time. Drop reactions, trigger Pause &amp; Predict, or paste any YouTube video.
           </p>
         </div>
 
         <div class="flex items-center gap-2 w-full md:w-auto">
-          <button id="btn-create-creator-show" class="flex-1 md:flex-none px-5 py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-xs shadow-glow-coral transition-transform active:scale-95 flex items-center justify-center gap-2">
+          <button id="btn-create-creator-show" class="flex-1 md:flex-none px-5 py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold hover:brightness-110 text-canvas font-bold text-xs shadow-glow-coral transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">videocam</span>
             <span>Host Live Room</span>
           </button>
         </div>
+      </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-sunset-coral text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">Stream Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-shows-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-sunset-coral text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (Squad Cinema)
+          </button>
+          <button class="btn-shows-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (Date Lounge)
+          </button>
+          <button class="btn-shows-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo (Personal Cinema)
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Banner Indicator -->
+      <div class="w-full mb-4 px-3 py-1.5 rounded-xl text-center text-xs font-mono ${currentPlayMode === 'DUOS' ? 'bg-duo-rose/10 text-duo-rose border border-duo-rose/30' : currentPlayMode === 'SOLO' ? 'bg-mint-green/10 text-mint-green border border-mint-green/30' : 'bg-surface border border-white/5 text-gray-400'}">
+        ${currentPlayMode === 'DUOS' ? '👫 Duos Date Lounge: Intimate 2-player stream session with synchronized timestamps & private reactions.' : currentPlayMode === 'SOLO' ? '👤 Solo Cinema: Distraction-free personal screen for creators, reviews, and study chill.' : '👥 Squad Cinema: Real-time living room stream with squad reaction rain and Pause & Predict!'}
       </div>
 
       <!-- Live Synchronized Watch Party Player Container -->
@@ -141,6 +166,23 @@ export function bindShowsEvents() {
       if (appMount) {
         appMount.innerHTML = renderShowsScreen();
         bindShowsEvents();
+      }
+    });
+  });
+
+  // In-Game Stream Mode Switcher
+  document.querySelectorAll('.btn-shows-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== store.getState().arcadePlayMode) {
+        audio.playClick();
+        store.setArcadePlayMode(mode);
+        const appMount = document.getElementById('app-mount');
+        if (appMount) {
+          appMount.innerHTML = renderShowsScreen();
+          bindShowsEvents();
+        }
       }
     });
   });

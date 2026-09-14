@@ -108,6 +108,9 @@ function generateTambolaTicket() {
 
 // State
 let gameState = {
+  playMode: 'GROUP', // 'GROUP' | 'DUOS' | 'SOLO'
+  activeDuoTicket: 'P1', // 'P1' | 'P2' for duos mode
+  ticketP2: null,
   calledNumbers: [],
   currentNumber: null,
   isAutoCalling: false,
@@ -128,20 +131,27 @@ function initTambolaGame() {
     clearInterval(gameState.autoCallInterval);
     gameState.autoCallInterval = null;
   }
+  const currentMode = gameState.playMode || store.getState().arcadePlayMode || 'GROUP';
+  gameState.playMode = currentMode;
   gameState.calledNumbers = [];
   gameState.currentNumber = null;
   gameState.isAutoCalling = false;
   gameState.ticket = generateTambolaTicket();
+  gameState.ticketP2 = generateTambolaTicket();
+  gameState.activeDuoTicket = 'P1';
   Object.keys(gameState.claims).forEach(k => {
     gameState.claims[k].claimedBy = null;
   });
 }
 
 export function renderTambolaGame() {
-  if (!gameState.ticket) {
+  const storeMode = store.getState().arcadePlayMode || 'GROUP';
+  if (!gameState.ticket || gameState.playMode !== storeMode) {
+    gameState.playMode = storeMode;
     initTambolaGame();
   }
 
+  const currentPlayMode = gameState.playMode || 'GROUP';
   const currentNum = gameState.currentNumber;
   const nickname = currentNum ? getNickname(currentNum) : 'Waiting to draw first lucky coin...';
   const totalCalled = gameState.calledNumbers.length;
@@ -151,7 +161,7 @@ export function renderTambolaGame() {
     <div class="min-h-screen bg-[#090C15] text-white pt-6 pb-28 px-4 sm:px-6 lg:px-12 max-w-[1280px] mx-auto select-none" id="tambola-root">
       
       <!-- Top Header -->
-      <div class="flex items-center justify-between pb-6 mb-8 border-b border-[#262B40]/70 flex-wrap gap-4">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#262B40]/70 flex-wrap gap-4">
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#06D6A0]/15 border border-[#06D6A0]/30 text-[#06D6A0] text-xs font-mono font-bold uppercase mb-2">
             <span class="material-symbols-outlined text-[16px]">casino</span>
@@ -171,17 +181,52 @@ export function renderTambolaGame() {
             <span>New Ticket</span>
           </button>
 
-          <button id="btn-tambola-reset" class="px-3.5 py-2 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-400 hover:text-white border border-[#2B3147] text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer">
-            <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-            <span>New Game</span>
-          </button>
-
           <a href="#/ARCADE" class="px-3.5 py-2 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-300 hover:text-white border border-[#2B3147] text-xs font-mono transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             <span>Arcade Hub</span>
           </a>
         </div>
       </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#06D6A0] text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">Housie Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-tambola-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-[#06D6A0] text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (Party Room)
+          </button>
+          <button class="btn-tambola-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (1v1 Ticket Clash)
+          </button>
+          <button class="btn-tambola-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo (Speed Caller)
+          </button>
+        </div>
+      </div>
+
+      ${currentPlayMode === 'SOLO' ? `
+        <div class="p-3 rounded-2xl bg-[#0E1524] border border-[#06D6A0]/30 flex items-center justify-between gap-3 text-xs font-mono mb-4">
+          <div class="flex items-center gap-2 text-amber-gold font-bold">
+            <span class="material-symbols-outlined text-base">timer</span>
+            <span>Speed Goal: Claim Jaldi 5 in under 25 calls!</span>
+          </div>
+          <div class="text-gray-300">Drawn So Far: <strong class="text-white font-bold">${totalCalled}</strong> / 90</div>
+        </div>
+      ` : currentPlayMode === 'DUOS' ? `
+        <div class="p-3 rounded-2xl bg-[#1A1224] border border-duo-rose/30 flex items-center justify-between gap-3 text-xs font-mono mb-4">
+          <div class="flex items-center gap-2 text-duo-rose font-bold">
+            <span class="material-symbols-outlined text-base">people</span>
+            <span>1v1 Ticket Clash: First camper to hit Jaldi 5 wins the duel!</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button class="btn-duo-switch btn-switch-ticket px-2.5 py-1 rounded-lg text-xs font-bold ${gameState.activeDuoTicket === 'P1' ? 'bg-sunset-coral text-white' : 'bg-surface-bright text-gray-300'}" data-ticket="P1">Ticket 1 (You)</button>
+            <button class="btn-duo-switch btn-switch-ticket px-2.5 py-1 rounded-lg text-xs font-bold ${gameState.activeDuoTicket === 'P2' ? 'bg-duo-rose text-white' : 'bg-surface-bright text-gray-300'}" data-ticket="P2">Ticket 2 (Partner)</button>
+          </div>
+        </div>
+      ` : ''}
 
       <!-- MAIN STAGE -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -247,7 +292,7 @@ export function renderTambolaGame() {
 
             <!-- 3x9 Ticket Grid -->
             <div class="grid grid-rows-3 gap-2 bg-[#0A0D18] p-2.5 sm:p-3.5 rounded-2xl border border-white/10 overflow-x-auto">
-              ${gameState.ticket.map((row, rIdx) => `
+              ${((currentPlayMode === 'DUOS' && gameState.activeDuoTicket === 'P2') ? gameState.ticketP2 : gameState.ticket).map((row, rIdx) => `
                 <div class="grid grid-cols-9 gap-1.5 sm:gap-2">
                   ${row.map((cell, cIdx) => {
                     if (!cell) {
@@ -414,12 +459,44 @@ export function bindTambolaEvents() {
     });
   }
 
+  // Mode Switcher
+  document.querySelectorAll('.btn-tambola-mode').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== gameState.playMode) {
+        audio.playClick();
+        gameState.playMode = mode;
+        store.setArcadePlayMode(mode);
+        initTambolaGame();
+        reRender();
+      }
+    });
+  });
+
+  // Duos Ticket Switch
+  document.querySelectorAll('.btn-duo-switch').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const t = btn.getAttribute('data-ticket');
+      if (t && t !== gameState.activeDuoTicket) {
+        audio.playClick();
+        gameState.activeDuoTicket = t;
+        reRender();
+      }
+    });
+  });
+
   // New Ticket
   const newTicketBtn = document.getElementById('btn-tambola-new-ticket');
   if (newTicketBtn) {
     newTicketBtn.addEventListener('click', () => {
       audio.playClick();
-      gameState.ticket = generateTambolaTicket();
+      if (gameState.playMode === 'DUOS' && gameState.activeDuoTicket === 'P2') {
+        gameState.ticketP2 = generateTambolaTicket();
+      } else {
+        gameState.ticket = generateTambolaTicket();
+      }
       reRender();
     });
   }
@@ -440,7 +517,8 @@ export function bindTambolaEvents() {
     cell.addEventListener('click', () => {
       const r = parseInt(cell.dataset.row, 10);
       const c = parseInt(cell.dataset.col, 10);
-      const cellData = gameState.ticket[r][c];
+      const curTicket = (gameState.playMode === 'DUOS' && gameState.activeDuoTicket === 'P2') ? gameState.ticketP2 : gameState.ticket;
+      const cellData = curTicket && curTicket[r] ? curTicket[r][c] : null;
       if (cellData) {
         cellData.marked = !cellData.marked;
         audio.playCameraSnap();
@@ -477,7 +555,7 @@ export function bindTambolaEvents() {
     const claim = gameState.claims[claimKey];
     if (!claim || claim.claimedBy) return;
 
-    const ticket = gameState.ticket;
+    const ticket = (gameState.playMode === 'DUOS' && gameState.activeDuoTicket === 'P2') ? gameState.ticketP2 : gameState.ticket;
     const called = new Set(gameState.calledNumbers);
     let isValid = false;
 

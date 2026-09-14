@@ -18,25 +18,74 @@ function getAllPrompts() {
   return [...MOST_LIKELY_TO_DECK, ...customBallots];
 }
 
+let duosVotes = { p1: null, p2: null };
+let soloArchetypes = { guilty: 0, notMe: 0 };
+
 function initVotes() {
+  const currentPlayMode = store.getState().arcadePlayMode || 'GROUP';
   const room = store.getState().activeRoom;
-  const players = (room && room.players) ? room.players : [];
+  const currentUser = store.getState().currentUser || {};
+  const currentUserId = currentUser.id || 'p1';
+
   votes = {};
-  players.forEach((p) => {
-    votes[p.id] = 0;
-  });
+  if (currentPlayMode === 'DUOS') {
+    votes[currentUserId] = 0;
+    votes['partner'] = 0;
+    duosVotes = { p1: null, p2: null };
+  } else if (currentPlayMode === 'SOLO') {
+    // Solo uses soloArchetypes
+  } else {
+    // GROUP
+    const players = (room && room.players && room.players.length >= 3)
+      ? room.players
+      : [
+          { id: currentUserId, name: currentUser.displayName ? `${currentUser.displayName.split(' ')[0]} (You)` : 'You (Host)' },
+          { id: 'p2', name: 'Kabir' },
+          { id: 'p3', name: 'Riya' },
+          { id: 'p4', name: 'Ananya' }
+        ];
+    players.forEach((p) => {
+      votes[p.id] = 0;
+    });
+  }
+
   hasVoted = false;
   revealed = false;
 }
 
 export function renderMostLikelyToGame() {
+  const currentPlayMode = store.getState().arcadePlayMode || 'GROUP';
   const prompts = getAllPrompts();
   if (currentPromptIndex >= prompts.length) currentPromptIndex = 0;
   const currentPrompt = prompts[currentPromptIndex] || prompts[0];
 
   const state = store.getState();
   const room = state.activeRoom || {};
-  const players = room.players || [];
+  const currentUser = state.currentUser || {};
+  const currentUserId = currentUser.id || 'p1';
+  const currentUserName = currentUser.displayName ? `${currentUser.displayName.split(' ')[0]} (You)` : 'You (Host)';
+
+  let players = [];
+  if (currentPlayMode === 'DUOS') {
+    players = [
+      { id: currentUserId, name: currentUserName, avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' },
+      { id: 'partner', name: 'Partner', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Partner' }
+    ];
+  } else if (currentPlayMode === 'SOLO') {
+    players = [
+      { id: currentUserId, name: currentUserName, avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' }
+    ];
+  } else {
+    players = (room.players && room.players.length >= 3)
+      ? room.players
+      : [
+          { id: currentUserId, name: currentUserName, avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' },
+          { id: 'p2', name: 'Kabir', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir' },
+          { id: 'p3', name: 'Riya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Riya' },
+          { id: 'p4', name: 'Ananya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya' }
+        ];
+  }
+
   const totalVotes = Object.values(votes).reduce((sum, v) => sum + v, 0);
 
   // Find current leader(s)
@@ -57,8 +106,8 @@ export function renderMostLikelyToGame() {
       <div class="absolute top-80 left-10 w-80 h-80 bg-sunset-coral/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
       <!-- Top Header & Back -->
-      <div class="flex items-center justify-between p-4 rounded-2xl bg-surface border border-border shadow-xl mb-6">
-        <button id="btn-mlt-back-arcade" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-bright/70 hover:bg-surface-bright text-xs font-bold text-gray-300 hover:text-white transition-all active:scale-95">
+      <div class="flex items-center justify-between p-4 rounded-2xl bg-surface border border-border shadow-xl mb-4">
+        <button id="btn-mlt-back-arcade" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-bright/70 hover:bg-surface-bright text-xs font-bold text-gray-300 hover:text-white transition-all active:scale-95 cursor-pointer">
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span>Back to Arcade</span>
         </button>
@@ -68,11 +117,30 @@ export function renderMostLikelyToGame() {
           <span class="text-[11px] font-mono font-bold text-amber-gold uppercase tracking-wider">Most Likely To · Live Ballot</span>
         </div>
 
-        <button id="btn-mlt-custom-prompt" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 border border-amber-gold/40 text-amber-gold text-xs font-bold transition-all active:scale-95">
+        <button id="btn-mlt-custom-prompt" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 border border-amber-gold/40 text-amber-gold text-xs font-bold transition-all active:scale-95 cursor-pointer">
           <span class="material-symbols-outlined text-[15px]">how_to_vote</span>
           <span class="hidden sm:inline">+ Custom Ballot</span>
           <span class="sm:hidden">+ Ballot</span>
         </button>
+      </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-gold text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">Ballot Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-mlt-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-amber-gold text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (Squad Vote)
+          </button>
+          <button class="btn-mlt-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (Who's More Likely?)
+          </button>
+          <button class="btn-mlt-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo (Roast Archive)
+          </button>
+        </div>
       </div>
 
       <!-- PROMPT CARD -->
@@ -88,7 +156,9 @@ export function renderMostLikelyToGame() {
           "${currentPrompt.question || currentPrompt.prompt || currentPrompt.text}"
         </h3>
 
-        <p class="text-xs text-gray-400 mt-2 mb-3">Tap on the camper in your room who fits this the most!</p>
+        <p class="text-xs text-gray-400 mt-2 mb-3">
+          ${currentPlayMode === 'DUOS' ? "Who fits this more: You or your Partner? Tap to cast your duel vote!" : currentPlayMode === 'SOLO' ? "Be honest: Does this describe you or would you never do this?" : "Tap on the camper in your room who fits this the most!"}
+        </p>
 
         <!-- In-Game 20-Second Ballot Shot Clock -->
         <div class="max-w-md mx-auto mb-4 p-2.5 rounded-2xl bg-[#0F131E]/80 border border-white/10 flex flex-col gap-1.5">
@@ -107,66 +177,97 @@ export function renderMostLikelyToGame() {
 
         <!-- Vote Control Buttons -->
         <div class="flex items-center justify-center gap-3">
-          <button id="btn-mlt-reveal" class="px-5 py-2.5 rounded-full ${revealed ? 'bg-mint-green/20 text-mint-green border border-mint-green/40' : 'bg-amber-gold hover:bg-[#FFBF47] text-dark'} font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px]">${revealed ? 'verified' : 'visibility'}</span>
-            <span>${revealed ? 'Results Revealed' : 'Reveal Squad Verdict'}</span>
-          </button>
+          ${currentPlayMode !== 'SOLO' ? `
+            <button id="btn-mlt-reveal" class="px-5 py-2.5 rounded-full ${revealed ? 'bg-mint-green/20 text-mint-green border border-mint-green/40' : 'bg-amber-gold hover:bg-[#FFBF47] text-dark'} font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">${revealed ? 'verified' : 'visibility'}</span>
+              <span>${revealed ? 'Results Revealed' : 'Reveal Verdict'}</span>
+            </button>
+          ` : ''}
 
-          <button id="btn-mlt-next" class="px-4 py-2.5 rounded-full bg-surface-bright hover:bg-surface-bright/80 text-gray-300 hover:text-white border border-border text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5">
+          <button id="btn-mlt-next" class="px-4 py-2.5 rounded-full bg-surface-bright hover:bg-surface-bright/80 text-gray-300 hover:text-white border border-border text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
             <span>Next Ballot</span>
             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
         </div>
       </div>
 
-      <!-- LIVE CANDIDATE GRID (ROOM CAMPERS) -->
-      <div class="p-5 rounded-2xl bg-surface border border-border shadow-xl">
-        <div class="flex items-center justify-between mb-4 pb-2 border-b border-border/60">
-          <h4 class="font-display text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-amber-gold text-[18px]">how_to_vote</span>
-            <span>Vote for Camper (${totalVotes} votes cast)</span>
-          </h4>
-          <span class="text-[11px] font-mono text-gray-400">1 Tap = 1 Vote</span>
+      <!-- LIVE CANDIDATE GRID (ROOM CAMPERS) OR SOLO CHOICES -->
+      ${currentPlayMode === 'SOLO' ? `
+        <div class="p-6 rounded-2xl bg-surface border border-border shadow-xl text-center">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-border/60">
+            <span class="text-xs font-mono text-gray-400 uppercase font-bold">Your Honest Self-Verdict</span>
+            <span class="text-xs font-mono text-mint-green font-bold">Campfire Archetype Log</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <button id="btn-solo-guilty" class="p-5 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border-2 border-rose-500/40 text-rose-300 font-bold flex flex-col items-center gap-2 active:scale-95 cursor-pointer transition-all">
+              <span class="material-symbols-outlined text-3xl text-rose-400">psychology_alt</span>
+              <span class="text-sm font-display">Guilty as Charged!</span>
+              <span class="text-[11px] font-mono text-rose-200/80">"Yup, that's totally me"</span>
+            </button>
+
+            <button id="btn-solo-notme" class="p-5 rounded-2xl bg-mint-green/15 hover:bg-mint-green/25 border-2 border-mint-green/40 text-mint-green font-bold flex flex-col items-center gap-2 active:scale-95 cursor-pointer transition-all">
+              <span class="material-symbols-outlined text-3xl text-mint-green">verified_user</span>
+              <span class="text-sm font-display">Never In My Life!</span>
+              <span class="text-[11px] font-mono text-mint-green/80">"Not even close"</span>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-around p-3 rounded-xl bg-black/40 border border-white/5 text-xs font-mono">
+            <span class="text-rose-400">Wild Tendencies: <strong>${soloArchetypes.guilty}</strong></span>
+            <span class="text-gray-500">|</span>
+            <span class="text-mint-green">Innocent Habits: <strong>${soloArchetypes.notMe}</strong></span>
+          </div>
         </div>
+      ` : `
+        <div class="p-5 rounded-2xl bg-surface border border-border shadow-xl">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-border/60">
+            <h4 class="font-display text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-gold text-[18px]">how_to_vote</span>
+              <span>${currentPlayMode === 'DUOS' ? 'Duos Face-off Ballot' : `Vote for Camper (${totalVotes} votes cast)`}</span>
+            </h4>
+            <span class="text-[11px] font-mono text-gray-400">1 Tap = 1 Vote</span>
+          </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="mlt-players-grid">
-          ${players.map((p) => {
-            const count = votes[p.id] || 0;
-            const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-            const isLeader = revealed && totalVotes > 0 && p.id === leaderId;
+          <div class="grid grid-cols-1 ${currentPlayMode === 'DUOS' ? 'grid-cols-2' : 'sm:grid-cols-2'} gap-3" id="mlt-players-grid">
+            ${players.map((p) => {
+              const count = votes[p.id] || 0;
+              const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+              const isLeader = revealed && totalVotes > 0 && p.id === leaderId;
 
-            return `
-              <div class="mlt-vote-card relative p-3.5 rounded-2xl ${isLeader ? 'bg-amber-gold/15 border-2 border-amber-gold shadow-lg shadow-amber-gold/10' : 'bg-surface-bright/60 hover:bg-surface-bright border border-border'} cursor-pointer transition-all active:scale-98 overflow-hidden group" data-player-id="${p.id}">
-                
-                <!-- Live Progress Bar Background -->
-                <div class="absolute left-0 top-0 bottom-0 bg-amber-gold/15 transition-all duration-500 pointer-events-none" style="width: ${revealed ? percentage : 0}%"></div>
+              return `
+                <div class="mlt-vote-card relative p-3.5 rounded-2xl ${isLeader ? 'bg-amber-gold/15 border-2 border-amber-gold shadow-lg shadow-amber-gold/10' : 'bg-surface-bright/60 hover:bg-surface-bright border border-border'} cursor-pointer transition-all active:scale-98 overflow-hidden group" data-player-id="${p.id}">
+                  
+                  <!-- Live Progress Bar Background -->
+                  <div class="absolute left-0 top-0 bottom-0 bg-amber-gold/15 transition-all duration-500 pointer-events-none" style="width: ${revealed ? percentage : 0}%"></div>
 
-                <div class="relative z-10 flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-surface border ${isLeader ? 'border-amber-gold' : 'border-border'} flex items-center justify-center shrink-0 overflow-hidden">
-                      ${p.avatar && (p.avatar.startsWith('http') || p.avatar.startsWith('data:') || p.avatar.startsWith('/')) ? `<img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>` : (p.avatar && p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-lg">person</span>')}
-                    </div>
-                    <div>
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-sm font-bold text-white group-hover:text-amber-gold transition-colors">${p.name}</span>
-                        ${isLeader ? '<span class="material-symbols-outlined text-amber-gold text-base" title="Squad Consensus">hotel_class</span>' : ''}
+                  <div class="relative z-10 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-11 h-11 rounded-full bg-surface border ${isLeader ? 'border-amber-gold' : 'border-border'} flex items-center justify-center shrink-0 overflow-hidden">
+                        <img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>
                       </div>
-                      <span class="text-[11px] text-gray-400">${revealed ? `${percentage}% consensus` : 'Tap to cast vote'}</span>
+                      <div>
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-sm font-bold text-white group-hover:text-amber-gold transition-colors">${p.name}</span>
+                          ${isLeader ? '<span class="material-symbols-outlined text-amber-gold text-base" title="Consensus Winner">hotel_class</span>' : ''}
+                        </div>
+                        <span class="text-[11px] text-gray-400">${revealed ? `${percentage}% consensus` : 'Tap to cast vote'}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div class="flex flex-col items-end">
-                    <span class="font-mono text-lg font-black ${isLeader ? 'text-amber-gold' : 'text-white'}">
-                      ${revealed ? `${count}` : '<span class="material-symbols-outlined text-sm text-gray-400">how_to_vote</span>'}
-                    </span>
-                    <span class="text-[10px] text-gray-400 font-mono">${revealed ? 'votes' : 'vote'}</span>
+                    <div class="flex flex-col items-end">
+                      <span class="font-mono text-lg font-black ${isLeader ? 'text-amber-gold' : 'text-white'}">
+                        ${revealed ? `${count}` : '<span class="material-symbols-outlined text-sm text-gray-400">how_to_vote</span>'}
+                      </span>
+                      <span class="text-[10px] text-gray-400 font-mono">${revealed ? 'votes' : 'vote'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('')}
+          </div>
         </div>
-      </div>
+      `}
 
       <!-- CUSTOM BALLOT MODAL -->
       <div id="mlt-custom-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -234,6 +335,50 @@ export function bindMostLikelyToEvents() {
         reRender();
       }
     }, 1000);
+  }
+
+  // In-Game Play Mode Switcher
+  document.querySelectorAll('.btn-mlt-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== store.getState().arcadePlayMode) {
+        if (mltTimerInterval) clearInterval(mltTimerInterval);
+        audio.playClick();
+        store.setArcadePlayMode(mode);
+        initVotes();
+        reRender();
+      }
+    });
+  });
+
+  // Solo Mode Buttons
+  const btnSoloGuilty = document.getElementById('btn-solo-guilty');
+  if (btnSoloGuilty) {
+    btnSoloGuilty.addEventListener('click', () => {
+      audio.playScoreUp();
+      soloArchetypes.guilty++;
+      setTimeout(() => {
+        const prompts = getAllPrompts();
+        currentPromptIndex = (currentPromptIndex + 1) % prompts.length;
+        reRender();
+      }, 400);
+      reRender();
+    });
+  }
+
+  const btnSoloNotMe = document.getElementById('btn-solo-notme');
+  if (btnSoloNotMe) {
+    btnSoloNotMe.addEventListener('click', () => {
+      audio.playChime();
+      soloArchetypes.notMe++;
+      setTimeout(() => {
+        const prompts = getAllPrompts();
+        currentPromptIndex = (currentPromptIndex + 1) % prompts.length;
+        reRender();
+      }, 400);
+      reRender();
+    });
   }
 
   // 1. Back to Arcade

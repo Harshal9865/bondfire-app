@@ -14,12 +14,34 @@
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
-import { triggerGameCountdown } from './gameCountdownOverlay.js';
+import { triggerGameCountdown, showGameExampleModal } from './gameCountdownOverlay.js';
 
 export function renderArcadeScreen() {
   const state = store.getState();
   const room = state.activeRoom || {};
   const players = room.players || [];
+  const playMode = state.arcadePlayMode || 'GROUP';
+
+  // Mode-dependent player labels & badge configurations
+  const modeBadges = {
+    RAJA: playMode === 'SOLO' ? 'Solo Detective Run' : playMode === 'DUOS' ? '1v1 Royal Duel' : '4 Players · 1000 Pts',
+    TAMBOLA: playMode === 'SOLO' ? 'Speed Caller Challenge' : playMode === 'DUOS' ? '1v1 Ticket Clash' : '1–90 Caller · Party',
+    BOLLYWOOD: playMode === 'SOLO' ? '15s Blitz Run' : playMode === 'DUOS' ? '1v1 Filmi Battle' : 'Squad Relay · 15s',
+    BOTTLE: playMode === 'SOLO' ? 'Daily Dare Wheel' : playMode === 'DUOS' ? '2-Player Intimate Duel' : '3–12 Players · Circle',
+    NHIE: playMode === 'SOLO' ? 'Solo Guilt Meter' : playMode === 'DUOS' ? '1v1 Bestie Face-off' : 'Squad Survivor · 10F',
+    MLT: playMode === 'SOLO' ? 'Roast Archive' : playMode === 'DUOS' ? '2P "Who\'s More Likely?"' : 'Squad Ballot · Votes',
+    WATCH: playMode === 'SOLO' ? 'Personal Cinema' : playMode === 'DUOS' ? 'Date Lounge (2P)' : 'Squad Cinema · Synced',
+  };
+
+  const actionLabels = {
+    RAJA: playMode === 'SOLO' ? 'Play Solo Detective' : playMode === 'DUOS' ? 'Play 1v1 Duel' : 'Play Royal Heist',
+    TAMBOLA: playMode === 'SOLO' ? 'Start Speed Caller' : playMode === 'DUOS' ? 'Play 1v1 Clash' : 'Play Tambola',
+    BOLLYWOOD: playMode === 'SOLO' ? 'Start Blitz Sprint' : playMode === 'DUOS' ? 'Play 1v1 Battle' : 'Play Filmi Masala',
+    BOTTLE: playMode === 'SOLO' ? 'Spin Daily Dare' : playMode === 'DUOS' ? 'Spin 1v1 Duel' : 'Spin with Squad',
+    NHIE: playMode === 'SOLO' ? 'Test Guilt Meter' : playMode === 'DUOS' ? '1v1 Finger Drop' : 'Drop a Finger',
+    MLT: playMode === 'SOLO' ? 'Roast Archive' : playMode === 'DUOS' ? 'Start 2P Debate' : 'Start Voting',
+    WATCH: playMode === 'SOLO' ? 'Solo Cinema' : playMode === 'DUOS' ? 'Watch 1v1 Stream' : 'Watch Together',
+  };
 
   return `
     <div class="flex flex-col w-full max-w-[1040px] mx-auto px-4 pt-6 pb-28 relative select-none z-20">
@@ -50,6 +72,41 @@ export function renderArcadeScreen() {
             <span class="material-symbols-outlined text-[16px]">tune</span>
             <span>Room Settings</span>
           </a>
+        </div>
+      </div>
+
+      <!-- PLAY MODE SELECTOR: GROUP (SQUAD) / DUOS (1V1) / SOLO (1P) -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-3xl bg-surface/90 border-2 border-border shadow-xl mb-6 backdrop-blur-md">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-gold/15 border border-amber-gold/30 flex items-center justify-center text-amber-gold shrink-0">
+            <span class="material-symbols-outlined text-lg">sports_esports</span>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-white uppercase tracking-wider font-mono flex items-center gap-1.5">
+              <span>Arcade Play Mode:</span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${playMode === 'SOLO' ? 'bg-mint-green/20 text-mint-green border border-mint-green/30' : playMode === 'DUOS' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/30' : 'bg-amber-gold/20 text-amber-gold border border-amber-gold/30'}">
+                ${playMode === 'SOLO' ? 'Solo (1 Player)' : playMode === 'DUOS' ? 'Duos (2-Player 1v1)' : 'Group (Squad 3+)'}
+              </span>
+            </div>
+            <p class="text-[11px] text-gray-400 font-sans mt-0.5">
+              ${playMode === 'SOLO' ? 'Solo practice run, detective challenge & personal high scores' : playMode === 'DUOS' ? 'Head-to-head 1v1 duels, couples & besties showdown' : 'Living room multiplayer party room synced across all screens'}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-[#0F131E] border border-white/10 w-full sm:w-auto justify-center shrink-0">
+          <button class="btn-arcade-mode-tab flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${playMode === 'GROUP' ? 'bg-amber-gold text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5'}" data-mode="GROUP">
+            <span class="material-symbols-outlined text-[15px]">groups</span>
+            <span>Group</span>
+          </button>
+          <button class="btn-arcade-mode-tab flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${playMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5'}" data-mode="DUOS">
+            <span class="material-symbols-outlined text-[15px]">people</span>
+            <span>Duos</span>
+          </button>
+          <button class="btn-arcade-mode-tab flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${playMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5'}" data-mode="SOLO">
+            <span class="material-symbols-outlined text-[15px]">person</span>
+            <span>Solo</span>
+          </button>
         </div>
       </div>
 
@@ -98,7 +155,7 @@ export function renderArcadeScreen() {
                   ROYAL BLUFF
                 </span>
                 <span class="text-xs text-amber-gold font-mono font-bold whitespace-nowrap shrink-0">
-                  4 Players · 1000 Pts
+                  ${modeBadges.RAJA}
                 </span>
               </div>
 
@@ -114,11 +171,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <!-- Action Button -->
-            <button id="arcade-launch-raja" class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-gold via-[#ffc633] to-sunset-coral text-dark font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-gold/20 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Play Royal Heist</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row (Launch + Example) -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-raja" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-amber-gold via-[#ffc633] to-sunset-coral text-dark font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-gold/20 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.RAJA}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-raja" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-amber-gold border border-amber-gold/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="RAJA_MANTRI">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
           <!-- CARD 2: DESI TAMBOLA HOUSIE (EMERALD MINT) -->
@@ -132,7 +194,7 @@ export function renderArcadeScreen() {
                   INDIAN HOUSIE
                 </span>
                 <span class="text-xs text-[#06D6A0] font-mono font-bold whitespace-nowrap shrink-0">
-                  1–90 Caller · Tickets
+                  ${modeBadges.TAMBOLA}
                 </span>
               </div>
 
@@ -148,11 +210,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <!-- Action Button -->
-            <button id="arcade-launch-tambola" class="w-full py-3 rounded-2xl bg-gradient-to-r from-[#06D6A0] to-amber-gold text-dark font-black text-xs uppercase tracking-wider shadow-lg shadow-[#06D6A0]/25 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Play Tambola</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row (Launch + Example) -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-tambola" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#06D6A0] to-amber-gold text-dark font-black text-xs uppercase tracking-wider shadow-lg shadow-[#06D6A0]/25 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.TAMBOLA}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-tambola" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-[#06D6A0] border border-[#06D6A0]/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="TAMBOLA">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
           <!-- CARD 3: BOLLYWOOD ANTAKSHARI & FILMI MASALA (ELECTRIC ROSE - NEW INTERESTING GAME!) -->
@@ -166,7 +233,7 @@ export function renderArcadeScreen() {
                   FILMI DHAMAKA
                 </span>
                 <span class="text-xs text-rose-400 font-mono font-bold whitespace-nowrap shrink-0">
-                  15s Shot Clock · Songs
+                  ${modeBadges.BOLLYWOOD}
                 </span>
               </div>
 
@@ -182,11 +249,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <!-- Action Button -->
-            <button id="arcade-launch-bollywood" class="w-full py-3 rounded-2xl bg-gradient-to-r from-rose-500 via-sunset-coral to-amber-gold text-canvas font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-500/25 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Play Filmi Masala</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row (Launch + Example) -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-bollywood" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-rose-500 via-sunset-coral to-amber-gold text-canvas font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-500/25 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.BOLLYWOOD}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-bollywood" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-rose-400 border border-rose-500/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="BOLLYWOOD">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -218,7 +290,9 @@ export function renderArcadeScreen() {
                 <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[8.5px] sm:text-[9px] bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 whitespace-nowrap shrink-0">
                   CLASSIC PARTY
                 </span>
-                <span class="text-xs text-mint-green font-mono font-bold whitespace-nowrap shrink-0">2–12 Players</span>
+                <span class="text-xs text-mint-green font-mono font-bold whitespace-nowrap shrink-0">
+                  ${modeBadges.BOTTLE}
+                </span>
               </div>
 
               <div class="flex items-center gap-3 mb-2">
@@ -231,10 +305,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <button id="arcade-launch-bottle" class="w-full py-3 rounded-2xl bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-xs shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Spin with Squad</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-bottle" class="flex-1 py-3 rounded-2xl bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-xs shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.BOTTLE}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-bottle" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-sunset-coral border border-sunset-coral/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="BOTTLE">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
           <!-- GAME 5: NEVER HAVE I EVER (DROP A FINGER) - DUO ROSE -->
@@ -246,7 +326,9 @@ export function renderArcadeScreen() {
                 <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[8.5px] sm:text-[9px] bg-duo-rose/20 text-duo-rose border border-duo-rose/40 whitespace-nowrap shrink-0">
                   SURVIVOR
                 </span>
-                <span class="text-xs text-duo-rose font-mono font-bold whitespace-nowrap shrink-0">10 Stamina Left</span>
+                <span class="text-xs text-duo-rose font-mono font-bold whitespace-nowrap shrink-0">
+                  ${modeBadges.NHIE}
+                </span>
               </div>
 
               <div class="flex items-center gap-3 mb-2">
@@ -259,10 +341,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <button id="arcade-launch-nhie" class="w-full py-3 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-xs shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Drop a Finger</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-nhie" class="flex-1 py-3 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-xs shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.NHIE}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-nhie" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-duo-rose border border-duo-rose/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="NHIE">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
           <!-- GAME 6: MOST LIKELY TO... (SQUAD BALLOT) - AMBER GOLD -->
@@ -274,7 +362,9 @@ export function renderArcadeScreen() {
                 <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[8.5px] sm:text-[9px] bg-amber-gold/20 text-amber-gold border border-amber-gold/40 whitespace-nowrap shrink-0">
                   LIVE BALLOT
                 </span>
-                <span class="text-xs text-amber-gold font-mono font-bold whitespace-nowrap shrink-0">Consensus Vote</span>
+                <span class="text-xs text-amber-gold font-mono font-bold whitespace-nowrap shrink-0">
+                  ${modeBadges.MLT}
+                </span>
               </div>
 
               <div class="flex items-center gap-3 mb-2">
@@ -287,10 +377,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <button id="arcade-launch-mlt" class="w-full py-3 rounded-2xl bg-amber-gold hover:bg-[#FFBF47] text-dark font-bold text-xs shadow-lg shadow-amber-gold/20 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Start Voting</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-mlt" class="flex-1 py-3 rounded-2xl bg-amber-gold hover:bg-[#FFBF47] text-dark font-bold text-xs shadow-lg shadow-amber-gold/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.MLT}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-mlt" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-amber-gold border border-amber-gold/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="MOST_LIKELY_TO">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
           <!-- GAME 7: WATCH PARTY STREAM (INTERACTIVE STREAM) - ELECTRIC VIOLET -->
@@ -302,7 +398,9 @@ export function renderArcadeScreen() {
                 <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[8.5px] sm:text-[9px] bg-[#7C4DFF]/20 text-[#A480FF] border border-[#7C4DFF]/40 whitespace-nowrap shrink-0">
                   WATCH &amp; PLAY
                 </span>
-                <span class="text-xs text-[#A480FF] font-mono font-bold whitespace-nowrap shrink-0">Synced Stream</span>
+                <span class="text-xs text-[#A480FF] font-mono font-bold whitespace-nowrap shrink-0">
+                  ${modeBadges.WATCH}
+                </span>
               </div>
 
               <div class="flex items-center gap-3 mb-2">
@@ -315,10 +413,16 @@ export function renderArcadeScreen() {
               </p>
             </div>
 
-            <button id="arcade-launch-watch" class="w-full py-3 rounded-2xl bg-[#7C4DFF] hover:bg-[#8D65FF] text-white font-bold text-xs shadow-lg shadow-[#7C4DFF]/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-              <span>Watch Together</span>
-              <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-            </button>
+            <!-- Action Buttons Row -->
+            <div class="flex items-center gap-2 w-full pt-1">
+              <button id="arcade-launch-watch" class="flex-1 py-3 rounded-2xl bg-[#7C4DFF] hover:bg-[#8D65FF] text-white font-bold text-xs shadow-lg shadow-[#7C4DFF]/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>${actionLabels.WATCH}</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+              <button id="btn-example-watch" class="btn-game-example p-3 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright text-[#A480FF] border border-[#7C4DFF]/30 transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0" title="See How It Works (Example)" data-game="ARCADE">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -329,19 +433,79 @@ export function renderArcadeScreen() {
 }
 
 export function bindArcadeEvents() {
+  // Play Mode Switcher Tabs
+  document.querySelectorAll('.btn-arcade-mode-tab').forEach((tab) => {
+    tab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = tab.getAttribute('data-mode');
+      if (mode && mode !== store.getState().arcadePlayMode) {
+        try { audio.playClick(); } catch (_) {}
+        store.setArcadePlayMode(mode);
+        const mount = document.getElementById('main-content') || document.querySelector('main');
+        if (mount) {
+          mount.innerHTML = renderArcadeScreen();
+          bindArcadeEvents();
+        }
+      }
+    });
+  });
+
+  // How to Play (Example) Buttons
+  document.querySelectorAll('.btn-game-example').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const gameKey = btn.getAttribute('data-game');
+      if (gameKey) {
+        try { audio.playClick(); } catch (_) {}
+        showGameExampleModal({
+          mode: gameKey,
+          playMode: store.getState().arcadePlayMode,
+          onLaunch: () => {
+            launchArcadeGame(gameKey);
+          }
+        });
+      }
+    });
+  });
+
+  function launchArcadeGame(modeKey) {
+    const titles = {
+      RAJA_MANTRI: 'Raja Mantri Chor Sipahi',
+      TAMBOLA: 'Desi Tambola Housie',
+      BOLLYWOOD: 'Bollywood Antakshari & Masala',
+      BOTTLE: 'Spin the Bottle',
+      NHIE: 'Never Have I Ever',
+      MOST_LIKELY_TO: 'Most Likely To',
+      ARCADE: 'Watch Party & Stream'
+    };
+
+    const routes = {
+      RAJA_MANTRI: 'RAJA_MANTRI',
+      TAMBOLA: 'TAMBOLA',
+      BOLLYWOOD: 'BOLLYWOOD',
+      BOTTLE: 'BOTTLE',
+      NHIE: 'NHIE',
+      MOST_LIKELY_TO: 'MOST_LIKELY_TO',
+      ARCADE: 'SHOWS'
+    };
+
+    triggerGameCountdown({
+      mode: modeKey,
+      title: titles[modeKey] || 'Arcade Game',
+      onComplete: () => {
+        const view = routes[modeKey] || 'ARCADE';
+        store.setView(view);
+        window.location.hash = `#/${view}`;
+      }
+    });
+  }
+
   // Launch Raja Mantri Chor Sipahi
   const btnRaja = document.getElementById('arcade-launch-raja');
   if (btnRaja) {
     btnRaja.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'RAJA_MANTRI',
-        title: 'Raja Mantri Chor Sipahi',
-        onComplete: () => {
-          store.setView('RAJA_MANTRI');
-          window.location.hash = '#/RAJA_MANTRI';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('RAJA_MANTRI');
     });
   }
 
@@ -349,15 +513,8 @@ export function bindArcadeEvents() {
   const btnTambola = document.getElementById('arcade-launch-tambola');
   if (btnTambola) {
     btnTambola.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'TAMBOLA',
-        title: 'Desi Tambola Housie',
-        onComplete: () => {
-          store.setView('TAMBOLA');
-          window.location.hash = '#/TAMBOLA';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('TAMBOLA');
     });
   }
 
@@ -365,15 +522,8 @@ export function bindArcadeEvents() {
   const btnBolly = document.getElementById('arcade-launch-bollywood');
   if (btnBolly) {
     btnBolly.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'BOLLYWOOD',
-        title: 'Bollywood Antakshari & Masala',
-        onComplete: () => {
-          store.setView('BOLLYWOOD');
-          window.location.hash = '#/BOLLYWOOD';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('BOLLYWOOD');
     });
   }
 
@@ -381,15 +531,8 @@ export function bindArcadeEvents() {
   const btnWatch = document.getElementById('arcade-launch-watch');
   if (btnWatch) {
     btnWatch.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'ARCADE',
-        title: 'Watch Party & Stream',
-        onComplete: () => {
-          store.setView('SHOWS');
-          window.location.hash = '#/SHOWS';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('ARCADE');
     });
   }
 
@@ -397,15 +540,8 @@ export function bindArcadeEvents() {
   const btnBottle = document.getElementById('arcade-launch-bottle');
   if (btnBottle) {
     btnBottle.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'BOTTLE',
-        title: 'Spin the Bottle',
-        onComplete: () => {
-          store.setView('BOTTLE');
-          window.location.hash = '#/BOTTLE';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('BOTTLE');
     });
   }
 
@@ -413,15 +549,8 @@ export function bindArcadeEvents() {
   const btnNhie = document.getElementById('arcade-launch-nhie');
   if (btnNhie) {
     btnNhie.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'NHIE',
-        title: 'Never Have I Ever',
-        onComplete: () => {
-          store.setView('NHIE');
-          window.location.hash = '#/NHIE';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('NHIE');
     });
   }
 
@@ -429,15 +558,9 @@ export function bindArcadeEvents() {
   const btnMlt = document.getElementById('arcade-launch-mlt');
   if (btnMlt) {
     btnMlt.addEventListener('click', () => {
-      audio.playClick();
-      triggerGameCountdown({
-        mode: 'MOST_LIKELY_TO',
-        title: 'Most Likely To',
-        onComplete: () => {
-          store.setView('MOST_LIKELY_TO');
-          window.location.hash = '#/MOST_LIKELY_TO';
-        }
-      });
+      try { audio.playClick(); } catch (_) {}
+      launchArcadeGame('MOST_LIKELY_TO');
     });
   }
 }
+

@@ -20,6 +20,7 @@ const ROLES = {
 };
 
 let gameState = {
+  playMode: 'GROUP', // 'GROUP' | 'DUOS' | 'SOLO'
   round: 1,
   totalRounds: 5,
   phase: 'SHUFFLE', // 'SHUFFLE' | 'PEEK' | 'RAJA_PROCLAIM' | 'ACCUSATION' | 'VERDICT'
@@ -35,15 +36,38 @@ let gameState = {
 
 function initNewRound(resetScores = false) {
   const state = store.getState();
+  const playMode = gameState.playMode || state.arcadePlayMode || 'GROUP';
+  gameState.playMode = playMode;
+
   const hostName = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'You';
   const realPlayers = (state.activeRoom?.players || []).map(p => p.name).filter(Boolean);
 
-  const playerNames = [
-    hostName,
-    realPlayers[0] && realPlayers[0] !== hostName ? realPlayers[0] : 'Aarav',
-    realPlayers[1] && realPlayers[1] !== hostName ? realPlayers[1] : 'Priya',
-    realPlayers[2] && realPlayers[2] !== hostName ? realPlayers[2] : 'Kabir'
-  ];
+  let playerNames = [];
+  if (playMode === 'SOLO') {
+    playerNames = [
+      hostName,
+      'Courtier Aarav (AI)',
+      'Courtier Priya (AI)',
+      'Courtier Kabir (AI)'
+    ];
+  } else if (playMode === 'DUOS') {
+    const partnerName = (realPlayers.length > 0 && realPlayers[0] !== hostName)
+      ? realPlayers[0]
+      : (realPlayers.length > 1 && realPlayers[1] !== hostName ? realPlayers[1] : 'Partner (Player 2)');
+    playerNames = [
+      hostName,
+      partnerName,
+      'Courtier Priya (AI)',
+      'Courtier Kabir (AI)'
+    ];
+  } else {
+    playerNames = [
+      hostName,
+      realPlayers[0] && realPlayers[0] !== hostName ? realPlayers[0] : 'Aarav',
+      realPlayers[1] && realPlayers[1] !== hostName ? realPlayers[1] : 'Priya',
+      realPlayers[2] && realPlayers[2] !== hostName ? realPlayers[2] : 'Kabir'
+    ];
+  }
 
   if (resetScores || Object.keys(gameState.scores).length === 0) {
     gameState.scores = {};
@@ -65,6 +89,8 @@ function initNewRound(resetScores = false) {
     roleKey: roleKeys[idx],
     role: ROLES[roleKeys[idx]],
     isUser: idx === 0,
+    isPartner: playMode === 'DUOS' && idx === 1,
+    isAI: (playMode === 'SOLO' && idx > 0) || (playMode === 'DUOS' && idx > 1),
     chitRevealed: false
   }));
 
@@ -78,19 +104,22 @@ function initNewRound(resetScores = false) {
 }
 
 export function renderRajaMantriGame() {
-  if (gameState.players.length === 0) {
+  const storeMode = store.getState().arcadePlayMode || 'GROUP';
+  if (gameState.players.length === 0 || gameState.playMode !== storeMode) {
+    gameState.playMode = storeMode;
     initNewRound(true);
   }
 
   const user = gameState.players[0];
   const raja = gameState.rajaPlayer;
   const mantri = gameState.mantriPlayer;
+  const currentPlayMode = gameState.playMode || 'GROUP';
 
   return `
     <div class="min-h-screen bg-[#090C15] text-white pt-6 pb-28 px-4 sm:px-6 lg:px-12 max-w-[1280px] mx-auto select-none" id="raja-mantri-root">
       
       <!-- Top Royal Bar -->
-      <div class="flex items-center justify-between pb-6 mb-8 border-b border-[#262B40]/70 flex-wrap gap-4">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#262B40]/70 flex-wrap gap-4">
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold uppercase mb-2">
             <span class="material-symbols-outlined text-[16px] text-amber-gold">crown</span>
@@ -115,6 +144,30 @@ export function renderRajaMantriGame() {
             <span>Arcade Hub</span>
           </a>
         </div>
+      </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-gold text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">Royal Court Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-raja-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-amber-gold text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (4 Campers)
+          </button>
+          <button class="btn-raja-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (1v1 Heist)
+          </button>
+          <button class="btn-raja-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo Detective
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Banner -->
+      <div class="w-full mb-6 px-4 py-2 rounded-xl text-center text-xs font-mono ${currentPlayMode === 'DUOS' ? 'bg-duo-rose/10 text-duo-rose border border-duo-rose/30' : currentPlayMode === 'SOLO' ? 'bg-mint-green/10 text-mint-green border border-mint-green/30' : 'bg-surface border border-white/5 text-gray-400'}">
+        ${currentPlayMode === 'DUOS' ? '👫 1v1 Royal Duel: Head-to-head showdown between Human 1 (Mantri) and Human 2 (Chor) with 2 AI courtiers!' : currentPlayMode === 'SOLO' ? '👤 Solo Detective Run: Read AI behavioral tells to unmask the hidden Chor and secure the bounty!' : '👥 Royal Living Room Court: 4 players taking turns guessing chits in real time.'}
       </div>
 
       <!-- MAIN ROYAL HEIST STAGE -->
@@ -325,6 +378,21 @@ export function bindRajaMantriEvents() {
   if (!confettiInstance) {
     confettiInstance = new ConfettiEngine('confetti-canvas');
   }
+
+  // In-Game Mode Switcher
+  document.querySelectorAll('.btn-raja-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== gameState.playMode) {
+        audio.playClick();
+        gameState.playMode = mode;
+        store.setArcadePlayMode(mode);
+        initNewRound(true);
+        reRender();
+      }
+    });
+  });
 
   // Reset Game
   const resetBtn = document.getElementById('btn-raja-reset');

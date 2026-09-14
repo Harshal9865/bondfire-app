@@ -10,23 +10,48 @@ import { getRandomTruth, getRandomDare } from '../data/truthOrDareData.js';
 
 export function renderSpinBottleGame() {
   const state = store.getState();
+  const currentPlayMode = state.arcadePlayMode || 'GROUP';
   const room = state.activeRoom || {};
-  const currentHostName = (state.currentUser && state.currentUser.displayName) ? `${state.currentUser.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+  const currentHostName = (state.currentUser && state.currentUser.displayName) ? `${state.currentUser.displayName.split(' ')[0]} (You)` : 'You (Host)';
   const currentHostAvatar = (state.currentUser && state.currentUser.avatarUrl) ? state.currentUser.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host';
 
-  const players = (room.players && room.players.length > 0)
-    ? room.players
-    : [
-        { id: state.currentUser?.id || 'p1', name: currentHostName, avatar: currentHostAvatar }
-      ];
+  let players = [];
+  if (currentPlayMode === 'DUOS') {
+    // 2 players directly facing each other
+    players = [
+      { id: state.currentUser?.id || 'p1', name: currentHostName, avatar: currentHostAvatar },
+      { id: 'p2', name: 'Partner', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Partner' }
+    ];
+  } else if (currentPlayMode === 'SOLO') {
+    // Solo Challenge Sectors around the wheel
+    players = [
+      { id: 'c1', name: 'Deep Truth', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Truth' },
+      { id: 'c2', name: 'Wild Dare', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Dare' },
+      { id: 'c3', name: 'Secret Confession', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Secret' },
+      { id: 'c4', name: 'Voice Note', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Voice' },
+      { id: 'c5', name: 'Retro Trivia', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Trivia' },
+      { id: 'c6', name: 'Rapid Fire', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Rapid' }
+    ];
+  } else {
+    // Group mode
+    players = (room.players && room.players.length >= 3)
+      ? room.players
+      : [
+          { id: state.currentUser?.id || 'p1', name: currentHostName, avatar: currentHostAvatar },
+          { id: 'p2', name: 'Riya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Riya' },
+          { id: 'p3', name: 'Kabir', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir' },
+          { id: 'p4', name: 'Ananya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya' },
+          { id: 'p5', name: 'Arjun', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun' }
+        ];
+  }
 
   return `
     <div class="flex flex-col items-center justify-between w-full max-w-xl mx-auto px-4 py-6 select-none relative min-h-[85vh]">
       
       <!-- Top Title & Room Info -->
-      <div class="w-full flex items-center justify-between mb-4">
+      <div class="w-full flex items-center justify-between mb-3">
         <div>
-          <span class="retro-pixel-badge text-[9.5px] text-sunset-coral">Arcade Multiplayer</span>
+          <span class="retro-pixel-badge text-[9.5px] text-sunset-coral">Arcade Classics</span>
           <h2 class="font-display text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             <span>Spin the Bottle</span>
             <span class="material-symbols-outlined text-amber-gold text-[22px]">wine_bar</span>
@@ -41,6 +66,30 @@ export function renderSpinBottleGame() {
             <span class="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
+      </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-sunset-coral text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">Bottle Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-bottle-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-sunset-coral text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (Circle)
+          </button>
+          <button class="btn-bottle-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (1v1)
+          </button>
+          <button class="btn-bottle-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo (Dare Wheel)
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Banner -->
+      <div class="w-full mb-3 px-3 py-1.5 rounded-xl text-center text-xs font-mono ${currentPlayMode === 'DUOS' ? 'bg-duo-rose/10 text-duo-rose border border-duo-rose/30' : currentPlayMode === 'SOLO' ? 'bg-mint-green/10 text-mint-green border border-mint-green/30' : 'bg-surface border border-white/5 text-gray-400'}">
+        ${currentPlayMode === 'DUOS' ? '👫 1v1 Intimate Face-off: The bottle spins back and forth strictly between You and your Partner.' : currentPlayMode === 'SOLO' ? '👤 Solo Dare Wheel: Spin to test your bravery against 6 spicy self-discovery dares.' : '👥 Squad Circle: Real party physics spinning across everyone in the campfire circle.'}
       </div>
 
       <!-- The Circle Arena -->
@@ -74,6 +123,7 @@ export function renderSpinBottleGame() {
         <!-- Camper Avatars Positioned Around the Circle -->
         ${players.map((p, idx) => {
           const total = players.length;
+          // In DUOS, position 0 at top (-90 deg), position 1 at bottom (+90 deg)
           const angle = (idx * (360 / total) - 90) * (Math.PI / 180);
           const radius = 135; // px distance from center on mobile
           const x = Math.cos(angle) * radius;
@@ -86,7 +136,7 @@ export function renderSpinBottleGame() {
               data-player-name="${p.name}"
               style="transform: translate(${x}px, ${y}px);"
             >
-              <div class="camper-avatar-ring w-12 h-12 rounded-full p-0.5 border-2 border-border bg-surface shadow-lg transition-all">
+              <div class="camper-avatar-ring w-12 h-12 rounded-full p-0.5 border-2 ${currentPlayMode === 'DUOS' ? (idx === 0 ? 'border-amber-gold' : 'border-duo-rose') : 'border-border'} bg-surface shadow-lg transition-all">
                 <img src="${p.avatar}" class="w-full h-full rounded-full object-cover bg-surface-bright" />
               </div>
               <span class="text-[10px] font-bold text-gray-300 font-mono mt-1 px-1.5 py-0.5 rounded bg-surface/90 border border-border truncate max-w-[80px]">
@@ -101,10 +151,10 @@ export function renderSpinBottleGame() {
       <!-- Spin Controls & Instructions -->
       <div class="w-full max-w-sm flex flex-col items-center gap-3 mt-6">
         <p class="text-xs text-gray-400 font-mono text-center" id="bottle-status-text">
-          Tap the bottle or click below to give it a spin!
+          ${currentPlayMode === 'DUOS' ? 'Tap spin to see who between You and Partner takes the challenge!' : currentPlayMode === 'SOLO' ? 'Tap spin to pick your daily solo truth or dare category!' : 'Tap the bottle or click below to give it a spin!'}
         </p>
 
-        <button id="btn-spin-now" class="w-full py-4 rounded-full bg-gradient-to-r from-sunset-coral via-amber-gold to-sunset-coral text-canvas font-display text-base font-extrabold shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2">
+        <button id="btn-spin-now" class="w-full py-4 rounded-full bg-gradient-to-r from-sunset-coral via-amber-gold to-sunset-coral text-canvas font-display text-base font-extrabold shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
           <span class="material-symbols-outlined text-[24px]">cyclone</span>
           <span>SPIN THE BOTTLE!</span>
         </button>
@@ -439,12 +489,34 @@ export function bindSpinBottleEvents() {
     });
   }
 
+  // In-Game Play Mode Switcher
+  document.querySelectorAll('.btn-bottle-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== store.getState().arcadePlayMode) {
+        stopChallengeTimer();
+        audio.playClick();
+        store.setArcadePlayMode(mode);
+        reRender();
+      }
+    });
+  });
+
   // Exit back to Arcade or Lobby
   if (btnExit) {
     btnExit.addEventListener('click', () => {
       stopChallengeTimer();
       audio.playClick();
-      store.setView('ROOMS');
+      store.setView('ARCADE');
     });
+  }
+
+  function reRender() {
+    const mount = document.getElementById('app-mount');
+    if (mount && store.getState().currentView === 'SPIN_BOTTLE') {
+      mount.innerHTML = renderSpinBottleGame();
+      bindSpinBottleEvents();
+    }
   }
 }

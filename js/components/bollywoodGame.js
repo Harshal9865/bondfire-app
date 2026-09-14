@@ -21,8 +21,11 @@ let currentEra = 'ALL'; // 'ALL' | 'RECENT' | '2010s' | '2000s' | 'RETRO' | 'ANT
 let activeDeck = getQuizDeck(currentEra, 10);
 
 let gameState = {
+  playMode: 'GROUP', // 'GROUP' | 'DUOS' | 'SOLO'
   currentIndex: 0,
   score: 0,
+  scoreP1: 0,
+  scoreP2: 0,
   streak: 0,
   timeLeft: 15,
   isAnswered: false,
@@ -32,8 +35,11 @@ let gameState = {
 
 function resetGameState() {
   gameState = {
+    playMode: gameState.playMode || store.getState().arcadePlayMode || 'GROUP',
     currentIndex: 0,
     score: 0,
+    scoreP1: 0,
+    scoreP2: 0,
     streak: 0,
     timeLeft: 15,
     isAnswered: false,
@@ -47,13 +53,16 @@ export function renderBollywoodGame() {
     activeDeck = getQuizDeck(currentEra, 10);
   }
 
+  const currentPlayMode = store.getState().arcadePlayMode || gameState.playMode || 'GROUP';
+  gameState.playMode = currentPlayMode;
   const current = activeDeck[gameState.currentIndex] || activeDeck[0];
+  const isP1Turn = gameState.currentIndex % 2 === 0;
 
   return `
     <div class="min-h-screen bg-[#090C15] text-white pt-6 pb-28 px-4 sm:px-6 lg:px-12 max-w-[960px] mx-auto select-none" id="bollywood-root">
       
       <!-- Top Navigation Header -->
-      <div class="flex items-center justify-between pb-6 mb-6 border-b border-[#262B40]/70 flex-wrap gap-4">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#262B40]/70 flex-wrap gap-4">
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold uppercase mb-2 shadow-sm">
             <span class="material-symbols-outlined text-[16px]">movie</span>
@@ -80,6 +89,39 @@ export function renderBollywoodGame() {
           </a>
         </div>
       </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-rose-400 text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">Antakshari Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-bolly-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-rose-500 text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (Squad Relay)
+          </button>
+          <button class="btn-bolly-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (1v1 Face-off)
+          </button>
+          <button class="btn-bolly-mode px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo (15s Sprint)
+          </button>
+        </div>
+      </div>
+
+      ${currentPlayMode === 'DUOS' ? `
+        <div class="p-3 rounded-2xl bg-[#1F1422] border border-duo-rose/40 flex items-center justify-between gap-3 text-xs font-mono mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full ${isP1Turn ? 'bg-amber-gold animate-ping' : 'bg-duo-rose animate-ping'}"></span>
+            <span class="font-bold text-white">Active Turn: <strong class="${isP1Turn ? 'text-amber-gold' : 'text-duo-rose'}">${isP1Turn ? 'Player 1 (You)' : 'Player 2 (Partner)'}</strong></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-amber-gold font-bold">P1: ${gameState.scoreP1}</span>
+            <span class="text-gray-500">|</span>
+            <span class="text-duo-rose font-bold">P2: ${gameState.scoreP2}</span>
+          </div>
+        </div>
+      ` : ''}
 
       <!-- Era & Category Filter Tabs -->
       <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
@@ -193,16 +235,53 @@ export function renderBollywoodGame() {
 }
 
 function renderGameOver() {
+  const isDuos = gameState.playMode === 'DUOS';
+  const isSolo = gameState.playMode === 'SOLO';
+
+  let verdictTitle = 'Filmi Shehenshah!';
+  let verdictDesc = `You scored <strong class="text-amber-gold font-mono text-lg font-bold">${gameState.score}</strong> points across the Bollywood Antakshari &amp; Dialogue relay!`;
+
+  if (isDuos) {
+    const p1 = gameState.scoreP1;
+    const p2 = gameState.scoreP2;
+    if (p1 > p2) {
+      verdictTitle = 'Player 1 Wins the Crown! 👑';
+      verdictDesc = `Player 1 took the victory with <strong class="text-amber-gold font-mono">${p1} pts</strong> vs Player 2's <strong class="text-duo-rose font-mono">${p2} pts</strong>!`;
+    } else if (p2 > p1) {
+      verdictTitle = 'Player 2 Wins the Crown! 👑';
+      verdictDesc = `Player 2 took the victory with <strong class="text-duo-rose font-mono">${p2} pts</strong> vs Player 1's <strong class="text-amber-gold font-mono">${p1} pts</strong>!`;
+    } else {
+      verdictTitle = 'Bollywood Tie! 🤝';
+      verdictDesc = `Both Bollywood Shehenshahs tied at <strong class="text-amber-gold font-mono">${p1} pts</strong>!`;
+    }
+  } else if (isSolo) {
+    verdictTitle = 'Solo Speed Shehenshah! ⚡';
+    verdictDesc = `Solo 15s Sprint finished with <strong class="text-mint-green font-mono text-lg font-bold">${gameState.score} pts</strong>! True Bollywood encyclopedia knowledge.`;
+  }
+
   return `
     <div class="p-8 sm:p-12 rounded-3xl bg-[#121522] border border-[#2B3147] text-center shadow-2xl max-w-lg mx-auto animate-fade-in">
       <div class="w-20 h-20 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40 flex items-center justify-center mx-auto mb-4 shadow-glow-amber">
         <span class="material-symbols-outlined text-4xl">military_tech</span>
       </div>
 
-      <h2 class="font-display text-3xl font-black text-white mb-2">Filmi Shehenshah!</h2>
+      <h2 class="font-display text-3xl font-black text-white mb-2">${verdictTitle}</h2>
       <p class="text-sm text-gray-300 font-sans mb-6">
-        You scored <strong class="text-amber-gold font-mono text-lg font-bold">${gameState.score}</strong> points across the Bollywood Antakshari &amp; Dialogue relay!
+        ${verdictDesc}
       </p>
+
+      ${isDuos ? `
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="p-3.5 rounded-2xl bg-amber-gold/10 border border-amber-gold/30 text-center">
+            <span class="text-xs font-mono text-gray-400 block mb-1">Player 1 (You)</span>
+            <span class="text-xl font-mono font-black text-amber-gold">${gameState.scoreP1} pts</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-duo-rose/10 border border-duo-rose/30 text-center">
+            <span class="text-xs font-mono text-gray-400 block mb-1">Player 2 (Partner)</span>
+            <span class="text-xl font-mono font-black text-duo-rose">${gameState.scoreP2} pts</span>
+          </div>
+        </div>
+      ` : ''}
 
       <div class="p-4 rounded-2xl bg-[#181C2B] border border-white/5 mb-6 text-xs font-mono text-gray-400 flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-amber-gold text-base">local_fire_department</span>
@@ -242,6 +321,22 @@ export function bindBollywoodEvents() {
     }, 1000);
   }
 
+  // In-Game Play Mode Switcher
+  document.querySelectorAll('.btn-bolly-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== gameState.playMode) {
+        audio.playClick();
+        store.setArcadePlayMode(mode);
+        gameState.playMode = mode;
+        activeDeck = getQuizDeck(currentEra, 10);
+        resetGameState();
+        reRender();
+      }
+    });
+  });
+
   // Era Filter Tabs
   document.querySelectorAll('.btn-era-filter').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -274,7 +369,15 @@ export function bindBollywoodEvents() {
     const current = activeDeck[gameState.currentIndex];
     if (current && selected === current.correct) {
       audio.playChime();
-      gameState.score += 100 + gameState.timeLeft * 5;
+      const pts = 100 + gameState.timeLeft * 5;
+      gameState.score += pts;
+      if (gameState.playMode === 'DUOS') {
+        if (gameState.currentIndex % 2 === 0) {
+          gameState.scoreP1 += pts;
+        } else {
+          gameState.scoreP2 += pts;
+        }
+      }
       gameState.streak++;
       if (confettiInstance) confettiInstance.burst(40, 1);
     } else {

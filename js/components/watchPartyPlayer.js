@@ -4,6 +4,7 @@
 // Supports: Direct MP4/WebM video streams & YouTube Embeds
 // ==============================================================================
 
+import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { socketService } from '../services/socket.js';
 
@@ -32,6 +33,7 @@ export class WatchPartyPlayer {
   }
 
   render() {
+    const playMode = store.getState().arcadePlayMode || 'GROUP';
     const isYouTubeUrl = this.videoUrl.includes('youtube.com') || this.videoUrl.includes('youtu.be');
     const isGenericHttp = this.videoUrl.startsWith('http://') || this.videoUrl.startsWith('https://');
     let ytEmbedUrl = '';
@@ -53,6 +55,14 @@ export class WatchPartyPlayer {
         
         <!-- Stream Stage Viewport -->
         <div class="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden" id="stream-stage">
+          
+          <!-- Mode Overlay Chip -->
+          <div class="absolute top-3 left-3 z-30 flex items-center gap-2 pointer-events-none">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase backdrop-blur-md border ${playMode === 'DUOS' ? 'bg-duo-rose/30 text-duo-rose border-duo-rose/50' : playMode === 'SOLO' ? 'bg-mint-green/30 text-mint-green border-mint-green/50' : 'bg-black/60 text-white border-white/20'} flex items-center gap-1.5 shadow-md">
+              <span class="w-2 h-2 rounded-full ${playMode === 'DUOS' ? 'bg-duo-rose animate-ping' : playMode === 'SOLO' ? 'bg-mint-green' : 'bg-sunset-coral animate-pulse'}"></span>
+              <span>${playMode === 'DUOS' ? 'Duos Date Lounge' : playMode === 'SOLO' ? 'Solo Cinema' : 'Squad Cinema · Live'}</span>
+            </span>
+          </div>
           ${isYouTube ? `
             <iframe 
               id="wp-yt-iframe" 

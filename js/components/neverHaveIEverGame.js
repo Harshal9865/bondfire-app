@@ -13,10 +13,37 @@ let roundHistory = [];
 let activeCategory = 'ALL';
 let nhieTimerInterval = null;
 
+let soloStats = {
+  answered: 0,
+  dropped: 0
+};
+
 function initPlayerFingers() {
+  const currentPlayMode = store.getState().arcadePlayMode || 'GROUP';
+  const currentUser = store.getState().currentUser || {};
+  const currentUserId = currentUser.id || 'p1';
+
+  if (currentPlayMode === 'DUOS') {
+    if (playerFingers[currentUserId] === undefined) playerFingers[currentUserId] = 10;
+    if (playerFingers['partner'] === undefined) playerFingers['partner'] = 10;
+    return;
+  }
+
+  if (currentPlayMode === 'SOLO') {
+    if (playerFingers[currentUserId] === undefined) playerFingers[currentUserId] = 10;
+    return;
+  }
+
+  // GROUP MODE
   const room = store.getState().activeRoom;
-  const players = (room && room.players) ? room.players : [];
-  players.forEach((p) => {
+  const roomPlayers = (room && room.players && room.players.length >= 3) ? room.players : [
+    { id: currentUserId, name: (currentUser.displayName ? `${currentUser.displayName.split(' ')[0]} (You)` : 'You (Host)'), avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' },
+    { id: 'p2', name: 'Riya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Riya' },
+    { id: 'p3', name: 'Kabir', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir' },
+    { id: 'p4', name: 'Ananya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya' }
+  ];
+
+  roomPlayers.forEach((p) => {
     if (playerFingers[p.id] === undefined) {
       playerFingers[p.id] = 10;
     }
@@ -26,10 +53,38 @@ function initPlayerFingers() {
 export function renderNeverHaveIEverGame() {
   initPlayerFingers();
   const state = store.getState();
+  const currentPlayMode = state.arcadePlayMode || 'GROUP';
   const room = state.activeRoom || {};
-  const players = room.players || [];
   const currentUser = state.currentUser || {};
   const currentUserId = currentUser.id || 'p1';
+  const currentUserName = currentUser.displayName ? `${currentUser.displayName.split(' ')[0]} (You)` : 'You';
+
+  let activePlayers = [];
+  if (currentPlayMode === 'DUOS') {
+    activePlayers = [
+      { id: currentUserId, name: currentUserName, avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' },
+      { id: 'partner', name: 'Partner', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Partner' }
+    ];
+  } else if (currentPlayMode === 'SOLO') {
+    activePlayers = [
+      { id: currentUserId, name: currentUserName, avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' }
+    ];
+  } else {
+    activePlayers = (room.players && room.players.length >= 3)
+      ? room.players
+      : [
+          { id: currentUserId, name: currentUserName, avatar: currentUser.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Host' },
+          { id: 'p2', name: 'Riya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Riya' },
+          { id: 'p3', name: 'Kabir', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir' },
+          { id: 'p4', name: 'Ananya', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya' }
+        ];
+  }
+
+  const soloGuiltPct = soloStats.answered > 0 ? Math.round((soloStats.dropped / soloStats.answered) * 100) : 0;
+  let soloRank = 'Pure Angel 😇';
+  if (soloStats.dropped >= 6) soloRank = 'Party Legend 👑';
+  else if (soloStats.dropped >= 3) soloRank = 'Wild Rebel 😈';
+  else if (soloStats.dropped >= 1) soloRank = 'Adventurous Camper ⛺';
 
   return `
     <div class="flex flex-col w-full max-w-[760px] mx-auto px-4 pt-6 pb-28 relative select-none z-20">
@@ -39,8 +94,8 @@ export function renderNeverHaveIEverGame() {
       <div class="absolute top-72 right-10 w-80 h-80 bg-amber-gold/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
       <!-- Top Navigation & Return to Arcade Bar -->
-      <div class="flex items-center justify-between p-4 rounded-2xl bg-surface border border-border shadow-xl mb-6">
-        <button id="btn-nhie-back-arcade" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-bright/70 hover:bg-surface-bright text-xs font-bold text-gray-300 hover:text-white transition-all active:scale-95">
+      <div class="flex items-center justify-between p-4 rounded-2xl bg-surface border border-border shadow-xl mb-4">
+        <button id="btn-nhie-back-arcade" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-bright/70 hover:bg-surface-bright text-xs font-bold text-gray-300 hover:text-white transition-all active:scale-95 cursor-pointer">
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           <span>Back to Arcade</span>
         </button>
@@ -50,11 +105,30 @@ export function renderNeverHaveIEverGame() {
           <span class="text-[11px] font-mono font-bold text-duo-rose uppercase tracking-wider">Never Have I Ever · Live</span>
         </div>
 
-        <button id="btn-nhie-custom-prompt" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sunset-coral/20 hover:bg-sunset-coral/30 border border-sunset-coral/40 text-sunset-coral text-xs font-bold transition-all active:scale-95">
+        <button id="btn-nhie-custom-prompt" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sunset-coral/20 hover:bg-sunset-coral/30 border border-sunset-coral/40 text-sunset-coral text-xs font-bold transition-all active:scale-95 cursor-pointer">
           <span class="material-symbols-outlined text-[15px]">add_circle</span>
           <span class="hidden sm:inline">+ Custom Prompt</span>
           <span class="sm:hidden">+ New</span>
         </button>
+      </div>
+
+      <!-- In-Game Play Mode Switcher -->
+      <div class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#121626] border border-[#262B40] mb-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-duo-rose text-base">tune</span>
+          <span class="text-xs font-mono text-gray-300 font-bold uppercase tracking-wider">NHIE Mode:</span>
+        </div>
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B0E17] border border-white/5">
+          <button class="btn-nhie-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'GROUP' ? 'bg-duo-rose text-white font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="GROUP">
+            Group (Squad 3+)
+          </button>
+          <button class="btn-nhie-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'DUOS' ? 'bg-amber-gold text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="DUOS">
+            Duos (1v1 Duel)
+          </button>
+          <button class="btn-nhie-mode px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPlayMode === 'SOLO' ? 'bg-mint-green text-dark font-black shadow-sm' : 'text-gray-400 hover:text-white'}" data-mode="SOLO">
+            Solo (Guilt Meter)
+          </button>
+        </div>
       </div>
 
       <!-- Category Filter Pills -->
@@ -90,7 +164,9 @@ export function renderNeverHaveIEverGame() {
           "${currentPrompt.text}"
         </h3>
 
-        <p class="text-xs text-gray-400 mt-2 mb-4">If you've done this, drop a finger! Be honest — your squad is watching.</p>
+        <p class="text-xs text-gray-400 mt-2 mb-4">
+          ${currentPlayMode === 'DUOS' ? '1v1 Duel: Mark who has done this. Last partner standing with fingers wins!' : currentPlayMode === 'SOLO' ? 'Solo Guilt Meter: Be honest to calibrate your squad wildness rating.' : "If you've done this, drop a finger! Be honest — your squad is watching."}
+        </p>
 
         <!-- In-Game 15-Second Decision Shot Clock -->
         <div class="max-w-md mx-auto mb-5 p-2.5 rounded-2xl bg-[#0F131E]/80 border border-white/10 flex flex-col gap-1.5">
@@ -109,74 +185,120 @@ export function renderNeverHaveIEverGame() {
 
         <!-- Player Actions: Drop Finger or Safe -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-          <button id="btn-nhie-drop-finger" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-sm shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[18px]">pan_tool</span>
-            <span class="retro-pixel-badge text-[10px]">I've Done This! (Drop Finger)</span>
-          </button>
+          ${currentPlayMode === 'DUOS' ? `
+            <button id="btn-nhie-drop-finger" class="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-xs shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">pan_tool</span>
+              <span>I Did It (You -1)</span>
+            </button>
+            <button id="btn-nhie-partner-drop" class="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-amber-gold text-dark font-black text-xs shadow-lg shadow-amber-gold/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">pan_tool</span>
+              <span>Partner Did It (-1)</span>
+            </button>
+            <button id="btn-nhie-safe" class="w-full sm:w-auto px-4 py-3.5 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright border border-border text-gray-300 hover:text-white font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px] text-mint-green">verified</span>
+              <span>Both Safe</span>
+            </button>
+          ` : `
+            <button id="btn-nhie-drop-finger" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-sm shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">pan_tool</span>
+              <span class="retro-pixel-badge text-[10px]">I've Done This! (Drop Finger)</span>
+            </button>
 
-          <button id="btn-nhie-safe" class="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright border border-border text-gray-300 hover:text-white font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-mint-green">verified</span>
-            <span class="retro-pixel-badge text-[10px]">I'm Safe</span>
-          </button>
+            <button id="btn-nhie-safe" class="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-surface-bright/80 hover:bg-surface-bright border border-border text-gray-300 hover:text-white font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px] text-mint-green">verified</span>
+              <span class="retro-pixel-badge text-[10px]">I'm Safe</span>
+            </button>
 
-          <button id="btn-nhie-next-card" class="p-3.5 rounded-2xl bg-surface-bright hover:bg-surface-bright/80 text-amber-gold hover:text-white border border-border transition-all active:scale-95" title="Next Card">
-            <span class="material-symbols-outlined text-[20px]">refresh</span>
-          </button>
+            <button id="btn-nhie-next-card" class="p-3.5 rounded-2xl bg-surface-bright hover:bg-surface-bright/80 text-amber-gold hover:text-white border border-border transition-all active:scale-95 cursor-pointer" title="Next Card">
+              <span class="material-symbols-outlined text-[20px]">refresh</span>
+            </button>
+          `}
         </div>
       </div>
 
-      <!-- SQUAD FINGER LEADERBOARD (LIVE CAMPERS) -->
-      <div class="p-5 rounded-2xl bg-surface border border-border shadow-xl">
-        <div class="flex items-center justify-between mb-4 pb-2 border-b border-border/60">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-duo-rose text-[18px]">front_hand</span>
-            <h4 class="font-display text-sm font-bold text-white uppercase tracking-wider">Campers Survivor Tally</h4>
+      <!-- SOLO GUILT METER OR SQUAD/DUOS TALLY -->
+      ${currentPlayMode === 'SOLO' ? `
+        <div class="p-6 rounded-2xl bg-surface border border-border shadow-xl text-center mb-4">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-border/60">
+            <span class="text-xs font-mono text-gray-400 uppercase font-bold">Solo Guilt Calibration</span>
+            <span class="text-xs font-mono text-amber-gold font-bold">${soloRank}</span>
           </div>
-          <button id="btn-reset-fingers" class="text-[11px] font-mono text-gray-400 hover:text-amber-gold transition-colors">
-            Reset 10 Fingers
-          </button>
+          <div class="flex items-center justify-center gap-6 my-3">
+            <div class="text-center">
+              <span class="text-3xl font-mono font-black text-duo-rose">${playerFingers[currentUserId] || 0}</span>
+              <span class="text-[11px] font-mono text-gray-400 block">Fingers Left</span>
+            </div>
+            <div class="h-10 w-px bg-white/10"></div>
+            <div class="text-center">
+              <span class="text-3xl font-mono font-black text-amber-gold">${soloGuiltPct}%</span>
+              <span class="text-[11px] font-mono text-gray-400 block">Guilt Index</span>
+            </div>
+            <div class="h-10 w-px bg-white/10"></div>
+            <div class="text-center">
+              <span class="text-3xl font-mono font-black text-mint-green">${soloStats.answered}</span>
+              <span class="text-[11px] font-mono text-gray-400 block">Answered</span>
+            </div>
+          </div>
+          <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/10 mt-3">
+            <div class="h-full bg-gradient-to-r from-mint-green via-amber-gold to-duo-rose" style="width: ${soloGuiltPct}%;"></div>
+          </div>
         </div>
+      ` : `
+        <!-- SQUAD / DUOS FINGER LEADERBOARD -->
+        <div class="p-5 rounded-2xl bg-surface border border-border shadow-xl">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-border/60">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-duo-rose text-[18px]">front_hand</span>
+              <h4 class="font-display text-sm font-bold text-white uppercase tracking-wider">
+                ${currentPlayMode === 'DUOS' ? 'Duos 1v1 Survival Duel' : 'Campers Survivor Tally'}
+              </h4>
+            </div>
+            <button id="btn-reset-fingers" class="text-[11px] font-mono text-gray-400 hover:text-amber-gold transition-colors cursor-pointer">
+              Reset 10 Fingers
+            </button>
+          </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="nhie-player-grid">
-          ${players.map((p) => {
-            const fingers = playerFingers[p.id] !== undefined ? playerFingers[p.id] : 10;
-            const isEliminated = fingers <= 0;
-            const isSelf = p.id === currentUserId || p.name === (currentUser.displayName || 'Harshal');
-            
-            return `
-              <div class="flex items-center justify-between p-3 rounded-xl ${isEliminated ? 'bg-red-500/10 border border-red-500/30 opacity-70' : 'bg-surface-bright/50 border border-border'} transition-all">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-duo-rose/20 to-amber-gold/20 border ${isEliminated ? 'border-red-500' : 'border-border'} flex items-center justify-center shrink-0 overflow-hidden">
-                    ${p.avatar && (p.avatar.startsWith('http') || p.avatar.startsWith('data:') || p.avatar.startsWith('/')) ? `<img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>` : (p.avatar && p.avatar.match(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u) ? p.avatar : '<span class="material-symbols-outlined text-gray-300 text-base">person</span>')}
+          <div class="grid grid-cols-1 ${currentPlayMode === 'DUOS' ? 'grid-cols-2' : 'sm:grid-cols-2'} gap-3" id="nhie-player-grid">
+            ${activePlayers.map((p) => {
+              const fingers = playerFingers[p.id] !== undefined ? playerFingers[p.id] : 10;
+              const isEliminated = fingers <= 0;
+              const isSelf = p.id === currentUserId;
+              
+              return `
+                <div class="flex items-center justify-between p-3 rounded-xl ${isEliminated ? 'bg-red-500/10 border border-red-500/30 opacity-70' : 'bg-surface-bright/50 border border-border'} transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-duo-rose/20 to-amber-gold/20 border ${isEliminated ? 'border-red-500' : 'border-border'} flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="${p.avatar}" class="w-full h-full object-cover rounded-full" alt="${p.name}"/>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-white">${p.name}</span>
+                        ${isSelf ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-duo-rose/20 text-duo-rose font-bold">YOU</span>' : ''}
+                        ${isEliminated ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-500/30 text-red-300 font-bold">OUT</span>' : ''}
+                      </div>
+                      <!-- Visual Retro Stamina / Finger Health Meter -->
+                      <div class="flex items-center gap-1 mt-1.5">
+                        ${Array.from({ length: 10 }).map((_, i) => `
+                          <span class="w-1.5 h-3.5 rounded-sm ${i < fingers ? 'bg-duo-rose shadow-sm shadow-duo-rose/50' : 'bg-gray-700/60'} transition-all inline-block"></span>
+                        `).join('')}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-xs font-bold text-white">${p.name}</span>
-                      ${isSelf ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-duo-rose/20 text-duo-rose font-bold">YOU</span>' : ''}
-                      ${isEliminated ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-500/30 text-red-300 font-bold">OUT</span>' : ''}
-                    </div>
-                    <!-- Visual Retro Stamina / Finger Health Meter -->
-                    <div class="flex items-center gap-1 mt-1.5">
-                      ${Array.from({ length: 10 }).map((_, i) => `
-                        <span class="w-1.5 h-3.5 rounded-sm ${i < fingers ? 'bg-duo-rose shadow-sm shadow-duo-rose/50' : 'bg-gray-700/60'} transition-all inline-block"></span>
-                      `).join('')}
-                    </div>
+
+                  <div class="flex flex-col items-end">
+                    <span class="font-mono text-base font-black ${isEliminated ? 'text-red-400' : fingers <= 3 ? 'text-amber-gold' : 'text-mint-green'}">
+                      ${fingers}/10
+                    </span>
+                    <button class="nhie-manual-drop text-[10px] text-gray-400 hover:text-duo-rose transition-colors mt-0.5 underline cursor-pointer" data-player-id="${p.id}">
+                      -1 Finger
+                    </button>
                   </div>
                 </div>
-
-                <div class="flex flex-col items-end">
-                  <span class="font-mono text-base font-black ${isEliminated ? 'text-red-400' : fingers <= 3 ? 'text-amber-gold' : 'text-mint-green'}">
-                    ${fingers}/10
-                  </span>
-                  <button class="nhie-manual-drop text-[10px] text-gray-400 hover:text-duo-rose transition-colors mt-0.5 underline cursor-pointer" data-player-id="${p.id}">
-                    -1 Finger
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('')}
+          </div>
         </div>
-      </div>
+      `}
 
       <!-- CUSTOM PROMPT MODAL (DYNAMIC USER CREATION) -->
       <div id="nhie-custom-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -271,6 +393,20 @@ export function bindNeverHaveIEverEvents() {
     });
   }
 
+  // In-Game Play Mode Switcher
+  document.querySelectorAll('.btn-nhie-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.getAttribute('data-mode');
+      if (mode && mode !== store.getState().arcadePlayMode) {
+        if (nhieTimerInterval) clearInterval(nhieTimerInterval);
+        audio.playClick();
+        store.setArcadePlayMode(mode);
+        reRender();
+      }
+    });
+  });
+
   // 2. Category Filter Buttons
   const catBtns = document.querySelectorAll('.nhie-cat-filter');
   catBtns.forEach((btn) => {
@@ -293,6 +429,11 @@ export function bindNeverHaveIEverEvents() {
       if (playerFingers[currentUserId] !== undefined && playerFingers[currentUserId] > 0) {
         playerFingers[currentUserId]--;
       }
+
+      if (store.getState().arcadePlayMode === 'SOLO') {
+        soloStats.answered++;
+        soloStats.dropped++;
+      }
       
       // Auto-transition to next card with slight delay
       setTimeout(() => {
@@ -304,11 +445,30 @@ export function bindNeverHaveIEverEvents() {
     });
   }
 
+  // 3b. Partner Drop Button (Duos Mode)
+  const btnPartnerDrop = document.getElementById('btn-nhie-partner-drop');
+  if (btnPartnerDrop) {
+    btnPartnerDrop.addEventListener('click', () => {
+      audio.playWrong();
+      if (playerFingers['partner'] !== undefined && playerFingers['partner'] > 0) {
+        playerFingers['partner']--;
+      }
+      setTimeout(() => {
+        currentPrompt = getRandomNhiePrompt(activeCategory);
+        reRender();
+      }, 500);
+      reRender();
+    });
+  }
+
   // 4. Safe Button
   const btnSafe = document.getElementById('btn-nhie-safe');
   if (btnSafe) {
     btnSafe.addEventListener('click', () => {
       audio.playScoreUp();
+      if (store.getState().arcadePlayMode === 'SOLO') {
+        soloStats.answered++;
+      }
       currentPrompt = getRandomNhiePrompt(activeCategory);
       reRender();
     });
