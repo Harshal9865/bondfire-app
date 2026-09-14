@@ -211,7 +211,8 @@ export function renderHero() {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- CARD 1: Couples ('Us Mode') -->
           <div class="group relative bg-surface rounded-3xl border border-border hover:border-duo-rose/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-rose/20 cursor-pointer bondfire-mode-card" data-card-theme="rose" id="card-mode-us">
-            <div class="mode-card-foil"></div>
+            <div class="mode-card-glow-layer"></div>
+            <div class="mode-card-lightbar"></div>
             <div class="mode-card-corner-tl"></div>
             <div class="mode-card-corner-br"></div>
             <div class="space-y-4 relative z-10">
@@ -260,7 +261,8 @@ export function renderHero() {
 
           <!-- CARD 2: Squads ('Pod Mode') -->
           <div class="group relative bg-surface rounded-3xl border-2 border-sunset-coral/50 shadow-glow-coral/20 transition-all duration-300 p-6 flex flex-col justify-between cursor-pointer bondfire-mode-card" data-card-theme="coral" id="card-mode-pods">
-            <div class="mode-card-foil"></div>
+            <div class="mode-card-glow-layer"></div>
+            <div class="mode-card-lightbar"></div>
             <div class="mode-card-corner-tl"></div>
             <div class="mode-card-corner-br"></div>
             <div class="space-y-4 relative z-10">
@@ -313,7 +315,8 @@ export function renderHero() {
 
           <!-- CARD 3: Solo ('Time Capsule') -->
           <div class="group relative bg-surface rounded-3xl border border-border hover:border-amber-gold/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-amber/20 cursor-pointer bondfire-mode-card" data-card-theme="gold" id="card-mode-solo">
-            <div class="mode-card-foil"></div>
+            <div class="mode-card-glow-layer"></div>
+            <div class="mode-card-lightbar"></div>
             <div class="mode-card-corner-tl"></div>
             <div class="mode-card-corner-br"></div>
             <div class="space-y-4 relative z-10">
@@ -359,7 +362,8 @@ export function renderHero() {
 
           <!-- CARD 4: Creative Feature ('Pixel Glade & Arcade') -->
           <div class="group relative bg-surface rounded-3xl border border-border hover:border-mint-green/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-mint/20 cursor-pointer bondfire-mode-card" data-card-theme="mint" id="card-mode-glade">
-            <div class="mode-card-foil"></div>
+            <div class="mode-card-glow-layer"></div>
+            <div class="mode-card-lightbar"></div>
             <div class="mode-card-corner-tl"></div>
             <div class="mode-card-corner-br"></div>
             <div class="space-y-4 relative z-10">
@@ -748,13 +752,11 @@ export function bindHeroEvents() {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      // 3D perspective rotation (subtle +/- 7deg for premium feel)
-      const rotateX = ((y - centerY) / centerY) * -7;
-      const rotateY = ((x - centerX) / centerX) * 7;
+      // 3D perspective rotation (subtle +/- 6deg for clean premium feel)
+      const rotateX = ((y - centerY) / centerY) * -6;
+      const rotateY = ((x - centerX) / centerX) * 6;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
-      card.style.setProperty('--card-foil-x', `${((x / rect.width) * 100).toFixed(1)}%`);
-      card.style.setProperty('--card-foil-y', `${((y / rect.height) * 100).toFixed(1)}%`);
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
     });
 
     card.addEventListener('mouseleave', () => {

@@ -1425,84 +1425,76 @@ body[data-theme-accent="VIOLET_DREAM"] {
 /* Individual Card Theme Glows & Accents */
 .bondfire-mode-card[data-card-theme="rose"] {
   --card-theme-color: #ff758f;
-  --card-theme-glow: rgba(255, 117, 143, 0.38);
+  --card-theme-glow: rgba(255, 117, 143, 0.45);
 }
 .bondfire-mode-card[data-card-theme="rose"]:hover {
-  border-color: rgba(255, 117, 143, 0.65);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px var(--card-theme-glow);
+  border-color: rgba(255, 117, 143, 0.8);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 117, 143, 0.35), inset 0 0 20px rgba(255, 117, 143, 0.1);
 }
 
 .bondfire-mode-card[data-card-theme="coral"] {
   --card-theme-color: #ff5a5f;
-  --card-theme-glow: rgba(255, 90, 95, 0.42);
+  --card-theme-glow: rgba(255, 90, 95, 0.45);
 }
 .bondfire-mode-card[data-card-theme="coral"]:hover {
-  border-color: rgba(255, 90, 95, 0.75);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 40px var(--card-theme-glow);
+  border-color: rgba(255, 90, 95, 0.85);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 90, 95, 0.4), inset 0 0 20px rgba(255, 90, 95, 0.1);
 }
 
 .bondfire-mode-card[data-card-theme="gold"] {
   --card-theme-color: #ffb703;
-  --card-theme-glow: rgba(255, 183, 3, 0.38);
+  --card-theme-glow: rgba(255, 183, 3, 0.45);
 }
 .bondfire-mode-card[data-card-theme="gold"]:hover {
-  border-color: rgba(255, 183, 3, 0.65);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px var(--card-theme-glow);
+  border-color: rgba(255, 183, 3, 0.8);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 183, 3, 0.35), inset 0 0 20px rgba(255, 183, 3, 0.1);
 }
 
 .bondfire-mode-card[data-card-theme="mint"] {
   --card-theme-color: #4ade80;
-  --card-theme-glow: rgba(74, 222, 128, 0.38);
+  --card-theme-glow: rgba(74, 222, 128, 0.45);
 }
 .bondfire-mode-card[data-card-theme="mint"]:hover {
-  border-color: rgba(74, 222, 128, 0.65);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px var(--card-theme-glow);
+  border-color: rgba(74, 222, 128, 0.8);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 0 30px rgba(74, 222, 128, 0.35), inset 0 0 20px rgba(74, 222, 128, 0.1);
 }
 
-/* Holographic Dynamic Spotlight Sheen (Tracks Cursor X/Y) */
-.mode-card-foil {
+/* Cozy Campfire Ambient Glow Layer (Soft, non-intrusive backdrop warmth) */
+.mode-card-glow-layer {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--card-foil-x, 50%) var(--card-foil-y, 50%), var(--card-theme-glow) 0%, transparent 65%);
-  pointer-events: none;
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 0%, var(--card-theme-glow), transparent 72%);
   opacity: 0;
-  transition: opacity 0.35s ease;
-  mix-blend-mode: screen;
-  z-index: 1;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.bondfire-mode-card:hover .mode-card-foil {
-  opacity: 1;
+.bondfire-mode-card:hover .mode-card-glow-layer {
+  opacity: 0.38;
 }
 
-/* Conic Gradient Animated Neon Border Runner */
-.bondfire-mode-card::after {
-  content: '';
+/* Sleek Cyber Neon Top Accent Lightbar */
+.mode-card-lightbar {
   position: absolute;
-  inset: -1.5px;
-  border-radius: 29px;
-  background: conic-gradient(from var(--mode-border-angle, 0deg), transparent 70%, var(--card-theme-color) 88%, #ffffff 96%, transparent 100%);
-  pointer-events: none;
-  z-index: 2;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 75%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--card-theme-color), transparent);
+  box-shadow: 0 0 12px var(--card-theme-color);
+  border-radius: 2px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 5;
 }
 
-.bondfire-mode-card:hover::after {
+.bondfire-mode-card:hover .mode-card-lightbar {
+  transform: translateX(-50%) scaleX(1);
   opacity: 1;
-  animation: rotateModeBorder 3.5s linear infinite;
-}
-
-@property --mode-border-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes rotateModeBorder {
-  to {
-    --mode-border-angle: 360deg;
-  }
 }
 
 /* Corner Cyberpunk Targeting Brackets */
