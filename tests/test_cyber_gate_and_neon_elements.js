@@ -1,6 +1,6 @@
 // ==============================================================================
 // TEST SUITE: CYBERPUNK TORII GATE PORTAL & CHINESE NEON AESTHETICS
-// Validates gateScreen, string curtain physics, interactive ceremonial objects,
+// Validates gateScreen, holographic portal core, quick-travel mode teleports,
 // audio synthesizers, routing, header shortcuts, and cyber-neon styling.
 // ==============================================================================
 
@@ -19,35 +19,29 @@ assert(audioSynthCode.includes('playZenGong()'), 'audioSynth.js must implement p
 assert(audioSynthCode.includes('playGateWarp()'), 'audioSynth.js must implement playGateWarp');
 console.log('  ✅ PASS: audioSynth.js implements playTalismanChime, playZenGong, and playGateWarp');
 
-// 2. Validate gateScreen.js renders Torii Gate, Welcome typography, and Horizontal Cyber Walls
+// 2. Validate gateScreen.js renders Torii Gate, Welcome typography, and atmospheric elements
 const gateScreenCode = fs.readFileSync(path.join(rootDir, 'js/components/gateScreen.js'), 'utf-8');
 assert(gateScreenCode.includes('WELCOME TO'), 'gateScreen.js must render WELCOME TO animated heading');
 assert(gateScreenCode.includes('cyber-torii-frame'), 'gateScreen.js must render cyber-torii-frame');
-assert(gateScreenCode.includes('cyber-wall-left'), 'gateScreen.js must render left cyber wall');
-assert(gateScreenCode.includes('cyber-wall-right'), 'gateScreen.js must render right cyber wall');
-assert(gateScreenCode.includes('cyber-pillar-tower'), 'gateScreen.js must render pagoda cyber pillars');
 assert(gateScreenCode.includes('cyber-wet-floor'), 'gateScreen.js must render wet reflective pavement');
-console.log('  ✅ PASS: gateScreen.js renders grand Torii gate, welcome typography, and horizontal cyber walls');
+assert(gateScreenCode.includes('cyber-embers-container'), 'gateScreen.js must render floating cyber embers');
+console.log('  ✅ PASS: gateScreen.js renders grand Torii gate, welcome typography, and atmospheric elements');
 
-// 3. Validate gateScreen.js string curtain with designer items & interactive physics
-assert(gateScreenCode.includes('cyber-curtain-container'), 'gateScreen.js must mount cyber-curtain-container');
-assert(gateScreenCode.includes('cyber-curtain-pole'), 'gateScreen.js must mount cyber-curtain-pole');
-assert(gateScreenCode.includes('cyber-gate-string'), 'gateScreen.js must generate cyber-gate-string elements');
-assert(gateScreenCode.includes('talisman-jade-bi'), 'gateScreen.js must render Jade Bi designer charms');
-assert(gateScreenCode.includes('talisman-paper-tag'), 'gateScreen.js must render Taoist cyber-talisman tags');
-assert(gateScreenCode.includes('talisman-flame-bead'), 'gateScreen.js must render cyber flame beads');
-assert(gateScreenCode.includes('talisman-bell-tassel'), 'gateScreen.js must render weighted brass bells and tassels');
-assert(gateScreenCode.includes('handlePointerMove'), 'gateScreen.js must track cursor/finger pointer movement for deflection');
-assert(gateScreenCode.includes('playTalismanChime'), 'gateScreen.js must trigger talisman chimes on string brush');
-console.log('  ✅ PASS: gateScreen.js renders interactive string curtain with designer charms and physics');
+// 3. Validate gateScreen.js holographic portal core & quick-travel mode teleports
+assert(gateScreenCode.includes('cyber-portal-core'), 'gateScreen.js must mount cyber-portal-core');
+assert(gateScreenCode.includes('portal-energy-ring'), 'gateScreen.js must mount portal-energy-ring');
+assert(gateScreenCode.includes('btn-gate-duo'), 'gateScreen.js must render Duo teleport pill');
+assert(gateScreenCode.includes('btn-gate-squad'), 'gateScreen.js must render Squad teleport pill');
+assert(gateScreenCode.includes('btn-gate-vault'), 'gateScreen.js must render Vault teleport pill');
+assert(gateScreenCode.includes('playTalismanChime'), 'gateScreen.js must trigger chimes on pill hover');
+console.log('  ✅ PASS: gateScreen.js renders holographic portal core with interactive mode teleports');
 
-// 4. Validate gateScreen.js interactive objects & warp entry
-assert(gateScreenCode.includes('gate-dragon-brazier'), 'gateScreen.js must mount dragon brazier');
-assert(gateScreenCode.includes('gate-cyber-bell'), 'gateScreen.js must mount wind gong / bell');
+// 4. Validate gateScreen.js interactive entrance & warp sequences
 assert(gateScreenCode.includes('btn-enter-gate'), 'gateScreen.js must mount enter button');
+assert(gateScreenCode.includes('btn-skip-gate'), 'gateScreen.js must mount direct skip button');
 assert(gateScreenCode.includes('triggerEnterSequence'), 'gateScreen.js must implement triggerEnterSequence');
 assert(gateScreenCode.includes('bondfire_gate_entered'), 'gateScreen.js must record gate entrance in sessionStorage');
-console.log('  ✅ PASS: gateScreen.js implements interactive Dragon Brazier, Wind Gong, and Warp Entrance');
+console.log('  ✅ PASS: gateScreen.js implements interactive Entrance, Quick Skip, and Warp sequence');
 
 // 5. Validate app.js routing and initial GATE landing
 const appCode = fs.readFileSync(path.join(rootDir, 'js/app.js'), 'utf-8');
@@ -70,14 +64,12 @@ console.log('  ✅ PASS: header.js includes Cyber Gate shortcut button and brand
 // 7. Validate css/components.css styles for Cyber Gate and Chinese neon
 const cssCode = fs.readFileSync(path.join(rootDir, 'css/components.css'), 'utf-8');
 assert(cssCode.includes('.cyber-gate-universe'), 'css must define .cyber-gate-universe');
-assert(cssCode.includes('.cyber-curtain-pole'), 'css must define .cyber-curtain-pole');
-assert(cssCode.includes('.cyber-gate-string'), 'css must define .cyber-gate-string');
-assert(cssCode.includes('.talisman-jade-bi'), 'css must define .talisman-jade-bi');
-assert(cssCode.includes('.talisman-paper-tag'), 'css must define .talisman-paper-tag');
-assert(cssCode.includes('.cyber-dragon-brazier'), 'css must define .cyber-dragon-brazier');
-assert(cssCode.includes('.cyber-wind-gong'), 'css must define .cyber-wind-gong');
+assert(cssCode.includes('.cyber-portal-core'), 'css must define .cyber-portal-core');
+assert(cssCode.includes('.portal-energy-ring'), 'css must define .portal-energy-ring');
+assert(cssCode.includes('.cyber-embers-container'), 'css must define .cyber-embers-container');
+assert(cssCode.includes('.gate-teleport-pill'), 'css must define .gate-teleport-pill');
 assert(cssCode.includes('.cyber-seal-badge'), 'css must define .cyber-seal-badge');
-console.log('  ✅ PASS: css/components.css contains full Cyber Gate, curtain physics, and Chinese neon styling');
+console.log('  ✅ PASS: css/components.css contains full Cyber Gate, portal energy ring, and Chinese neon styling');
 
 // 8. Validate homeScrollStory.js and roomsHubScreen.js cyber-Chinese additions
 const homeStoryCode = fs.readFileSync(path.join(rootDir, 'js/components/homeScrollStory.js'), 'utf-8');
