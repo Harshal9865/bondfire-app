@@ -82,7 +82,6 @@ export function renderGateScreen() {
         <!-- Elegant Cyberpunk Subtitle -->
         <p class="font-mono text-xs sm:text-sm text-gray-300 max-w-lg mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
           <span class="text-amber-gold font-bold">"STEP INTO THE CYBER CAMPFIRE — UNLOCK REAL MEMORIES"</span>
-          <span class="block sm:inline text-gray-400 mt-1 sm:mt-0 sm:ml-2">Neural intimacy protocol active · Jack in to connect.</span>
         </p>
 
         <!-- Interactive Holographic Gateway Portal Core -->
