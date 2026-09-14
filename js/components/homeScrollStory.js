@@ -72,16 +72,16 @@ export function renderHomeScrollStory() {
       </div>
     </div>
 
-    <!-- CYBERPUNK CHINESE TORII NEON ARCHWAY SECTION DIVIDER -->
+    <!-- CYBERPUNK SECTION DIVIDER -->
     <div class="w-full max-w-4xl mx-auto px-4 py-8 flex flex-col items-center justify-center relative select-none">
       <div class="w-full flex items-center justify-center gap-3 sm:gap-4">
         <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-sunset-coral/50 to-sunset-coral"></div>
         <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-[#0E121E]/90 border border-sunset-coral/60 shadow-[0_0_20px_rgba(255,90,95,0.4)]">
-          <span class="text-xs sm:text-sm">⛩️</span>
+          <span class="text-xs text-sunset-coral font-mono">◈</span>
           <span class="font-mono font-bold text-[10px] sm:text-xs text-sunset-coral tracking-widest uppercase">
-            赛博营地 · 记忆矩阵 // CYBER MATRIX
+            BONDFIRE MEMORY MATRIX // CYBER PROTOCOL
           </span>
-          <span class="text-xs sm:text-sm">⛩️</span>
+          <span class="text-xs text-sunset-coral font-mono">◈</span>
         </div>
         <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-sunset-coral/50 to-sunset-coral"></div>
       </div>

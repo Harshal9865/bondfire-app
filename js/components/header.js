@@ -31,7 +31,6 @@ export function renderHeader() {
             <span class="font-display font-bold text-base sm:text-lg md:text-xl tracking-tight text-white flex items-center gap-1.5 leading-none whitespace-nowrap">
               Bondfire
               <span class="text-[7.5px] sm:text-[8.5px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30">Beta</span>
-              <span class="hidden sm:inline-flex cyber-seal-badge ml-1 py-0 px-1.5 text-[8.5px] border border-sunset-coral/40 text-sunset-coral font-mono">⛩️ 赛博</span>
             </span>
             <span class="hidden xl:block text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-medium tracking-wide whitespace-nowrap">formerly Huddle</span>
           </div>
@@ -129,11 +128,6 @@ export function renderHeader() {
             </svg>
           </button>
 
-          <!-- Cyberpunk Torii Gate Portal Trigger Button -->
-          <button class="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full bg-[#141824] border border-sunset-coral/50 text-sunset-coral hover:bg-sunset-coral/20 hover:border-sunset-coral hover:scale-105 shadow-[0_0_12px_rgba(255,90,95,0.35)] text-xs font-bold transition-all duration-200 active:scale-95 shrink-0 cursor-pointer" id="btn-header-gate" title="Cyberpunk Torii Gate Portal">
-            <span class="text-[13px] sm:text-[14px]">⛩️</span>
-            <span class="hidden sm:inline text-[10.5px] font-mono font-bold tracking-wider">GATE</span>
-          </button>
 
           <!-- Room Code Quick Pill (Large Desktops >= 1536px) -->
           <div class="hidden 2xl:flex items-center p-1 rounded-full bg-surface border border-border focus-within:border-sunset-coral/70 transition-colors shadow-inner shrink-0">
@@ -183,10 +177,6 @@ export function renderHeader() {
 
       <!-- Horizontal Scrolling Category & Mode Tabs (Mobile < 768px) -->
       <div class="md:hidden w-full overflow-x-auto no-scrollbar border-t border-[#262B40]/60 px-2.5 py-1.5 bg-[#0E121E]/85 backdrop-blur-md flex items-center gap-1.5 scroll-smooth">
-        <button class="mobile-filter-pill px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all flex items-center gap-1 shrink-0 ${currentView === 'GATE' ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="GATE">
-          <span class="text-[13px]">⛩️</span>
-          <span>Gate</span>
-        </button>
         <button class="mobile-filter-pill px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all flex items-center gap-1 shrink-0 ${currentView === 'MEMORIES' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'bg-surface text-gray-400 border border-border/80'}" data-view="MEMORIES">
           <span class="material-symbols-outlined text-[13px] text-amber-gold">inventory_2</span>
           <span>Vault</span>
@@ -354,18 +344,6 @@ export function renderHeader() {
               </div>
             </button>
 
-            <button class="sheet-nav-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-sunset-coral/60 text-left flex items-center gap-3 transition-all active:scale-95" data-view="GATE">
-              <div class="w-9 h-9 rounded-xl bg-sunset-coral/10 border border-sunset-coral/30 flex items-center justify-center text-sunset-coral shrink-0">
-                <span class="text-[20px]">⛩️</span>
-              </div>
-              <div class="min-w-0">
-                <div class="text-xs font-bold text-white flex items-center gap-1">
-                  <span>Cyber Gate</span>
-                  <span class="cyber-seal-badge py-0 px-1 text-[8px]">传送门</span>
-                </div>
-                <div class="text-[10px] text-gray-400 truncate">Torii Sanctuary</div>
-              </div>
-            </button>
 
             <button class="sheet-nav-btn p-3 rounded-2xl bg-surface border border-border/80 hover:border-amber-gold/60 text-left flex items-center gap-3 transition-all active:scale-95" data-view="PROFILE">
               <div class="w-9 h-9 rounded-xl bg-amber-gold/10 border border-amber-gold/30 flex items-center justify-center text-amber-gold shrink-0">
@@ -599,17 +577,6 @@ export function bindHeaderEvents() {
     });
   }
 
-  // Header Cyber Torii Gate Shortcut Button
-  const headerGateBtn = document.getElementById('btn-header-gate');
-  if (headerGateBtn) {
-    headerGateBtn.addEventListener('click', () => {
-      audio.playClick();
-      store.setView('GATE');
-      if (typeof window !== 'undefined') {
-        window.location.hash = '#/GATE';
-      }
-    });
-  }
 
   // Mobile Filter Pills Click (Vault, Photobook, Friends, Arcade, Store, Squad, Solo, Us Mode)
   const filterPills = document.querySelectorAll('.mobile-filter-pill');
