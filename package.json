@@ -8,7 +8,7 @@
     "dev": "npx serve -s . -p 3000",
     "start": "npx serve -s . -p 3000",
     "build": "tailwindcss -i ./css/input.css -o ./css/output.css",
-    "test": "node tests/scenario_full_lifecycle.js && node tests/verify_services.js",
+    "test": "node tests/scenario_full_lifecycle.js && node tests/verify_services.js && node tests/test_empty_room_auto_deletion.js",
     "deploy": "npm run build && npx vercel"
   },
   "keywords": [

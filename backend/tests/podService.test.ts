@@ -53,4 +53,48 @@ describe('PodService', () => {
     const readyState2 = PodService.togglePlayerReady(pod.roomCode, 'user_guest_9');
     expect(readyState2).toBe(false);
   });
+
+  it('should schedule empty room deletion when all members leave', () => {
+    const pod = PodService.createPod('Squad Pod', 'SQUAD', 'user_host_10', 'Devon');
+    expect(PodService.getPodByRoomCode(pod.roomCode)).toBeDefined();
+
+    // Host leaves -> 0 members remain
+    PodService.leavePod(pod.roomCode, 'user_host_10');
+    expect(pod.activeMembers).toHaveLength(0);
+    expect(pod.emptySince).toBeInstanceOf(Date);
+    expect(pod.scheduledDeletionAt).toBeInstanceOf(Date);
+    expect(PodService.isDeletionScheduled(pod.roomCode)).toBe(true);
+  });
+
+  it('should cancel empty room deletion when a member joins before expiration', () => {
+    const pod = PodService.createPod('Party Pod', 'SQUAD', 'user_host_11', 'Ananya');
+    PodService.leavePod(pod.roomCode, 'user_host_11');
+    expect(PodService.isDeletionScheduled(pod.roomCode)).toBe(true);
+
+    // New member joins
+    PodService.joinPod(pod.roomCode, 'user_guest_11', 'Sam');
+    expect(PodService.isDeletionScheduled(pod.roomCode)).toBe(false);
+    expect(pod.emptySince).toBeNull();
+    expect(pod.scheduledDeletionAt).toBeNull();
+    expect(pod.activeMembers).toHaveLength(1);
+  });
+
+  it('should automatically delete active room after timeout if no members are present', async () => {
+    // Configure fast 50ms timeout for test execution
+    PodService.setEmptyRoomTimeout(50);
+    const pod = PodService.createPod('Expiring Pod', 'SQUAD', 'user_host_12', 'Zara');
+    const roomCode = pod.roomCode;
+
+    PodService.leavePod(roomCode, 'user_host_12');
+    expect(PodService.getPodByRoomCode(roomCode)).toBeDefined();
+
+    // Wait 70ms for the 50ms timeout to fire
+    await new Promise((resolve) => setTimeout(resolve, 70));
+
+    // Room must be deleted
+    expect(PodService.getPodByRoomCode(roomCode)).toBeNull();
+
+    // Restore default 2-minute timeout
+    PodService.setEmptyRoomTimeout(2 * 60 * 1000);
+  });
 });

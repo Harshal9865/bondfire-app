@@ -8,7 +8,15 @@ import { CONFIG, generateRoomCode } from '../config.js';
 class ReactiveStore {
   constructor() {
     this.listeners = new Set();
+    this.emptyRoomTimeout = null;
+    this.emptyTimeoutMs = 2 * 60 * 1000; // 2 minutes (120,000 ms)
     this.state = this.loadInitialState();
+
+    // Check if loaded room was left empty and resume 2-minute deletion countdown
+    if (this.state.activeRoom?.emptySince && (!this.state.activeRoom.players || this.state.activeRoom.players.length === 0)) {
+      const remainingMs = Math.max(100, (this.state.activeRoom.scheduledDeletionAt || (this.state.activeRoom.emptySince + this.emptyTimeoutMs)) - Date.now());
+      this.handleEmptyRoomDetected(remainingMs);
+    }
 
     // Listen for cross-tab storage synchronization
     if (typeof window !== 'undefined') {
@@ -150,12 +158,32 @@ class ReactiveStore {
             if (!parsed.activeRoom.language) {
               parsed.activeRoom.language = 'hi-IN';
             }
-            if (Array.isArray(parsed.activeRoom.players)) {
+            const emptySince = parsed.activeRoom.emptySince;
+            const scheduledDeletionAt = parsed.activeRoom.scheduledDeletionAt;
+            const isExpired = (emptySince && Date.now() - emptySince >= 120000) ||
+                              (scheduledDeletionAt && Date.now() >= scheduledDeletionAt);
+            if (isExpired) {
+              parsed.activeRoom = {
+                roomCode: generateRoomCode(),
+                podName: 'My Squad Room',
+                roomTemplate: 'SQUAD_NIGHT',
+                humorTone: 'FRIENDLY_ROAST',
+                language: 'hi-IN',
+                isHost: true,
+                selectedGameMode: 'RED_FLAG_COURT',
+                players: [
+                  { id: parsed.currentUser?.id || 'usr_host', name: (parsed.currentUser && parsed.currentUser.displayName) ? `${parsed.currentUser.displayName.split(' ')[0]} (Host)` : 'Host (You)', role: 'HOST', isReady: true, avatar: (parsed.currentUser && parsed.currentUser.avatarUrl) ? parsed.currentUser.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost' },
+                ],
+                emptySince: null,
+                scheduledDeletionAt: null,
+              };
+            } else if (Array.isArray(parsed.activeRoom.players)) {
               const mockBotNames = new Set(['Liam', 'Sarah', 'Alex', 'Rohan', 'Zara', 'Devon', 'Nia']);
               parsed.activeRoom.players = parsed.activeRoom.players.filter(
                 (p) => !p.isBot && !mockBotNames.has(p.name) && !p.name.includes('(Bot)')
               );
-              if (parsed.activeRoom.players.length === 0) {
+              // If not in the middle of an empty-room deletion countdown and players array is 0, initialize host
+              if (parsed.activeRoom.players.length === 0 && !parsed.activeRoom.emptySince) {
                 const hostName = (parsed.currentUser && parsed.currentUser.displayName) ? `${parsed.currentUser.displayName.split(' ')[0]} (Host)` : 'Host (You)';
                 const hostAvatar = (parsed.currentUser && parsed.currentUser.avatarUrl) ? parsed.currentUser.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost';
                 parsed.activeRoom.players = [
@@ -282,6 +310,7 @@ class ReactiveStore {
 
   addRoomPlayer(name, avatar = null) {
     if (!name || !name.trim()) return;
+    this.cancelEmptyRoomTimer();
     const activeRoom = { ...this.state.activeRoom };
     if (!activeRoom.players) activeRoom.players = [];
     const trimmed = name.trim();
@@ -305,6 +334,126 @@ class ReactiveStore {
       players: filtered,
     };
     this.setState({ activeRoom });
+    if (filtered.length === 0) {
+      this.handleEmptyRoomDetected();
+    }
+  }
+
+  setEmptyRoomTimeout(ms) {
+    this.emptyTimeoutMs = ms;
+  }
+
+  handleEmptyRoomDetected(customTimeoutMs = null) {
+    if (this.emptyRoomTimeout) {
+      clearTimeout(this.emptyRoomTimeout);
+      this.emptyRoomTimeout = null;
+    }
+    const timeout = typeof customTimeoutMs === 'number' ? customTimeoutMs : this.emptyTimeoutMs;
+    const now = Date.now();
+    const scheduledDeletionAt = now + timeout;
+
+    const activeRoom = {
+      ...this.state.activeRoom,
+      emptySince: this.state.activeRoom?.emptySince || now,
+      scheduledDeletionAt,
+    };
+    this.setState({ activeRoom });
+
+    this.emptyRoomTimeout = setTimeout(() => {
+      this.deleteActiveRoom('EMPTY_TIMEOUT_EXPIRED');
+    }, timeout);
+
+    if (this.emptyRoomTimeout && this.emptyRoomTimeout.unref) {
+      this.emptyRoomTimeout.unref();
+    }
+  }
+
+  cancelEmptyRoomTimer() {
+    if (this.emptyRoomTimeout) {
+      clearTimeout(this.emptyRoomTimeout);
+      this.emptyRoomTimeout = null;
+    }
+    if (this.state.activeRoom && (this.state.activeRoom.emptySince || this.state.activeRoom.scheduledDeletionAt)) {
+      const activeRoom = {
+        ...this.state.activeRoom,
+        emptySince: null,
+        scheduledDeletionAt: null,
+      };
+      this.setState({ activeRoom });
+    }
+  }
+
+  deleteActiveRoom(reason = 'ROOM_DELETED') {
+    if (this.emptyRoomTimeout) {
+      clearTimeout(this.emptyRoomTimeout);
+      this.emptyRoomTimeout = null;
+    }
+    const oldCode = this.state.activeRoom?.roomCode;
+    const newCode = generateRoomCode();
+    const user = this.state.currentUser;
+    const hostName = (user && user.displayName) ? `${user.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+    const hostAvatar = (user && user.avatarUrl) ? user.avatarUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost';
+
+    const activeRoom = {
+      roomCode: newCode,
+      podName: 'My Squad Room',
+      roomTemplate: 'SQUAD_NIGHT',
+      humorTone: 'FRIENDLY_ROAST',
+      language: 'hi-IN',
+      isHost: true,
+      selectedGameMode: 'RED_FLAG_COURT',
+      players: [
+        { id: user?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
+      ],
+      emptySince: null,
+      scheduledDeletionAt: null,
+    };
+    this.setState({ activeRoom });
+
+    if (typeof window !== 'undefined') {
+      if (typeof window.showToast === 'function') {
+        window.showToast('Room auto-deleted: No members present for 2 minutes.', 'info');
+      }
+      if (oldCode) {
+        try {
+          fetch(`/api/rooms/${encodeURIComponent(oldCode)}/leave`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user?.id || 'usr_host' }),
+          }).catch(() => {});
+        } catch (_) {}
+      }
+    }
+  }
+
+  leaveRoom() {
+    this.cancelEmptyRoomTimer();
+    const currentCode = this.state.activeRoom?.roomCode;
+    const user = this.state.currentUser;
+    const userId = user?.id || 'usr_host';
+    const currentPlayers = this.state.activeRoom?.players || [];
+    const remaining = currentPlayers.filter((p) => p.id !== userId);
+
+    if (typeof window !== 'undefined' && currentCode) {
+      try {
+        fetch(`/api/rooms/${encodeURIComponent(currentCode)}/leave`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }).catch(() => {});
+      } catch (_) {}
+    }
+
+    const activeRoom = {
+      ...this.state.activeRoom,
+      players: remaining,
+    };
+    this.setState({ activeRoom });
+
+    if (remaining.length === 0) {
+      this.handleEmptyRoomDetected();
+    }
+    return activeRoom;
   }
 
   addCustomRoomCard(card) {
@@ -466,10 +615,16 @@ class ReactiveStore {
     if (!Array.isArray(players)) return;
     const activeRoom = { ...this.state.activeRoom, players };
     this.setState({ activeRoom });
+    if (players.length === 0) {
+      this.handleEmptyRoomDetected();
+    } else {
+      this.cancelEmptyRoomTimer();
+    }
   }
 
   joinRoomWithCode(roomCode, isDuo = false) {
     if (!roomCode) return this.state.activeRoom;
+    this.cancelEmptyRoomTimer();
     const cleanCode = roomCode.trim().toUpperCase();
     const user = this.state.currentUser;
     const isAlreadyHost = this.state.activeRoom?.isHost && this.state.activeRoom?.roomCode === cleanCode;
@@ -642,6 +797,7 @@ class ReactiveStore {
   }
 
   createDuoRoom(customName) {
+    this.cancelEmptyRoomTimer();
     const roomCode = generateRoomCode();
     const user = this.state.currentUser;
     const hostName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'You';
@@ -656,6 +812,8 @@ class ReactiveStore {
       players: [
         { id: user?.id || `usr_host_${Date.now()}`, name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
       ],
+      emptySince: null,
+      scheduledDeletionAt: null,
     };
     this.setState({ activeRoom, currentMode: 'US' });
 
@@ -675,6 +833,7 @@ class ReactiveStore {
   }
 
   leaveDuoRoom() {
+    this.cancelEmptyRoomTimer();
     this.setState({
       activeRoom: {
         roomCode: generateRoomCode(),
@@ -687,12 +846,15 @@ class ReactiveStore {
         players: [
           { id: 'usr_host', name: 'Host (You)', role: 'HOST', isReady: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost' },
         ],
+        emptySince: null,
+        scheduledDeletionAt: null,
       },
       currentMode: 'US',
     });
   }
 
   createNewRoom(podName) {
+    this.cancelEmptyRoomTimer();
     const roomCode = generateRoomCode();
     const user = this.state.currentUser;
     const hostName = (user && user.isLoggedIn && user.displayName) ? `${user.displayName.split(' ')[0]} (Host)` : 'Host (You)';
@@ -705,6 +867,8 @@ class ReactiveStore {
       players: [
         { id: user?.id || 'usr_host', name: hostName, role: 'HOST', isReady: true, avatar: hostAvatar },
       ],
+      emptySince: null,
+      scheduledDeletionAt: null,
     };
     this.setState({ activeRoom });
 
@@ -729,6 +893,9 @@ class ReactiveStore {
       activeRoom.players = activeRoom.players.filter((p) => p.id !== playerId);
     }
     this.setState({ activeRoom });
+    if (!activeRoom.players || activeRoom.players.length === 0) {
+      this.handleEmptyRoomDetected();
+    }
   }
 
   setGameMode(gameMode) {

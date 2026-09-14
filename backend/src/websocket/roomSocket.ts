@@ -191,6 +191,26 @@ export class RoomSocketManager {
             });
             break;
           }
+          // 2.0 CLIENT LEAVE ROOM
+          case 'CLIENT_LEAVE_ROOM': {
+            if (!currentClient) return;
+            const pod = PodService.leavePod(currentClient.roomCode, currentClient.userId);
+            const roomSet = this.clientsByRoom.get(currentClient.roomCode);
+            if (roomSet) {
+              roomSet.delete(currentClient);
+              if (roomSet.size === 0) {
+                this.clientsByRoom.delete(currentClient.roomCode);
+              }
+            }
+            if (pod && pod.activeMembers && pod.activeMembers.length > 0) {
+              this.broadcastToRoom(currentClient.roomCode, {
+                type: 'SERVER_PLAYER_LEFT',
+                payload: { userId: currentClient.userId, displayName: currentClient.displayName, pod },
+                timestamp: Date.now(),
+              });
+            }
+            break;
+          }
         }
       } catch (err) {
         console.error('WebSocket message parsing error:', err);
@@ -205,6 +225,17 @@ export class RoomSocketManager {
           if (roomSet.size === 0) {
             this.clientsByRoom.delete(currentClient.roomCode);
           }
+        }
+
+        // Leave pod in PodService (triggers 2-minute empty countdown if 0 members remain)
+        const pod = PodService.leavePod(currentClient.roomCode, currentClient.userId);
+
+        if (pod && pod.activeMembers && pod.activeMembers.length > 0) {
+          this.broadcastToRoom(currentClient.roomCode, {
+            type: 'SERVER_PLAYER_LEFT',
+            payload: { userId: currentClient.userId, displayName: currentClient.displayName, pod },
+            timestamp: Date.now(),
+          });
         }
       }
     });

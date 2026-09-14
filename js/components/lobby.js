@@ -109,14 +109,41 @@ export function renderLobby() {
           <p class="text-xs text-gray-400 mt-0.5">Host: <span class="text-white font-bold">${hostName}</span> · ${room.players.length} Campers in Room</p>
         </div>
         
-        <button id="btn-copy-code" class="group flex flex-col items-end cursor-pointer bg-surface-bright/70 hover:bg-surface-bright p-2.5 rounded-xl border border-border/80 transition-all">
-          <span class="text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">Room Passcode</span>
-          <div class="flex items-center gap-2">
-            <span class="font-mono text-xl font-black text-amber-gold tracking-widest">${room.roomCode}</span>
-            <span class="material-symbols-outlined text-[16px] text-gray-400 group-hover:text-sunset-coral">content_copy</span>
-          </div>
-        </button>
+        <div class="flex items-center gap-2">
+          <button id="btn-copy-code" class="group flex flex-col items-end cursor-pointer bg-surface-bright/70 hover:bg-surface-bright p-2.5 rounded-xl border border-border/80 transition-all">
+            <span class="text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">Room Passcode</span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xl font-black text-amber-gold tracking-widest">${room.roomCode}</span>
+              <span class="material-symbols-outlined text-[16px] text-gray-400 group-hover:text-sunset-coral">content_copy</span>
+            </div>
+          </button>
+          <button id="btn-lobby-leave-room" class="p-2.5 rounded-xl bg-surface-bright/70 hover:bg-sunset-coral/20 border border-border/80 hover:border-sunset-coral/50 text-gray-400 hover:text-sunset-coral transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer" title="Leave Room">
+            <span class="material-symbols-outlined text-[18px]">logout</span>
+            <span class="text-[8.5px] uppercase font-bold tracking-wider">Leave</span>
+          </button>
+        </div>
       </div>
+
+      <!-- Empty Room Auto-Deletion Warning Banner (Active when 0 members) -->
+      ${room.players && room.players.length === 0 ? `
+        <div class="w-full mb-6 p-4 rounded-2xl bg-sunset-coral/15 border-2 border-sunset-coral/50 flex flex-col sm:flex-row items-center justify-between gap-3 animate-pulse shadow-glow-coral">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-sunset-coral/20 text-sunset-coral flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-2xl">timer</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-sunset-coral animate-ping"></span>
+                <span class="text-[11px] font-mono text-sunset-coral uppercase font-bold tracking-wider">Empty Room · Auto-Delete in 2 Mins</span>
+              </div>
+              <p class="text-xs text-gray-300 mt-0.5">All campers have left. This room will be automatically deleted if nobody joins within 2 minutes.</p>
+            </div>
+          </div>
+          <button id="btn-rejoin-empty-room" class="w-full sm:w-auto px-4 py-2 rounded-full bg-sunset-coral text-canvas font-black text-xs hover:brightness-110 active:scale-95 transition-all shadow cursor-pointer">
+            Re-join Room
+          </button>
+        </div>
+      ` : ''}
 
       <!-- Quick Social Sharing: 1-Tap WhatsApp & QR -->
       <div class="grid grid-cols-2 gap-3 mb-4">
@@ -279,15 +306,20 @@ export function renderLobby() {
             const avatar = isCurrentUser && user && user.avatarUrl ? user.avatarUrl : (p.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`);
 
             return `
-              <div class="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">
-                <div class="relative">
-                  <img src="${avatar}" class="w-10 h-10 rounded-lg bg-surface-bright object-cover" />
-                  ${isHost ? `<div class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-gold text-canvas flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-[11px] font-bold">hotel_class</span></div>` : ''}
+              <div class="flex items-center justify-between gap-2 p-3 rounded-xl bg-surface border border-border group">
+                <div class="flex items-center gap-3 overflow-hidden">
+                  <div class="relative shrink-0">
+                    <img src="${avatar}" class="w-10 h-10 rounded-lg bg-surface-bright object-cover" />
+                    ${isHost ? `<div class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-gold text-canvas flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-[11px] font-bold">hotel_class</span></div>` : ''}
+                  </div>
+                  <div class="flex flex-col overflow-hidden">
+                    <span class="text-xs font-bold text-white truncate">${displayName}</span>
+                    <span class="retro-pixel-badge text-[8.5px] ${p.isReady ? 'text-mint-green' : 'text-gray-500'}">${p.isReady ? 'Ready' : 'Joining...'}</span>
+                  </div>
                 </div>
-                <div class="flex flex-col overflow-hidden">
-                  <span class="text-xs font-bold text-white truncate">${displayName}</span>
-                  <span class="retro-pixel-badge text-[8.5px] ${p.isReady ? 'text-mint-green' : 'text-gray-500'}">${p.isReady ? 'Ready' : 'Joining...'}</span>
-                </div>
+                <button class="btn-remove-player p-1.5 rounded-lg text-gray-500 hover:text-sunset-coral hover:bg-sunset-coral/10 transition-colors shrink-0 cursor-pointer" data-id="${p.id}" title="Remove from room">
+                  <span class="material-symbols-outlined text-[16px]">close</span>
+                </button>
               </div>
             `;
           }).join('')}
@@ -649,6 +681,41 @@ export function bindLobbyEvents() {
       store.notify();
     });
   }
+
+  // Leave Room button
+  const btnLeaveLobby = document.getElementById('btn-lobby-leave-room');
+  if (btnLeaveLobby) {
+    btnLeaveLobby.addEventListener('click', () => {
+      audio.playClick();
+      store.leaveRoom();
+      store.setView('ROOMS');
+      window.location.hash = '#/ROOMS';
+    });
+  }
+
+  // Re-join Empty Room button
+  const btnRejoin = document.getElementById('btn-rejoin-empty-room');
+  if (btnRejoin) {
+    btnRejoin.addEventListener('click', () => {
+      audio.playChime();
+      const user = store.getState().currentUser;
+      const hostName = (user && user.displayName) ? `${user.displayName.split(' ')[0]} (Host)` : 'Host (You)';
+      store.addRoomPlayer(hostName);
+      store.notify();
+    });
+  }
+
+  // Remove Camper / Player buttons
+  document.querySelectorAll('.btn-remove-player').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const playerId = btn.getAttribute('data-id');
+      if (!playerId) return;
+      audio.playClick();
+      store.removeRoomPlayer(playerId);
+      store.notify();
+    });
+  });
 
   // Add Custom Squad Card Modal Controls
   const btnOpenCustomCard = document.getElementById('btn-open-custom-card-modal');

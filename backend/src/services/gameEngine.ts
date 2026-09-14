@@ -166,4 +166,18 @@ export class GameEngine {
       correctCount: stats.correctCount,
     }));
   }
+
+  /**
+   * Deletes and cleans up any active session for a pod
+   */
+  public static deleteSessionByPodId(podId: string): boolean {
+    for (const [sessionId, session] of this.sessions.entries()) {
+      if (session.podId === podId) {
+        this.sessions.delete(sessionId);
+        this.rounds.delete(sessionId);
+        return true;
+      }
+    }
+    return false;
+  }
 }

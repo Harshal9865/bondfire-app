@@ -100,6 +100,20 @@ async function bootstrap() {
     }
   );
 
+  // Leave Room (POST /api/rooms/:code/leave)
+  app.post<{ Params: { code: string }; Body: { userId: string } }>(
+    '/api/rooms/:code/leave',
+    async (req, reply) => {
+      const { code } = req.params;
+      const { userId } = req.body;
+      if (!code || !userId) {
+        return reply.status(400).send({ error: 'Room code and userId are required' });
+      }
+      const pod = PodService.leavePod(code, userId);
+      return { success: true, pod };
+    }
+  );
+
   // Get Group Lore & Memory Graph (GET /api/groups/:id/lore)
   app.get<{ Params: { id: string } }>('/api/groups/:id/lore', async (req, reply) => {
     return { 

@@ -28,6 +28,8 @@ export interface Pod {
   createdBy?: string;
   activeMembers?: PodMemberSummary[];
   createdAt: Date;
+  emptySince?: Date | null;
+  scheduledDeletionAt?: Date | null;
 }
 
 export interface PodMemberSummary {
@@ -104,6 +106,7 @@ export interface PlayerVote {
 // WebSocket Event Protocol Messages
 export type ClientMessageType = 
   | 'CLIENT_JOIN_ROOM' 
+  | 'CLIENT_LEAVE_ROOM'
   | 'CLIENT_TOGGLE_READY' 
   | 'CLIENT_CAST_VOTE' 
   | 'CLIENT_EMOJI_REACTION' 
@@ -118,6 +121,7 @@ export type ServerMessageType =
   | 'SERVER_ROOM_STATE' 
   | 'SERVER_PLAYER_JOINED' 
   | 'SERVER_PLAYER_LEFT' 
+  | 'SERVER_ROOM_DELETED'
   | 'SERVER_PLAYER_READY_CHANGED' 
   | 'SERVER_ROUND_STARTED' 
   | 'SERVER_VOTE_RECORDED' 
