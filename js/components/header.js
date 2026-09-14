@@ -41,16 +41,15 @@ export function renderHeader() {
           
           <!-- Mode Switcher Section -->
           <div class="flex items-center gap-0.5 p-0.5 bg-surface-dark/60 rounded-full border border-border/60 shrink-0" id="header-mode-switcher">
-            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'bg-surface-bright text-white shadow-sm border border-amber-gold/40 font-bold' : 'text-gray-400 hover:text-white'} transition-all" data-mode="SOLO">
-              <span class="material-symbols-outlined text-[15px] ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'text-amber-gold' : ''}">person</span>
+            <button class="mode-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${currentMode === 'SOLO' || currentView === 'SOLO' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'}" data-mode="SOLO">
+              <span class="material-symbols-outlined text-[15px]">person</span>
               <span>Solo</span>
             </button>
-            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentMode === 'US' || currentView === 'COUPLE' ? 'bg-surface-bright text-white shadow-sm border border-duo-rose/40 font-bold' : 'text-gray-400 hover:text-duo-rose'} transition-all" data-mode="US">
-              <span class="material-symbols-outlined text-[15px] ${currentMode === 'US' || currentView === 'COUPLE' ? 'text-duo-rose' : ''}">favorite</span>
+            <button class="mode-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${currentMode === 'US' || currentView === 'COUPLE' ? 'bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'}" data-mode="US">
+              <span class="material-symbols-outlined text-[15px]">favorite</span>
               <span>Us Mode</span>
             </button>
-            <button class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${currentMode === 'PODS' || ['ROOMS', 'LOBBY', 'GAME', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 shadow-sm' : 'text-gray-400 hover:text-white'} relative transition-all" data-mode="PODS">
-              <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-pulse"></span>
+            <button class="mode-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${currentMode === 'PODS' || ['ROOMS', 'LOBBY', 'GAME', 'BOTTLE', 'NHIE', 'MOST_LIKELY_TO'].includes(currentView) ? 'bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'}" data-mode="PODS">
               <span class="material-symbols-outlined text-[15px]">groups</span>
               <span>Pods</span>
             </button>

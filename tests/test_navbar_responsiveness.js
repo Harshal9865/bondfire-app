@@ -40,6 +40,38 @@ test('Unified central capsule houses both Mode Switcher and direct links without
   assert.ok(headerLinksIndex > modeSwitcherIndex, 'Direct links must be nested inside glass-pill after mode switcher');
 });
 
+test('Mode Switcher buttons (Solo, Us Mode, Pods) have identical symmetrical UX/UI without asymmetrical dots', () => {
+  store.setState({ currentMode: 'PODS', currentView: 'ROOMS' });
+  const podsHeader = renderHeader();
+  
+  // Verify Pods button has no asymmetric pulsing dot
+  const modeSwitcherHtml = podsHeader.split('id="header-mode-switcher"')[1].split('</div>')[0];
+  assert.ok(!modeSwitcherHtml.includes('animate-pulse'), 'Mode switcher buttons must not have asymmetric pulsating dots');
+  
+  // Verify all three mode buttons have identical sizing and base classes
+  const btnSoloMatch = modeSwitcherHtml.includes('data-mode="SOLO"');
+  const btnUsMatch = modeSwitcherHtml.includes('data-mode="US"');
+  const btnPodsMatch = modeSwitcherHtml.includes('data-mode="PODS"');
+  assert.ok(btnSoloMatch && btnUsMatch && btnPodsMatch, 'All three mode buttons exist');
+
+  // Verify uniform padding px-3.5 py-1.5 and font-semibold
+  const occurrences = (modeSwitcherHtml.match(/px-3\.5 py-1\.5 rounded-full text-xs font-semibold/g) || []).length;
+  assert.equal(occurrences, 3, 'All 3 mode buttons must share identical px-3.5 py-1.5 rounded-full text-xs font-semibold sizing');
+
+  // Verify uniform active theme-accented styling when switching modes
+  store.setState({ currentMode: 'SOLO', currentView: 'SOLO' });
+  const soloHeader = renderHeader();
+  assert.ok(soloHeader.includes('bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold shadow-sm'), 'Solo active button has matching accent pill style');
+
+  store.setState({ currentMode: 'US', currentView: 'COUPLE' });
+  const usHeader = renderHeader();
+  assert.ok(usHeader.includes('bg-duo-rose/20 text-duo-rose border border-duo-rose/40 font-bold shadow-sm'), 'Us Mode active button has matching accent pill style');
+
+  store.setState({ currentMode: 'PODS', currentView: 'ROOMS' });
+  const podsActiveHeader = renderHeader();
+  assert.ok(podsActiveHeader.includes('bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40 font-bold shadow-sm'), 'Pods active button has matching accent pill style');
+});
+
 test('Brand identity contains shrink-0 and whitespace-nowrap to prevent vertical text squishing', () => {
   const headerHtml = renderHeader();
   assert.ok(headerHtml.includes('id="nav-brand-logo"'), 'Brand logo exists');
