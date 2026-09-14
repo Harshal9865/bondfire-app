@@ -598,6 +598,7 @@ export function bindHeaderEvents() {
       const view = tab.dataset.view;
       if (view) {
         store.setView(view);
+        window.location.hash = `#/${view}`;
       }
     });
   });

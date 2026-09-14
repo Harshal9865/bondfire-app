@@ -65,10 +65,10 @@ export function renderSpotifyJukebox() {
 
   return `
     <!-- Floating Campfire Jukebox Widget (Full Song Player) -->
-    <div id="spotify-jukebox-container" class="fixed bottom-4 right-4 z-50 flex flex-col items-end pointer-events-auto">
+    <div id="spotify-jukebox-container" class="fixed bottom-[74px] sm:bottom-[78px] md:bottom-6 right-3 sm:right-5 z-40 md:z-50 flex flex-col items-end pointer-events-auto">
       
       <!-- Collapsible Jukebox Panel -->
-      <div id="spotify-jukebox-modal" class="w-80 sm:w-96 rounded-3xl bg-[#0e121e]/95 backdrop-blur-2xl border-2 border-amber-gold/50 shadow-2xl p-4 mb-2 flex flex-col gap-3 transition-all duration-300 ${isJukeboxOpen ? '' : 'hidden'}">
+      <div id="spotify-jukebox-modal" class="w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-3xl bg-[#0e121e]/95 backdrop-blur-2xl border-2 border-amber-gold/50 shadow-2xl p-3.5 sm:p-4 mb-2 flex flex-col gap-3 transition-all duration-300 max-h-[72vh] overflow-y-auto ${isJukeboxOpen ? '' : 'hidden'}">
         
         <!-- Header with Mode Switcher -->
         <div class="flex items-center justify-between pb-2 border-b border-white/10">
@@ -123,9 +123,9 @@ export function renderSpotifyJukebox() {
       </div>
 
       <!-- Floating Launch Button -->
-      <button id="btn-toggle-jukebox" class="px-3.5 py-2 rounded-full bg-surface border-2 border-amber-gold/60 shadow-[0_4px_25px_rgba(255,183,3,0.35)] hover:scale-105 active:scale-95 text-white flex items-center gap-2 transition-all cursor-pointer group" title="Open Campfire Jukebox">
-        <span class="material-symbols-outlined text-amber-gold text-[18px] group-hover:rotate-12 transition-transform">music_note</span>
-        <span class="text-xs font-bold text-gray-200" id="jukebox-toggle-label">Campfire Music</span>
+      <button id="btn-toggle-jukebox" class="p-2.5 sm:px-3.5 sm:py-2 rounded-full bg-[#0E121E]/95 border-2 border-amber-gold/60 shadow-[0_4px_25px_rgba(255,183,3,0.35)] hover:scale-105 active:scale-95 text-white flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer group backdrop-blur-md" title="Open Campfire Jukebox">
+        <span class="material-symbols-outlined text-amber-gold text-[20px] sm:text-[18px] group-hover:rotate-12 transition-transform">music_note</span>
+        <span class="hidden sm:inline text-xs font-bold text-gray-200" id="jukebox-toggle-label">Campfire Music</span>
         <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
       </button>
     </div>

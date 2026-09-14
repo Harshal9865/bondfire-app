@@ -725,6 +725,21 @@ export function bindHeroEvents() {
     e.stopPropagation();
     goToYearbook();
   });
-  if (keepsakeCard) keepsakeCard.addEventListener('click', goToYearbook);
   if (yearbookBadge) yearbookBadge.addEventListener('click', goToYearbook);
+
+  if (keepsakeCard) {
+    keepsakeCard.addEventListener('touchstart', () => {
+      keepsakeCard.classList.add('is-active');
+    }, { passive: true });
+
+    keepsakeCard.addEventListener('touchend', () => {
+      setTimeout(() => keepsakeCard.classList.remove('is-active'), 800);
+    }, { passive: true });
+
+    keepsakeCard.addEventListener('click', (e) => {
+      if (e.target.closest('#btn-preview-book-modal')) return;
+      try { audio.playClick(); } catch (_) {}
+      keepsakeCard.classList.toggle('is-active');
+    });
+  }
 }

@@ -29,6 +29,7 @@ import { renderSoloScreen, bindSoloEvents } from './components/soloScreen.js';
 import { renderCoupleScreen, bindCoupleEvents } from './components/coupleScreen.js';
 import { renderFooter, bindFooterEvents } from './components/footer.js';
 import { renderSpotifyJukebox, bindSpotifyEvents } from './components/spotifyPlayer.js';
+import { renderRoomsHub, bindRoomsHubEvents } from './components/roomsHubScreen.js';
 
 class BondfireApp {
   constructor() {
@@ -202,6 +203,10 @@ class BondfireApp {
         break;
 
       case 'ROOMS':
+        this.appMount.innerHTML = renderRoomsHub();
+        bindRoomsHubEvents();
+        break;
+
       case 'LOBBY':
         this.appMount.innerHTML = renderLobby();
         bindLobbyEvents();
