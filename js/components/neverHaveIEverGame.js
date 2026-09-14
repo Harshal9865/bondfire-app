@@ -11,6 +11,7 @@ let currentPrompt = getRandomNhiePrompt('ALL');
 let playerFingers = {}; // { playerId: number } (10 down to 0)
 let roundHistory = [];
 let activeCategory = 'ALL';
+let nhieTimerInterval = null;
 
 function initPlayerFingers() {
   const room = store.getState().activeRoom;
@@ -89,7 +90,22 @@ export function renderNeverHaveIEverGame() {
           "${currentPrompt.text}"
         </h3>
 
-        <p class="text-xs text-gray-400 mt-2 mb-6">If you've done this, drop a finger! Be honest — your squad is watching.</p>
+        <p class="text-xs text-gray-400 mt-2 mb-4">If you've done this, drop a finger! Be honest — your squad is watching.</p>
+
+        <!-- In-Game 15-Second Decision Shot Clock -->
+        <div class="max-w-md mx-auto mb-5 p-2.5 rounded-2xl bg-[#0F131E]/80 border border-white/10 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-duo-rose animate-pulse">timer</span>
+              <span class="text-xs font-mono font-bold text-gray-300">Decision Shot Clock:</span>
+              <span id="nhie-shot-clock-text" class="text-xs font-mono font-black text-duo-rose bg-duo-rose/15 px-2 py-0.5 rounded-full border border-duo-rose/30">15s</span>
+            </div>
+            <span id="nhie-timer-status" class="text-[10.5px] font-mono text-gray-400">Drop a finger or mark safe</span>
+          </div>
+          <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/5">
+            <div id="nhie-timer-bar" class="h-full bg-gradient-to-r from-duo-rose to-amber-gold rounded-full transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+          </div>
+        </div>
 
         <!-- Player Actions: Drop Finger or Safe -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
@@ -199,10 +215,56 @@ export function renderNeverHaveIEverGame() {
 }
 
 export function bindNeverHaveIEverEvents() {
+  if (nhieTimerInterval) {
+    clearInterval(nhieTimerInterval);
+    nhieTimerInterval = null;
+  }
+
+  // Active 15-Second Decision Shot Clock
+  let nhieSecondsLeft = 15;
+  const timerText = document.getElementById('nhie-shot-clock-text');
+  const timerBar = document.getElementById('nhie-timer-bar');
+  const timerStatus = document.getElementById('nhie-timer-status');
+
+  nhieTimerInterval = setInterval(() => {
+    nhieSecondsLeft--;
+    if (nhieSecondsLeft < 0) nhieSecondsLeft = 0;
+
+    if (timerText) timerText.textContent = `${nhieSecondsLeft}s`;
+    if (timerBar) {
+      const pct = Math.max(0, (nhieSecondsLeft / 15) * 100);
+      timerBar.style.width = `${pct}%`;
+      if (nhieSecondsLeft <= 5) {
+        timerBar.className = 'h-full bg-red-500 rounded-full transition-all duration-1000 ease-linear animate-pulse';
+      }
+    }
+
+    if (nhieSecondsLeft <= 5 && nhieSecondsLeft > 0) {
+      audio.playTick();
+      if (timerText) timerText.className = 'text-xs font-mono font-black text-red-400 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/40 animate-bounce';
+    }
+
+    if (nhieSecondsLeft <= 0) {
+      clearInterval(nhieTimerInterval);
+      nhieTimerInterval = null;
+      audio.playBip();
+      if (timerText) timerText.textContent = "TIME'S UP!";
+      if (timerStatus) {
+        timerStatus.textContent = 'All campers declared safe! Next prompt incoming...';
+        timerStatus.className = 'text-[10.5px] font-mono font-bold text-mint-green';
+      }
+      setTimeout(() => {
+        currentPrompt = getRandomNhiePrompt(activeCategory);
+        reRender();
+      }, 1500);
+    }
+  }, 1000);
+
   // 1. Back to Arcade
   const btnBack = document.getElementById('btn-nhie-back-arcade');
   if (btnBack) {
     btnBack.addEventListener('click', () => {
+      if (nhieTimerInterval) clearInterval(nhieTimerInterval);
       audio.playClick();
       store.setView('ARCADE');
       window.location.hash = '#/ARCADE';

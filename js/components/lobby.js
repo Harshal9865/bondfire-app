@@ -581,8 +581,14 @@ export function bindLobbyEvents() {
   if (btnBottle) {
     btnBottle.addEventListener('click', () => {
       audio.playChime();
-      store.setState({ currentView: 'BOTTLE' });
-      window.location.hash = '#/BOTTLE';
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Spin the Bottle',
+        onComplete: () => {
+          store.setState({ currentView: 'BOTTLE' });
+          window.location.hash = '#/BOTTLE';
+        }
+      });
     });
   }
 

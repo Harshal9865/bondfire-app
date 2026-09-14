@@ -14,7 +14,7 @@ let confettiInstance = null;
  * Returns dynamic, authentic, highly engaging game examples for each game mode.
  * Dynamically uses real connected player names from the room instead of bot placeholders.
  */
-function getExampleForMode(modeKey, customTitle) {
+export function getExampleForMode(modeKey, customTitle) {
   const state = store.getState();
   const roomCampers = state.activeRoom?.players || state.activeRoom?.campers || [];
   const camperNames = roomCampers.map((c) => c.name).filter(Boolean);

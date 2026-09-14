@@ -20,6 +20,7 @@ let recordedVoiceBlobUrl = null;
 let isRecording = false;
 let activeAudioPlayer = null;
 let activeAudioUrl = null;
+let coupleQuizTimerInterval = null;
 
 const DATE_NIGHT_QUESTIONS = [
   {
@@ -524,6 +525,21 @@ export function renderCoupleScreen() {
           <p class="text-xs text-gray-400">Lock in your answers together to unlock compatibility sparks.</p>
         </div>
 
+        <!-- In-Game 25-Second Date Night Sync Shot Clock -->
+        <div class="p-2.5 rounded-2xl bg-canvas border border-border/80 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-sunset-coral animate-pulse">timer</span>
+              <span class="text-xs font-mono font-bold text-gray-300">Sync Shot Clock:</span>
+              <span id="couple-quiz-timer-text" class="text-xs font-mono font-black text-sunset-coral bg-sunset-coral/15 px-2 py-0.5 rounded-full border border-sunset-coral/30">25s</span>
+            </div>
+            <span id="couple-quiz-timer-status" class="text-[10.5px] font-mono text-gray-400">Lock in answers together!</span>
+          </div>
+          <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/5">
+            <div id="couple-quiz-timer-bar" class="h-full bg-gradient-to-r from-sunset-coral to-amber-gold rounded-full transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+          </div>
+        </div>
+
         <!-- 2 Real Partner Choices -->
         <div class="flex flex-col gap-2.5" id="couple-quiz-options">
           <button class="couple-quiz-btn group w-full min-h-[58px] p-3 rounded-2xl bg-surface-bright hover:border-sunset-coral/50 active:scale-[0.98] transition-all flex items-center justify-between text-left border border-border" data-choice="${partnerOne}" type="button">
@@ -661,10 +677,50 @@ export function bindCoupleEvents() {
     confetti = new ConfettiEngine('confetti-canvas');
   }
 
+  if (coupleQuizTimerInterval) {
+    clearInterval(coupleQuizTimerInterval);
+    coupleQuizTimerInterval = null;
+  }
+
+  // Active 25-Second Date Night Sync Shot Clock
+  const quizTimerText = document.getElementById('couple-quiz-timer-text');
+  const quizTimerBar = document.getElementById('couple-quiz-timer-bar');
+  const quizTimerStatus = document.getElementById('couple-quiz-timer-status');
+
+  if (quizTimerText && quizTimerBar) {
+    let coupleQuizSecondsLeft = 25;
+    coupleQuizTimerInterval = setInterval(() => {
+      coupleQuizSecondsLeft--;
+      if (coupleQuizSecondsLeft < 0) coupleQuizSecondsLeft = 0;
+
+      quizTimerText.textContent = `${coupleQuizSecondsLeft}s`;
+      const pct = Math.max(0, (coupleQuizSecondsLeft / 25) * 100);
+      quizTimerBar.style.width = `${pct}%`;
+
+      if (coupleQuizSecondsLeft <= 5 && coupleQuizSecondsLeft > 0) {
+        audio.playTick();
+        quizTimerText.className = 'text-xs font-mono font-black text-red-400 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/40 animate-bounce';
+        quizTimerBar.className = 'h-full bg-red-500 rounded-full transition-all duration-1000 ease-linear animate-pulse';
+      }
+
+      if (coupleQuizSecondsLeft <= 0) {
+        clearInterval(coupleQuizTimerInterval);
+        coupleQuizTimerInterval = null;
+        audio.playBip();
+        quizTimerText.textContent = "TIME'S UP!";
+        if (quizTimerStatus) {
+          quizTimerStatus.textContent = 'Sync time expired! Lock in your choice now.';
+          quizTimerStatus.className = 'text-[10.5px] font-mono font-bold text-sunset-coral';
+        }
+      }
+    }, 1000);
+  }
+
   // 1. Create Duo Room
   const btnCreateDuo = document.getElementById('btn-create-duo-room');
   if (btnCreateDuo) {
     btnCreateDuo.addEventListener('click', () => {
+      if (coupleQuizTimerInterval) clearInterval(coupleQuizTimerInterval);
       audio.playChime();
       store.createDuoRoom();
       store.setView('COUPLE');
@@ -791,6 +847,7 @@ export function bindCoupleEvents() {
   const nextMemBtn = document.getElementById('btn-couple-next-memory');
 
   const advanceQuiz = () => {
+    if (coupleQuizTimerInterval) clearInterval(coupleQuizTimerInterval);
     audio.playClick();
     currentQuizIndex = (currentQuizIndex + 1) % DATE_NIGHT_QUESTIONS.length;
     store.setView('COUPLE');
@@ -800,6 +857,7 @@ export function bindCoupleEvents() {
   if (nextMemBtn) nextMemBtn.addEventListener('click', advanceQuiz);
   if (prevQuizBtn) {
     prevQuizBtn.addEventListener('click', () => {
+      if (coupleQuizTimerInterval) clearInterval(coupleQuizTimerInterval);
       audio.playClick();
       currentQuizIndex = (currentQuizIndex - 1 + DATE_NIGHT_QUESTIONS.length) % DATE_NIGHT_QUESTIONS.length;
       store.setView('COUPLE');

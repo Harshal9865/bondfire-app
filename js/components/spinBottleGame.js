@@ -146,6 +146,21 @@ export function renderSpinBottleGame() {
             <p id="prompt-text" class="text-sm sm:text-base text-white font-medium leading-relaxed font-mono">
               "What is the most embarrassing thing currently in your browser history?"
             </p>
+
+            <!-- In-Game 30-Second Challenge Shot Clock -->
+            <div class="mt-2 pt-2.5 border-t border-white/10 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-amber-gold animate-pulse">timer</span>
+                  <span class="text-xs font-mono font-bold text-gray-300">Challenge Shot Clock:</span>
+                  <span id="bottle-shot-clock-text" class="text-xs font-mono font-black text-amber-gold bg-amber-gold/15 px-2 py-0.5 rounded-full border border-amber-gold/30">30s</span>
+                </div>
+                <span id="bottle-timer-status" class="text-[10.5px] font-mono text-gray-400">Answer or face dare!</span>
+              </div>
+              <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/5">
+                <div id="bottle-timer-bar" class="h-full bg-gradient-to-r from-sunset-coral via-amber-gold to-mint-green rounded-full transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+              </div>
+            </div>
           </div>
 
           <!-- Or Type a Custom Dare Section -->
@@ -279,6 +294,65 @@ export function bindSpinBottleEvents() {
   if (spinBtn) spinBtn.addEventListener('click', doSpin);
   if (bottle) bottle.addEventListener('click', doSpin);
 
+  let challengeTimerId = null;
+  let challengeSecondsLeft = 30;
+
+  function stopChallengeTimer() {
+    if (challengeTimerId) {
+      clearInterval(challengeTimerId);
+      challengeTimerId = null;
+    }
+  }
+
+  function startChallengeTimer() {
+    stopChallengeTimer();
+    challengeSecondsLeft = 30;
+    const timerText = document.getElementById('bottle-shot-clock-text');
+    const timerBar = document.getElementById('bottle-timer-bar');
+    const timerStatus = document.getElementById('bottle-timer-status');
+    if (timerText) {
+      timerText.textContent = '30s';
+      timerText.className = 'text-xs font-mono font-black text-amber-gold bg-amber-gold/15 px-2 py-0.5 rounded-full border border-amber-gold/30';
+    }
+    if (timerBar) {
+      timerBar.style.width = '100%';
+      timerBar.className = 'h-full bg-gradient-to-r from-sunset-coral via-amber-gold to-mint-green rounded-full transition-all duration-1000 ease-linear';
+    }
+    if (timerStatus) {
+      timerStatus.textContent = 'Answer or face dare!';
+      timerStatus.className = 'text-[10.5px] font-mono text-gray-400';
+    }
+
+    challengeTimerId = setInterval(() => {
+      challengeSecondsLeft--;
+      if (challengeSecondsLeft < 0) challengeSecondsLeft = 0;
+
+      if (timerText) timerText.textContent = `${challengeSecondsLeft}s`;
+      if (timerBar) {
+        const pct = Math.max(0, (challengeSecondsLeft / 30) * 100);
+        timerBar.style.width = `${pct}%`;
+        if (challengeSecondsLeft <= 5) {
+          timerBar.className = 'h-full bg-red-500 rounded-full transition-all duration-1000 ease-linear animate-pulse';
+        }
+      }
+
+      if (challengeSecondsLeft <= 5 && challengeSecondsLeft > 0) {
+        audio.playTick();
+        if (timerText) timerText.className = 'text-xs font-mono font-black text-red-400 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/40 animate-bounce';
+      }
+
+      if (challengeSecondsLeft <= 0) {
+        stopChallengeTimer();
+        audio.playWrong();
+        if (timerText) timerText.textContent = "TIME'S UP!";
+        if (timerStatus) {
+          timerStatus.textContent = "Time expired! Squad votes penalty!";
+          timerStatus.className = 'text-[10.5px] font-mono font-bold text-red-400';
+        }
+      }
+    }, 1000);
+  }
+
   // Truth Pick
   if (btnTruth) {
     btnTruth.addEventListener('click', () => {
@@ -290,6 +364,7 @@ export function bindSpinBottleEvents() {
       }
       if (promptText) promptText.textContent = `"${getRandomTruth(currentSpice)}"`;
       if (promptBox) promptBox.classList.remove('hidden');
+      startChallengeTimer();
     });
   }
 
@@ -304,6 +379,7 @@ export function bindSpinBottleEvents() {
       }
       if (promptText) promptText.textContent = `"${getRandomDare(currentSpice === 'SAVAGE' ? 'CHAOS' : currentSpice)}"`;
       if (promptBox) promptBox.classList.remove('hidden');
+      startChallengeTimer();
     });
   }
 
@@ -316,6 +392,7 @@ export function bindSpinBottleEvents() {
       } else {
         promptText.textContent = `"${getRandomDare(currentSpice === 'SAVAGE' ? 'CHAOS' : currentSpice)}"`;
       }
+      startChallengeTimer();
     });
   }
 
@@ -342,18 +419,21 @@ export function bindSpinBottleEvents() {
       if (promptBox) promptBox.classList.remove('hidden');
       customInput.value = '';
       customContainer.classList.add('hidden');
+      startChallengeTimer();
     });
   }
 
   // Done or Close
   if (btnDone && modal) {
     btnDone.addEventListener('click', () => {
+      stopChallengeTimer();
       audio.playChime();
       modal.classList.add('hidden');
     });
   }
   if (btnClose && modal) {
     btnClose.addEventListener('click', () => {
+      stopChallengeTimer();
       audio.playClick();
       modal.classList.add('hidden');
     });
@@ -362,6 +442,7 @@ export function bindSpinBottleEvents() {
   // Exit back to Arcade or Lobby
   if (btnExit) {
     btnExit.addEventListener('click', () => {
+      stopChallengeTimer();
       audio.playClick();
       store.setView('ROOMS');
     });

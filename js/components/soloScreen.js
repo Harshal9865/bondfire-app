@@ -10,6 +10,7 @@ import { triggerGameCountdown } from './gameCountdownOverlay.js';
 
 let confetti = null;
 let activeSoloTab = 'DAILY'; // 'DAILY' | 'CAPSULE' | 'QUIZ'
+let soloQuizTimerInterval = null;
 
 function getSavedReflections() {
   try {
@@ -276,6 +277,21 @@ export function renderSoloScreen() {
             <p class="text-xs text-gray-400">Lock in your answer to track your mood growth over time.</p>
           </div>
 
+          <!-- In-Game 30-Second Reflection Shot Clock -->
+          <div class="p-2.5 rounded-2xl bg-canvas border border-border/80 flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-amber-gold animate-pulse">schedule</span>
+                <span class="text-xs font-mono font-bold text-gray-300">Reflection Shot Clock:</span>
+                <span id="solo-quiz-timer-text" class="text-xs font-mono font-black text-amber-gold bg-amber-gold/15 px-2 py-0.5 rounded-full border border-amber-gold/30">30s</span>
+              </div>
+              <span id="solo-quiz-timer-status" class="text-[10.5px] font-mono text-gray-400">Take your time to reflect</span>
+            </div>
+            <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/5">
+              <div id="solo-quiz-timer-bar" class="h-full bg-gradient-to-r from-amber-gold to-sunset-coral rounded-full transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+            </div>
+          </div>
+
           <div class="space-y-2.5" id="solo-quiz-options">
             <button class="solo-quiz-opt w-full p-3.5 rounded-2xl bg-surface-bright hover:border-amber-gold/60 border border-border text-left text-xs font-semibold text-gray-200 transition-all flex items-center justify-between">
               <span>Traveling somewhere completely new with people I love</span>
@@ -310,10 +326,49 @@ export function bindSoloEvents() {
     confetti = new ConfettiEngine('confetti-canvas');
   }
 
+  if (soloQuizTimerInterval) {
+    clearInterval(soloQuizTimerInterval);
+    soloQuizTimerInterval = null;
+  }
+
+  // Active 30-Second Reflection Shot Clock (Flashback Quiz)
+  const soloTimerText = document.getElementById('solo-quiz-timer-text');
+  const soloTimerBar = document.getElementById('solo-quiz-timer-bar');
+  const soloTimerStatus = document.getElementById('solo-quiz-timer-status');
+
+  if (soloTimerText && soloTimerBar) {
+    let soloSecondsLeft = 30;
+    soloQuizTimerInterval = setInterval(() => {
+      soloSecondsLeft--;
+      if (soloSecondsLeft < 0) soloSecondsLeft = 0;
+
+      soloTimerText.textContent = `${soloSecondsLeft}s`;
+      const pct = Math.max(0, (soloSecondsLeft / 30) * 100);
+      soloTimerBar.style.width = `${pct}%`;
+
+      if (soloSecondsLeft <= 5 && soloSecondsLeft > 0) {
+        audio.playTick();
+        soloTimerText.className = 'text-xs font-mono font-black text-amber-gold bg-amber-gold/20 px-2 py-0.5 rounded-full border border-amber-gold/40 animate-bounce';
+      }
+
+      if (soloSecondsLeft <= 0) {
+        clearInterval(soloQuizTimerInterval);
+        soloQuizTimerInterval = null;
+        audio.playBip();
+        soloTimerText.textContent = 'DONE';
+        if (soloTimerStatus) {
+          soloTimerStatus.textContent = 'Reflection complete - select an option!';
+          soloTimerStatus.className = 'text-[10.5px] font-mono font-bold text-amber-gold';
+        }
+      }
+    }, 1000);
+  }
+
   // Tab switching
   const tabs = document.querySelectorAll('.solo-nav-tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
+      if (soloQuizTimerInterval) clearInterval(soloQuizTimerInterval);
       audio.playClick();
       const targetTab = tab.dataset.tab;
       if (targetTab === 'QUIZ') {
@@ -432,6 +487,10 @@ export function bindSoloEvents() {
   const quizFeedback = document.getElementById('solo-quiz-feedback');
   quizOpts.forEach(btn => {
     btn.addEventListener('click', () => {
+      if (soloQuizTimerInterval) {
+        clearInterval(soloQuizTimerInterval);
+        soloQuizTimerInterval = null;
+      }
       audio.playCorrect();
       confetti.burst(40);
       quizOpts.forEach(b => {

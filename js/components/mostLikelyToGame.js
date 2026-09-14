@@ -12,6 +12,7 @@ let customBallots = [];
 let votes = {}; // { playerId: number }
 let hasVoted = false;
 let revealed = false;
+let mltTimerInterval = null;
 
 function getAllPrompts() {
   return [...MOST_LIKELY_TO_DECK, ...customBallots];
@@ -87,7 +88,22 @@ export function renderMostLikelyToGame() {
           "${currentPrompt.question || currentPrompt.prompt || currentPrompt.text}"
         </h3>
 
-        <p class="text-xs text-gray-400 mt-2 mb-4">Tap on the camper in your room who fits this the most!</p>
+        <p class="text-xs text-gray-400 mt-2 mb-3">Tap on the camper in your room who fits this the most!</p>
+
+        <!-- In-Game 20-Second Ballot Shot Clock -->
+        <div class="max-w-md mx-auto mb-4 p-2.5 rounded-2xl bg-[#0F131E]/80 border border-white/10 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-amber-gold animate-pulse">timer</span>
+              <span class="text-xs font-mono font-bold text-gray-300">Ballot Shot Clock:</span>
+              <span id="mlt-shot-clock-text" class="text-xs font-mono font-black text-amber-gold bg-amber-gold/15 px-2 py-0.5 rounded-full border border-amber-gold/30">${revealed ? 'VERDICT' : '20s'}</span>
+            </div>
+            <span id="mlt-timer-status" class="text-[10.5px] font-mono text-gray-400">${revealed ? 'Verdict unlocked!' : 'Vote before clock expires'}</span>
+          </div>
+          <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/5">
+            <div id="mlt-timer-bar" class="h-full bg-gradient-to-r from-amber-gold to-sunset-coral rounded-full transition-all duration-1000 ease-linear" style="width: ${revealed ? '0%' : '100%'};"></div>
+          </div>
+        </div>
 
         <!-- Vote Control Buttons -->
         <div class="flex items-center justify-center gap-3">
@@ -180,10 +196,51 @@ export function renderMostLikelyToGame() {
 }
 
 export function bindMostLikelyToEvents() {
+  if (mltTimerInterval) {
+    clearInterval(mltTimerInterval);
+    mltTimerInterval = null;
+  }
+
+  // Active 20-Second Ballot Shot Clock (Auto-reveals verdict on expiry)
+  if (!revealed) {
+    let mltSecondsLeft = 20;
+    const timerText = document.getElementById('mlt-shot-clock-text');
+    const timerBar = document.getElementById('mlt-timer-bar');
+    const timerStatus = document.getElementById('mlt-timer-status');
+
+    mltTimerInterval = setInterval(() => {
+      mltSecondsLeft--;
+      if (mltSecondsLeft < 0) mltSecondsLeft = 0;
+
+      if (timerText) timerText.textContent = `${mltSecondsLeft}s`;
+      if (timerBar) {
+        const pct = Math.max(0, (mltSecondsLeft / 20) * 100);
+        timerBar.style.width = `${pct}%`;
+        if (mltSecondsLeft <= 5) {
+          timerBar.className = 'h-full bg-red-500 rounded-full transition-all duration-1000 ease-linear animate-pulse';
+        }
+      }
+
+      if (mltSecondsLeft <= 5 && mltSecondsLeft > 0) {
+        audio.playTick();
+        if (timerText) timerText.className = 'text-xs font-mono font-black text-red-400 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/40 animate-bounce';
+      }
+
+      if (mltSecondsLeft <= 0) {
+        clearInterval(mltTimerInterval);
+        mltTimerInterval = null;
+        audio.playFanfare();
+        revealed = true;
+        reRender();
+      }
+    }, 1000);
+  }
+
   // 1. Back to Arcade
   const btnBack = document.getElementById('btn-mlt-back-arcade');
   if (btnBack) {
     btnBack.addEventListener('click', () => {
+      if (mltTimerInterval) clearInterval(mltTimerInterval);
       audio.playClick();
       store.setView('ARCADE');
       window.location.hash = '#/ARCADE';
@@ -210,6 +267,7 @@ export function bindMostLikelyToEvents() {
   const btnReveal = document.getElementById('btn-mlt-reveal');
   if (btnReveal) {
     btnReveal.addEventListener('click', () => {
+      if (mltTimerInterval) clearInterval(mltTimerInterval);
       audio.playFanfare();
       revealed = true;
       reRender();
