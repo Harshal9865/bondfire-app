@@ -22,11 +22,12 @@ const BOLLYWOOD_QUESTIONS = [
     hint: 'Iconic 1987 sci-fi superhero classic with the invisible watch.'
   },
   {
-    type: 'EMOJI',
-    prompt: '🕶️ 🎒 🚂 ❄️ ⛺',
+    type: 'VISUAL',
+    prompt: 'Sunglasses · Backpack · Midnight Train · Snow Peaks',
+    icons: ['travel_explore', 'backpack', 'train', 'landscape'],
     options: ['Yeh Jawaani Hai Deewani', 'Zindagi Na Milegi Dobara', 'Jab We Met', 'Dil Chahta Hai'],
     correct: 0,
-    hint: 'Bunny and Naina on a Manali trekking trip.'
+    hint: 'Bunny, Naina, Avi & Aditi on a spontaneous Manali trekking trip.'
   },
   {
     type: 'ANTAKSHARI',
@@ -44,11 +45,12 @@ const BOLLYWOOD_QUESTIONS = [
     hint: 'Spoken on the rocky hills of Ramgarh.'
   },
   {
-    type: 'EMOJI',
-    prompt: '🎸 🌧️ 🎤 🥃 💔',
+    type: 'VISUAL',
+    prompt: 'Acoustic Guitar · Heavy Rain · Concert Mic · Lost Romance',
+    icons: ['music_note', 'rainy', 'mic', 'heart_broken'],
     options: ['Aashiqui 2', 'Rockstar', 'Ae Dil Hai Mushkil', 'Kabir Singh'],
     correct: 0,
-    hint: 'Rahul Jaykar and Aarohi under the rain coat.'
+    hint: 'Rahul Jaykar and Aarohi under the jacket in Mumbai rain.'
   },
   {
     type: 'DIALOGUE',
@@ -87,7 +89,7 @@ export function renderBollywoodGame() {
       <div class="flex items-center justify-between pb-6 mb-8 border-b border-[#262B40]/70 flex-wrap gap-4">
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold uppercase mb-2">
-            <span class="text-base">🎬</span>
+            <span class="material-symbols-outlined text-[16px]">movie</span>
             <span>INDIAN ARCADE // BOLLYWOOD ANTAKSHARI &amp; MASALA</span>
           </div>
           <h1 class="font-display text-2xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
@@ -119,16 +121,22 @@ export function renderBollywoodGame() {
           <!-- Category & Streak Badge -->
           <div class="flex items-center justify-between mb-6">
             <span class="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-sunset-coral/15 text-sunset-coral border border-sunset-coral/30">
-              ${current.type === 'ANTAKSHARI' ? `ANTAR-SHUTTLE LETTER: "${current.letter}"` : current.type === 'EMOJI' ? 'EMOJI PLOT RIDDLE' : 'ICONIC DIALOGUE DECODE'}
+              ${current.type === 'ANTAKSHARI' ? `ANTAKSHARI LETTER: "${current.letter}"` : current.type === 'VISUAL' ? 'VISUAL SCENE RIDDLE' : 'ICONIC DIALOGUE DECODE'}
             </span>
 
-            <span class="text-xs font-mono text-amber-gold font-bold">
-              🔥 Streak: ${gameState.streak} | Score: ${gameState.score}
+            <span class="text-xs font-mono text-amber-gold font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px] text-amber-gold">local_fire_department</span>
+              <span>Streak: ${gameState.streak} | Score: ${gameState.score}</span>
             </span>
           </div>
 
           <!-- Prompt Question Box -->
           <div class="text-center py-6 px-4 rounded-2xl bg-[#181C2B] border border-white/5 mb-8">
+            ${current.icons ? `
+              <div class="flex items-center justify-center gap-4 mb-3">
+                ${current.icons.map(ic => `<span class="material-symbols-outlined text-3xl sm:text-4xl text-sunset-coral">${ic}</span>`).join('')}
+              </div>
+            ` : ''}
             <div class="font-display font-black text-2xl sm:text-4xl text-white tracking-tight leading-relaxed mb-3">
               ${current.prompt}
             </div>

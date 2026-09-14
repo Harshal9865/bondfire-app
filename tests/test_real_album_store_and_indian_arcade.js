@@ -112,12 +112,14 @@ assert(tambolaCode.includes('Jaldi 5') || tambolaCode.includes('jaldi5'), 'Must 
 assert(tambolaCode.includes('Full House') || tambolaCode.includes('fullHouse'), 'Must support Full House claim');
 console.log('  ✅ PASS: tambolaGame.js implements authentic 1-90 caller machine, 3x9 tickets, and winning claims');
 
-// 8. Check arcadeScreen.js for 6 complete party games and restored original colors
+// 8. Check arcadeScreen.js for 3 separate Desi cards (Raja, Tambola, Bollywood) + 4 Classics
 const arcadePath = path.join(rootDir, 'js/components/arcadeScreen.js');
 const arcadeCode = fs.readFileSync(arcadePath, 'utf8');
 
+assert(!arcadeCode.includes('Raja Mantri & Desi Tambola'), 'Must NOT combine Raja Mantri and Tambola in one banner');
 assert(arcadeCode.includes('arcade-launch-raja'), 'arcadeScreen.js must have launch button for Raja Mantri');
 assert(arcadeCode.includes('arcade-launch-tambola'), 'arcadeScreen.js must have launch button for Desi Tambola');
+assert(arcadeCode.includes('arcade-launch-bollywood'), 'arcadeScreen.js must have launch button for Bollywood Antakshari');
 assert(arcadeCode.includes('arcade-launch-bottle'), 'arcadeScreen.js must retain Spin the Bottle');
 assert(arcadeCode.includes('arcade-launch-nhie'), 'arcadeScreen.js must retain Never Have I Ever');
 assert(arcadeCode.includes('arcade-launch-mlt'), 'arcadeScreen.js must retain Most Likely To');
@@ -125,17 +127,20 @@ assert(arcadeCode.includes('arcade-launch-watch'), 'arcadeScreen.js must retain 
 assert(arcadeCode.includes('border-sunset-coral'), 'Original sunset-coral color preserved for Bottle');
 assert(arcadeCode.includes('border-duo-rose'), 'Original duo-rose color preserved for NHIE');
 assert(arcadeCode.includes('border-amber-gold'), 'Original amber-gold color preserved for MLT');
-console.log('  ✅ PASS: arcadeScreen.js contains 6 complete party games with original color palettes restored');
+assert(arcadeCode.includes('whitespace-nowrap shrink-0'), 'Must enforce non-wrapping badges to prevent text overflow bug (Image 3)');
+console.log('  ✅ PASS: arcadeScreen.js separates Raja & Tambola into distinct cards, adds Bollywood, and fixes badge wrapping');
 
-// 9. Check app.js for routing support
+// 9. Check app.js for routing support across all 7 games
 const appPath = path.join(rootDir, 'js/app.js');
 const appCode = fs.readFileSync(appPath, 'utf8');
 
 assert(appCode.includes('renderRajaMantriGame'), 'app.js must import renderRajaMantriGame');
 assert(appCode.includes('renderTambolaGame'), 'app.js must import renderTambolaGame');
+assert(appCode.includes('renderBollywoodGame'), 'app.js must import renderBollywoodGame');
 assert(appCode.includes("case 'RAJA_MANTRI':"), 'app.js must route RAJA_MANTRI');
 assert(appCode.includes("case 'TAMBOLA':") || appCode.includes("case 'HOUSIE':"), 'app.js must route TAMBOLA / HOUSIE');
-console.log('  ✅ PASS: app.js routes all 6 arcade games and keeps existing routing solid');
+assert(appCode.includes("case 'BOLLYWOOD':") || appCode.includes("case 'ANTAKSHARI':"), 'app.js must route BOLLYWOOD / ANTAKSHARI');
+console.log('  ✅ PASS: app.js routes all 7 arcade games and keeps existing routing solid');
 
 // 10. Check audioSynth.js for new sound synthesizers
 const audioPath = path.join(rootDir, 'js/visuals/audioSynth.js');

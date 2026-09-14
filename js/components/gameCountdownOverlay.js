@@ -57,6 +57,21 @@ export function getExampleForMode(modeKey, customTitle) {
         scoringHint: 'Be the first to claim authentic winning combinations to claim the room jackpot!',
       };
 
+    case 'BOLLYWOOD':
+    case 'ANTAKSHARI':
+      return {
+        badge: 'Bollywood Antakshari · Filmi Masala',
+        title: 'How Bollywood Relay Works',
+        summary: 'Fast-paced Bollywood showdown with 15s shot clock! Solve Antakshari letter chains, decipher iconic dialogues, and guess movie titles from emoji clues!',
+        sampleCard: {
+          tag: 'Sample Dialogue · Ramgarh Hills',
+          question: '“Kitne aadmi the? ... Yeh haath humko de de Thakur!”',
+          options: ['Gabbar Singh (Sholay)', 'Mogambo (Mr. India)', 'Kancha Cheena', 'Crime Master Gogo'],
+          correctIndex: 0,
+        },
+        scoringHint: 'Fast answers earn speed streak bonuses and Campfire Sparks!',
+      };
+
     case 'RED_FLAG_COURT':
       return {
         badge: 'The Red Flag Courtroom · Party Trial',
