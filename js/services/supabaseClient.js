@@ -344,20 +344,37 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
 
       if (payload.action === 'START_GAME') {
         const currentRoom = store.getState().activeRoom;
-        store.setState({
-          currentView: 'GAME',
-          activeRoom: {
-            ...currentRoom,
-            selectedGameMode: payload.gameMode || currentRoom.selectedGameMode,
-          },
-          activeGame: {
-            ...store.getState().activeGame,
-            roundIndex: payload.roundIndex || 1,
-            selectedOption: null,
-            isAnswerRevealed: false,
-          },
-        });
-        window.location.hash = '#/GAME';
+        const targetMode = payload.gameMode || currentRoom?.selectedGameMode || 'RED_FLAG_COURT';
+
+        const finalizeStart = () => {
+          store.setState({
+            currentView: 'GAME',
+            activeRoom: {
+              ...currentRoom,
+              selectedGameMode: targetMode,
+            },
+            activeGame: {
+              ...store.getState().activeGame,
+              roundIndex: payload.roundIndex || 1,
+              dynamicDeck: payload.dynamicDeck || store.getState().activeGame?.dynamicDeck,
+              selectedOption: null,
+              isAnswerRevealed: false,
+            },
+          });
+          window.location.hash = '#/GAME';
+        };
+
+        if (typeof document !== 'undefined' && !document.getElementById('game-countdown-overlay')) {
+          import('../components/gameCountdownOverlay.js').then(({ triggerGameCountdown }) => {
+            triggerGameCountdown({
+              mode: targetMode,
+              title: currentRoom?.podName || 'Bondfire Arena',
+              onComplete: finalizeStart,
+            });
+          }).catch(finalizeStart);
+        } else {
+          finalizeStart();
+        }
       } else if (payload.action === 'SELECT_OPTION') {
         const activeGame = store.getState().activeGame;
         store.setState({
@@ -379,14 +396,28 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
         });
       } else if (payload.action === 'START_DUO_SESSION') {
         const currentRoom = store.getState().activeRoom;
-        store.setState({
-          currentView: 'COUPLE',
-          activeRoom: {
-            ...currentRoom,
-            sessionStarted: true,
-          },
-        });
-        window.location.hash = '#/COUPLE';
+        const finalizeDuo = () => {
+          store.setState({
+            currentView: 'COUPLE',
+            activeRoom: {
+              ...currentRoom,
+              sessionStarted: true,
+            },
+          });
+          window.location.hash = '#/COUPLE';
+        };
+
+        if (typeof document !== 'undefined' && !document.getElementById('game-countdown-overlay')) {
+          import('../components/gameCountdownOverlay.js').then(({ triggerGameCountdown }) => {
+            triggerGameCountdown({
+              mode: 'US',
+              title: 'Us Mode · Date Night Compatibility',
+              onComplete: finalizeDuo,
+            });
+          }).catch(finalizeDuo);
+        } else {
+          finalizeDuo();
+        }
       } else if (payload.action === 'PARTNER_JOINED' || payload.action === 'CAMPER_JOINED') {
         if (payload.player) {
           const currentRoom = store.getState().activeRoom;

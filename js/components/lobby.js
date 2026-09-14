@@ -480,12 +480,16 @@ export function bindLobbyEvents() {
       }
 
       // Run visual rules example & 5-4-3-2-1 expanding circle countdown
+      const chosenMode = state.activeRoom?.selectedGameMode || 'SQUAD';
       triggerGameCountdown({
-        mode: 'SQUAD',
+        mode: chosenMode,
         title: state.activeRoom?.podName || 'Squad Party Arena',
         onComplete: () => {
           store.setState({ currentView: 'GAME' });
-          broadcastRoomAction('START_GAME', { gameMode: store.getState().activeRoom.selectedGameMode });
+          broadcastRoomAction('START_GAME', { 
+            gameMode: chosenMode,
+            dynamicDeck: store.getState().activeGame?.dynamicDeck 
+          });
           window.location.hash = '#/GAME';
         },
       });

@@ -112,7 +112,7 @@ test('gameCountdownOverlay.js provides rules, live sample question, and 5s timer
 // -----------------------------------------------------------------------------
 test('lobby.js launches game through triggerGameCountdown', () => {
   const lobbyJs = fs.readFileSync(path.join(rootDir, 'js', 'components', 'lobby.js'), 'utf8');
-  assert.ok(lobbyJs.includes("triggerGameCountdown({\n        mode: 'SQUAD'"), 'Squad lobby must trigger game countdown');
+  assert.ok(lobbyJs.includes("triggerGameCountdown") && (lobbyJs.includes("mode: chosenMode") || lobbyJs.includes("mode: 'SQUAD'")), 'Squad lobby must trigger game countdown');
 });
 
 test('coupleScreen.js launches Us date night session through triggerGameCountdown', () => {
@@ -131,6 +131,18 @@ test('arcadeScreen.js launches mini-games through triggerGameCountdown', () => {
   assert.ok(arcadeJs.includes("title: 'Spin the Bottle'"), 'Spin the bottle must use countdown');
   assert.ok(arcadeJs.includes("title: 'Never Have I Ever'"), 'Never have I ever must use countdown');
   assert.ok(arcadeJs.includes("title: 'Most Likely To'"), 'Most likely to must use countdown');
+});
+
+test('gameScreen.js launches game countdown when selecting a new game mode', () => {
+  const gameJs = fs.readFileSync(path.join(rootDir, 'js', 'components', 'gameScreen.js'), 'utf8');
+  assert.ok(gameJs.includes('triggerGameCountdown'), 'gameScreen.js must import and call triggerGameCountdown');
+  assert.ok(gameJs.includes('btn-select-game-mode'), 'Game mode switch modal must trigger countdown');
+});
+
+test('supabaseClient.js launches game countdown on incoming START_GAME and START_DUO_SESSION broadcasts', () => {
+  const supaJs = fs.readFileSync(path.join(rootDir, 'js', 'services', 'supabaseClient.js'), 'utf8');
+  assert.ok(supaJs.includes('triggerGameCountdown'), 'supabaseClient.js must trigger countdown on START_GAME');
+  assert.ok(supaJs.includes("payload.action === 'START_GAME'"), 'START_GAME handler must trigger countdown');
 });
 
 console.log(`\n🎉 All ${passedTests} Spotify Jukebox & Countdown tests passed successfully!\n`);

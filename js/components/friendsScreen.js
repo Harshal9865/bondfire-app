@@ -136,13 +136,20 @@ export function renderFriendsScreen() {
 function renderCampersRoster(friends) {
   if (!friends || friends.length === 0) {
     return `
-      <div class="p-12 text-center rounded-3xl bg-surface-container-low border border-border flex flex-col items-center justify-center">
-        <span class="material-symbols-outlined text-[48px] text-gray-500 mb-3">person_off</span>
-        <h3 class="font-headline-sm text-headline-sm font-bold text-white mb-1">No Campers Found</h3>
-        <p class="text-xs text-gray-400 max-w-xs mb-4">You haven't added anyone matching this filter yet. Invite your group chat crew!</p>
-        <button id="btn-empty-invite" class="px-5 py-2.5 rounded-full bg-sunset-coral text-canvas font-bold text-xs shadow-glow-coral">
-          + Add First Camper
-        </button>
+      <div class="p-10 sm:p-14 text-center rounded-3xl bg-surface-container-low border border-border flex flex-col items-center justify-center max-w-lg mx-auto shadow-xl relative overflow-hidden">
+        <div class="w-16 h-16 rounded-2xl bg-sunset-coral/15 border border-sunset-coral/30 flex items-center justify-center text-sunset-coral mb-4 shadow-inner">
+          <span class="material-symbols-outlined text-[34px]">diversity_3</span>
+        </div>
+        <h3 class="font-headline-sm text-lg sm:text-xl font-bold text-white mb-1.5">Zero Bots. Just Real Campers.</h3>
+        <p class="text-xs sm:text-sm text-gray-400 max-w-sm mb-6 leading-relaxed">
+          Your Squad Lounge is ready! Bondfire is built for real friends and group chats. Connect with your friends using your Citizen ID or room invite.
+        </p>
+        <div class="flex items-center gap-3">
+          <button id="btn-empty-invite" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">person_add</span>
+            <span>+ Add Your First Camper</span>
+          </button>
+        </div>
       </div>
     `;
   }

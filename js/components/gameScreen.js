@@ -17,6 +17,7 @@ import { generateDynamicGameDeck } from '../services/geminiService.js';
 import { p2pMesh } from '../services/webrtcService.js';
 import { renderSpotifyJukebox, bindSpotifyEvents, playSongOnSpotify } from './spotifyPlayer.js';
 import { broadcastRoomAction, syncRealtimeRoom } from '../services/supabaseClient.js';
+import { triggerGameCountdown } from './gameCountdownOverlay.js';
 
 let timerInterval = null;
 let confettiInstance = null;
@@ -1182,18 +1183,26 @@ export function bindGameEvents() {
     btn.addEventListener('click', () => {
       audio.playChime();
       const newMode = btn.dataset.mode;
-      store.setGameMode(newMode);
-      store.setState({
-        activeGame: {
-          ...store.getState().activeGame,
-          roundIndex: 1,
-          selectedOption: null,
-          isAnswerRevealed: false,
-          timeRemaining: 20,
+      if (gameModeModal) gameModeModal.style.display = 'none';
+
+      triggerGameCountdown({
+        mode: newMode,
+        title: store.getState().activeRoom?.podName || 'Bondfire Arena',
+        onComplete: () => {
+          store.setGameMode(newMode);
+          store.setState({
+            activeGame: {
+              ...store.getState().activeGame,
+              roundIndex: 1,
+              selectedOption: null,
+              isAnswerRevealed: false,
+              timeRemaining: 20,
+            },
+          });
+          broadcastRoomAction('START_GAME', { gameMode: newMode, roundIndex: 1 });
+          store.setView('GAME');
         },
       });
-      if (gameModeModal) gameModeModal.style.display = 'none';
-      store.setView('GAME');
     });
   });
 

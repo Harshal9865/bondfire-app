@@ -167,7 +167,19 @@ class ReactiveStore {
             }
           }
           if (Array.isArray(parsed.friendsList)) {
-            parsed.friendsList = parsed.friendsList.filter((f) => !['Liam Vance', 'Sarah Chen', 'Alex Rivera', 'Rohan Verma'].includes(f.name));
+            const mockBotNames = new Set([
+              'Devon Vance', 'Ananya Sharma', 'Liam Vance', 'Sarah Chen', 'Alex Rivera', 'Rohan Verma',
+              'Devon', 'Ananya', 'Liam', 'Sarah', 'Alex', 'Rohan', 'Zara', 'Nia'
+            ]);
+            parsed.friendsList = parsed.friendsList.filter((f) => 
+              !f.isBot && 
+              f.role !== 'Bot' &&
+              !mockBotNames.has(f.name) && 
+              f.username !== 'devon_v' && 
+              f.username !== 'ananya_s' &&
+              !(typeof f.avatarUrl === 'string' && f.avatarUrl.includes('bottts')) &&
+              !(typeof f.avatar === 'string' && f.avatar.includes('bottts'))
+            );
           }
           if (Array.isArray(parsed.squadsList)) {
             parsed.squadsList = parsed.squadsList.filter((s) => !['The Goa Trip Crew', 'College Roomies 2024', 'Midnight Date Night'].includes(s.name));
