@@ -80,9 +80,12 @@ export function renderRoomsHub() {
             </div>
 
             <!-- Title & Description -->
-            <h2 class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Us Mode · Duo Sanctuary
-            </h2>
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                Us Mode · Duo Sanctuary
+              </h2>
+              <span class="cyber-seal-badge-rose text-[9px]">「 双人 · 灵犀 」</span>
+            </div>
             <p class="text-xs font-mono text-duo-rose/90 uppercase tracking-wide font-bold mt-0.5 mb-3">
               Couples, Dates &amp; Best Friends
             </p>
@@ -142,9 +145,12 @@ export function renderRoomsHub() {
             </div>
 
             <!-- Title & Description -->
-            <h2 class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Squad Party Arena
-            </h2>
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                Squad Party Arena
+              </h2>
+              <span class="cyber-seal-badge text-[9px]">「 战队 · 聚火 」</span>
+            </div>
             <p class="text-xs font-mono text-amber-gold uppercase tracking-wide font-bold mt-0.5 mb-3">
               Friend Groups, Pods &amp; Cabin Hangouts
             </p>

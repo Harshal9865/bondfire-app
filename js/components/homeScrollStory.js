@@ -72,8 +72,23 @@ export function renderHomeScrollStory() {
       </div>
     </div>
 
+    <!-- CYBERPUNK CHINESE TORII NEON ARCHWAY SECTION DIVIDER -->
+    <div class="w-full max-w-4xl mx-auto px-4 py-8 flex flex-col items-center justify-center relative select-none">
+      <div class="w-full flex items-center justify-center gap-3 sm:gap-4">
+        <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-sunset-coral/50 to-sunset-coral"></div>
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-[#0E121E]/90 border border-sunset-coral/60 shadow-[0_0_20px_rgba(255,90,95,0.4)]">
+          <span class="text-xs sm:text-sm">⛩️</span>
+          <span class="font-mono font-bold text-[10px] sm:text-xs text-sunset-coral tracking-widest uppercase">
+            赛博营地 · 记忆矩阵 // CYBER MATRIX
+          </span>
+          <span class="text-xs sm:text-sm">⛩️</span>
+        </div>
+        <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-sunset-coral/50 to-sunset-coral"></div>
+      </div>
+    </div>
+
     <!-- SECTION 2: FOUR WAYS TO PLAY (Exact Cards from Screenshot 2) -->
-    <section class="relative w-full py-20 lg:py-28 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto z-20">
+    <section class="relative w-full py-16 lg:py-24 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto z-20">
       
       <!-- Section Header -->
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-16 gap-4">
@@ -95,13 +110,14 @@ export function renderHomeScrollStory() {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Mode 1: Couples & Duos -->
-        <div class="rounded-3xl bg-[#121522] border border-[#262B40] hover:border-duo-rose/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-lg group">
+        <div class="rounded-3xl bg-[#121522] border border-[#262B40] hover:border-duo-rose/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-lg group cyber-hud-corner">
           <div>
             <div class="w-12 h-12 rounded-2xl bg-duo-rose/15 border border-duo-rose/30 flex items-center justify-center text-duo-rose mb-5 group-hover:scale-110 transition-transform">
               <span class="material-symbols-outlined text-[26px]">favorite</span>
             </div>
             <div class="flex items-center gap-2 mb-2">
               <h3 class="font-display text-xl font-bold text-white">Couples & Duos</h3>
+              <span class="cyber-seal-badge-rose text-[8.5px]">「 双人 · 灵犀 」</span>
             </div>
             <p class="text-gray-400 text-sm leading-relaxed mb-6 font-sans">
               Date night games powered by shared memories & inside jokes. Discover who remembers the anniversary details best.
@@ -118,7 +134,7 @@ export function renderHomeScrollStory() {
         </div>
 
         <!-- Mode 2: Squads & Pods (Popular) -->
-        <div class="rounded-3xl bg-gradient-to-b from-[#1E1926] to-[#121522] border-2 border-sunset-coral/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-glow-coral group relative">
+        <div class="rounded-3xl bg-gradient-to-b from-[#1E1926] to-[#121522] border-2 border-sunset-coral/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-glow-coral group relative cyber-hud-corner">
           <div class="absolute -top-3 right-6 retro-pixel-badge px-3 py-0.5 rounded-full bg-sunset-coral text-canvas text-[9px] shadow inline-flex items-center gap-1">
             <span class="material-symbols-outlined text-[12px]">local_fire_department</span>
             <span>MOST POPULAR</span>
@@ -129,6 +145,7 @@ export function renderHomeScrollStory() {
             </div>
             <div class="flex items-center gap-2 mb-2">
               <h3 class="font-display text-xl font-bold text-white">Squads & Pods</h3>
+              <span class="cyber-seal-badge text-[8.5px]">「 战队 · 聚火 」</span>
             </div>
             <p class="text-gray-300 text-sm leading-relaxed mb-6 font-sans">
               Friend group roasts, bracket battles & photobook lore. Real group chat screenshots turned into ruthless comedy.
@@ -145,13 +162,14 @@ export function renderHomeScrollStory() {
         </div>
 
         <!-- Mode 3: Solo Reflection -->
-        <div class="rounded-3xl bg-[#121522] border border-[#262B40] hover:border-amber-gold/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-lg group">
+        <div class="rounded-3xl bg-[#121522] border border-[#262B40] hover:border-amber-gold/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-lg group cyber-hud-corner">
           <div>
             <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/30 flex items-center justify-center text-amber-gold mb-5 group-hover:scale-110 transition-transform">
               <span class="material-symbols-outlined text-[26px]">self_improvement</span>
             </div>
             <div class="flex items-center gap-2 mb-2">
               <h3 class="font-display text-xl font-bold text-white">Solo Reflection</h3>
+              <span class="cyber-seal-badge-gold text-[8.5px]">「 独白 · 胶囊 」</span>
             </div>
             <p class="text-gray-400 text-sm leading-relaxed mb-6 font-sans">
               Mindful personal games, time capsules & memory vault. Revisit forgotten camera roll moments with gentle prompts.
@@ -168,13 +186,14 @@ export function renderHomeScrollStory() {
         </div>
 
         <!-- Mode 4: Pixel Glade -->
-        <div class="rounded-3xl bg-[#121522] border border-[#262B40] hover:border-mint-green/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-lg group">
+        <div class="rounded-3xl bg-[#121522] border border-[#262B40] hover:border-mint-green/60 p-6 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1.5 shadow-lg group cyber-hud-corner">
           <div>
             <div class="w-12 h-12 rounded-2xl bg-mint-green/15 border border-mint-green/30 flex items-center justify-center text-mint-green mb-5 group-hover:scale-110 transition-transform">
               <span class="material-symbols-outlined text-[26px]">stadia_controller</span>
             </div>
             <div class="flex items-center gap-2 mb-2">
               <h3 class="font-display text-xl font-bold text-white">Pixel Glade</h3>
+              <span class="cyber-seal-badge-cyan text-[8.5px]">「 游艺 · 幻境 」</span>
             </div>
             <p class="text-gray-400 text-sm leading-relaxed mb-6 font-sans">
               Retro 2D pixel campfire lounge for lo-fi chill hangs. Roast pixel marshmallows and leave graffiti on the shared canvas.

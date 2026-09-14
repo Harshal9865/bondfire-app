@@ -385,6 +385,150 @@ class AudioSynthesizer {
       osc.stop(now + t + 0.04);
     });
   }
+
+  /**
+   * Cyberpunk Talisman & Jade Bead String Chime
+   * Plays harmonic pentatonic crystal bell tones when brushing curtain strings
+   */
+  playTalismanChime(pitchIndex = 0) {
+    if (!this.isEnabled()) return;
+    this.init();
+    this.triggerHaptic(8);
+    if (!this.ctx) return;
+
+    const pentatonicNotes = [392, 440, 523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66];
+    const freq = pentatonicNotes[Math.abs(pitchIndex) % pentatonicNotes.length];
+    const now = this.ctx.currentTime;
+
+    // Fundamental crystal tone
+    const osc1 = this.ctx.createOscillator();
+    const gain1 = this.ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(freq, now);
+
+    // Overtone shimmer (glass / jade resonance)
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(freq * 2.756, now);
+
+    const masterGain = this.ctx.createGain();
+    gain1.gain.setValueAtTime(0.09, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+    gain2.gain.setValueAtTime(0.035, now);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+    masterGain.gain.setValueAtTime(1.0, now);
+
+    osc1.connect(gain1);
+    osc2.connect(gain2);
+    gain1.connect(masterGain);
+    gain2.connect(masterGain);
+    masterGain.connect(this.ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.4);
+    osc2.stop(now + 0.25);
+  }
+
+  /**
+   * Resonant Cyber Zen Temple Bell / Holographic Gong
+   * Deep metallic strike with rich reverberant sub-harmonics
+   */
+  playZenGong() {
+    if (!this.isEnabled()) return;
+    this.init();
+    this.triggerHaptic(40);
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const duration = 2.4;
+
+    // Fundamental low strike (D3 = 146.8 Hz)
+    const oscRoot = this.ctx.createOscillator();
+    const gainRoot = this.ctx.createGain();
+    oscRoot.type = 'sine';
+    oscRoot.frequency.setValueAtTime(146.83, now);
+    oscRoot.frequency.exponentialRampToValueAtTime(144.0, now + duration);
+
+    gainRoot.gain.setValueAtTime(0.25, now);
+    gainRoot.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    // Metallic overtone (gong rim chime)
+    const oscRim = this.ctx.createOscillator();
+    const gainRim = this.ctx.createGain();
+    oscRim.type = 'triangle';
+    oscRim.frequency.setValueAtTime(438.5, now);
+    oscRim.frequency.exponentialRampToValueAtTime(432.0, now + 1.2);
+
+    gainRim.gain.setValueAtTime(0.12, now);
+    gainRim.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+    // Deep sub bass warmth
+    const oscSub = this.ctx.createOscillator();
+    const gainSub = this.ctx.createGain();
+    oscSub.type = 'sine';
+    oscSub.frequency.setValueAtTime(73.4, now);
+
+    gainSub.gain.setValueAtTime(0.18, now);
+    gainSub.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+    oscRoot.connect(gainRoot);
+    oscRim.connect(gainRim);
+    oscSub.connect(gainSub);
+
+    gainRoot.connect(this.ctx.destination);
+    gainRim.connect(this.ctx.destination);
+    gainSub.connect(this.ctx.destination);
+
+    oscRoot.start(now);
+    oscRim.start(now);
+    oscSub.start(now);
+
+    oscRoot.stop(now + duration);
+    oscRim.stop(now + 1.25);
+    oscSub.stop(now + 1.85);
+  }
+
+  /**
+   * Cyber Dimension Gate Warp / Portal Transition
+   * Futuristic rising energy pulse with dimensional whoosh
+   */
+  playGateWarp() {
+    if (!this.isEnabled()) return;
+    this.init();
+    this.triggerHaptic(50);
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const duration = 1.2;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.8);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(400, now);
+    filter.frequency.exponentialRampToValueAtTime(3200, now + 0.8);
+    filter.Q.setValueAtTime(4.0, now);
+
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.5);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + duration);
+  }
 }
 
 export const audio = new AudioSynthesizer();

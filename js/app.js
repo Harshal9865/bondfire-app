@@ -30,6 +30,7 @@ import { renderCoupleScreen, bindCoupleEvents } from './components/coupleScreen.
 import { renderFooter, bindFooterEvents } from './components/footer.js';
 import { renderSpotifyJukebox, bindSpotifyEvents } from './components/spotifyPlayer.js';
 import { renderRoomsHub, bindRoomsHubEvents } from './components/roomsHubScreen.js';
+import { renderGateScreen, bindGateScreenEvents } from './components/gateScreen.js';
 
 class BondfireApp {
   constructor() {
@@ -140,10 +141,24 @@ class BondfireApp {
       'PIXEL_GLADE': 'ARCADE',
       'GLADE': 'ARCADE',
       'HERO': 'HOME',
+      'PORTAL': 'GATE',
+      'TORII': 'GATE',
     };
     const resolvedHash = aliasMap[hash] || hash;
-    const validViews = ['HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE'];
-    let targetView = validViews.includes(resolvedHash) ? resolvedHash : 'HOME';
+    const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE'];
+    
+    // Check if user has already passed through the Gate in this session
+    const hasEnteredGate = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('bondfire_gate_entered') === 'true');
+    const defaultLandingView = hasEnteredGate ? 'HOME' : 'GATE';
+
+    let targetView;
+    if (resolvedHash === 'GATE') {
+      targetView = 'GATE';
+    } else if (hash === '' || hash === '#' || !rawHash) {
+      targetView = defaultLandingView;
+    } else {
+      targetView = validViews.includes(resolvedHash) ? resolvedHash : defaultLandingView;
+    }
 
     // If an invite code was present, automatically join that room!
     if (roomCodeFromUrl && roomCodeFromUrl.length >= 3) {
@@ -166,7 +181,7 @@ class BondfireApp {
   render(state) {
     try {
       // 1. Render Global Header
-      if (this.headerMount && state.currentView !== 'TV_MODE' && state.currentView !== 'GAME') {
+      if (this.headerMount && state.currentView !== 'TV_MODE' && state.currentView !== 'GAME' && state.currentView !== 'GATE') {
         this.headerMount.innerHTML = renderHeader();
         bindHeaderEvents();
       } else if (this.headerMount) {
@@ -267,6 +282,12 @@ class BondfireApp {
         bindCoupleEvents();
         break;
 
+      case 'GATE':
+        this.appMount.innerHTML = renderGateScreen();
+        bindGateScreenEvents();
+        if (this.footerMount) this.footerMount.innerHTML = '';
+        return; // Fullscreen gate experience
+
       case 'HERO':
       case 'HOME':
       default:
@@ -276,9 +297,11 @@ class BondfireApp {
     }
 
       // 3. Render Global Footer
-      if (this.footerMount) {
+      if (this.footerMount && state.currentView !== 'GATE') {
         this.footerMount.innerHTML = renderFooter();
         bindFooterEvents();
+      } else if (this.footerMount) {
+        this.footerMount.innerHTML = '';
       }
 
       // Scroll to top on view transition
