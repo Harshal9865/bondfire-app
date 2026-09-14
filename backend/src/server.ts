@@ -9,6 +9,7 @@ import fastifyRateLimit from '@fastify/rate-limit';
 import fastifyWebsocket from '@fastify/websocket';
 
 import { env } from './config/env';
+import { PodType } from './types';
 import { PodService } from './services/podService';
 import { GameEngine } from './services/gameEngine';
 import { RoomSocketManager } from './websocket/roomSocket';
@@ -40,8 +41,8 @@ async function bootstrap() {
   // 4. WebSocket Engine
   await app.register(fastifyWebsocket);
 
-  app.get('/ws', { websocket: true }, (connection) => {
-    RoomSocketManager.handleConnection(connection.socket);
+  app.get('/ws', { websocket: true }, (connection: any) => {
+    RoomSocketManager.handleConnection(connection.socket || connection);
   });
 
   // ============================================================================
@@ -67,7 +68,8 @@ async function bootstrap() {
 
       const hostUserId = `usr_${Date.now()}`;
       // In a full DB implementation, this would create a pod associated with a group
-      const pod = PodService.createPod(name, template || 'SQUAD', hostUserId, hostName, avatarUrl);
+      const podType: PodType = (template === 'COUPLE' || template === 'SOLO') ? template : 'SQUAD';
+      const pod = PodService.createPod(name, podType, hostUserId, hostName, avatarUrl);
       return reply.status(201).send({ room: pod, hostUserId });
     }
   );

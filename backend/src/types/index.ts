@@ -108,7 +108,11 @@ export type ClientMessageType =
   | 'CLIENT_CAST_VOTE' 
   | 'CLIENT_EMOJI_REACTION' 
   | 'CLIENT_HOST_START_GAME' 
-  | 'CLIENT_HOST_NEXT_ROUND';
+  | 'CLIENT_HOST_NEXT_ROUND'
+  | 'CLIENT_SHOW_RUNNER_ADVANCE'
+  | 'CLIENT_TRIGGER_PANIC_BUTTON'
+  | 'CLIENT_SOUNDBOARD_TRIGGER'
+  | 'CLIENT_WATCH_PLAY_SYNC';
 
 export type ServerMessageType = 
   | 'SERVER_ROOM_STATE' 
@@ -120,7 +124,11 @@ export type ServerMessageType =
   | 'SERVER_ROUND_REVEALED' 
   | 'SERVER_GAME_OVER' 
   | 'SERVER_EMOJI_BURST' 
-  | 'SERVER_ERROR';
+  | 'SERVER_ERROR'
+  | 'SERVER_SHOW_RUNNER_STEP'
+  | 'SERVER_PROMPT_SWAPPED'
+  | 'SERVER_SOUNDBOARD_PLAY'
+  | 'SERVER_WATCH_PLAY_SYNCED';
 
 export interface WSMessage<T = unknown> {
   type: ClientMessageType | ServerMessageType;

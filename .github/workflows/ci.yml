@@ -50,10 +50,22 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+
       - name: Validate Database Migrations
         run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL service to accept connections..."
+            sleep 2
+          done
           PGPASSWORD=postgres_secure_password_2026 psql -h localhost -U postgres -d bondfire_db -f database/schema.sql
           PGPASSWORD=postgres_secure_password_2026 psql -h localhost -U postgres -d bondfire_db -f database/seed.sql
+
+      - name: Run Frontend & Core Logic Tests
+        run: npm test
 
       - name: Compile TypeScript
         working-directory: ./backend
@@ -65,4 +77,4 @@ jobs:
 
       - name: Lint Source Code
         working-directory: ./backend
-        run: npx eslint src --ext .ts || true
+        run: npm run lint

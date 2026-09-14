@@ -24,7 +24,7 @@ export class RoomSocketManager {
   public static handleConnection(socket: WebSocket): void {
     let currentClient: ConnectedClient | null = null;
 
-    socket.on('message', (rawData: string) => {
+    socket.on('message', async (rawData: string) => {
       try {
         const msg: WSMessage<any> = JSON.parse(rawData);
 
