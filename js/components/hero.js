@@ -210,11 +210,14 @@ export function renderHero() {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- CARD 1: Couples ('Us Mode') -->
-          <div class="group relative bg-surface rounded-3xl border border-border hover:border-duo-rose/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-rose/20 cursor-pointer" id="card-mode-us">
-            <div class="space-y-4">
+          <div class="group relative bg-surface rounded-3xl border border-border hover:border-duo-rose/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-rose/20 cursor-pointer bondfire-mode-card" data-card-theme="rose" id="card-mode-us">
+            <div class="mode-card-foil"></div>
+            <div class="mode-card-corner-tl"></div>
+            <div class="mode-card-corner-br"></div>
+            <div class="space-y-4 relative z-10">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-duo-rose/15 border border-duo-rose/40 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-2xl text-duo-rose">favorite</span>
+                <div class="w-12 h-12 rounded-2xl bg-duo-rose/15 border border-duo-rose/40 flex items-center justify-center mode-card-icon shadow-sm">
+                  <span class="material-symbols-outlined text-2xl text-duo-rose mode-card-heart-pulse">favorite</span>
                 </div>
                 <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-duo-rose/15 text-duo-rose border border-duo-rose/30">
                   Us Mode
@@ -238,35 +241,38 @@ export function renderHero() {
                   <span class="retro-led-rose text-[10px]">2-Player Sync</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div class="p-2 rounded-xl bg-surface border border-border">
+                  <div class="p-2 rounded-xl bg-surface border border-border mode-micro-pill transition-all">
                     <div class="text-[9px] text-gray-400 font-mono">2021 First Date</div>
                     <div class="font-bold text-white mt-0.5 text-[11px] flex items-center justify-center gap-1"><span>Luna Cafe</span><span class="material-symbols-outlined text-[13px] text-amber-gold">local_cafe</span></div>
                   </div>
-                  <div class="p-2 rounded-xl bg-surface border border-border">
+                  <div class="p-2 rounded-xl bg-surface border border-border mode-micro-pill transition-all">
                     <div class="text-[9px] text-gray-400 font-mono">2024 Anniversary</div>
                     <div class="font-bold text-duo-rose mt-0.5 text-[11px] flex items-center justify-center gap-1"><span>Dolomite Peaks</span><span class="material-symbols-outlined text-[13px] text-duo-rose">landscape</span></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-duo-rose">
+            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-duo-rose relative z-10">
               <span class="retro-pixel-badge text-[10px]">Explore Couples Vault</span>
-              <span>→</span>
+              <span class="mode-card-arrow">→</span>
             </div>
           </div>
 
           <!-- CARD 2: Squads ('Pod Mode') -->
-          <div class="group relative bg-surface rounded-3xl border-2 border-sunset-coral/50 shadow-glow-coral/20 transition-all duration-300 p-6 flex flex-col justify-between cursor-pointer" id="card-mode-pods">
-            <div class="space-y-4">
+          <div class="group relative bg-surface rounded-3xl border-2 border-sunset-coral/50 shadow-glow-coral/20 transition-all duration-300 p-6 flex flex-col justify-between cursor-pointer bondfire-mode-card" data-card-theme="coral" id="card-mode-pods">
+            <div class="mode-card-foil"></div>
+            <div class="mode-card-corner-tl"></div>
+            <div class="mode-card-corner-br"></div>
+            <div class="space-y-4 relative z-10">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-sunset-coral/15 border border-sunset-coral/40 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-2xl bg-sunset-coral/15 border border-sunset-coral/40 flex items-center justify-center mode-card-icon shadow-sm">
                   <span class="material-symbols-outlined text-2xl text-sunset-coral">groups</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                   <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/40">
                     Pod Mode
                   </span>
-                  <span class="retro-pixel-badge text-[9px] px-2 py-0.5 rounded bg-amber-gold text-canvas">POPULAR</span>
+                  <span class="retro-pixel-badge text-[9px] px-2 py-0.5 rounded bg-amber-gold text-canvas font-bold animate-pulse">POPULAR</span>
                 </div>
               </div>
               <div>
@@ -286,27 +292,33 @@ export function renderHero() {
                   <span class="retro-pixel-badge text-[9px]">Active Mini-Game</span>
                   <span class="retro-led-coral text-[10px]">3–16 Players</span>
                 </div>
-                <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs">
+                <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs mode-micro-pill transition-all">
                   <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-sunset-coral">mic</span><span class="font-medium text-gray-200 text-[11px]">Audio Mystery Round</span></div>
-                  <span class="px-1.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[9px] font-mono">0:04 Clip</span>
+                  <span class="px-1.5 py-0.5 rounded bg-sunset-coral/20 text-sunset-coral text-[9px] font-mono flex items-center gap-1">
+                    <span>0:04 Clip</span>
+                    <span class="inline-flex items-center gap-0.5"><span class="mode-eq-bar bar-1"></span><span class="mode-eq-bar bar-2"></span><span class="mode-eq-bar bar-3"></span></span>
+                  </span>
                 </div>
-                <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs">
+                <div class="p-2 rounded-xl bg-surface border border-border flex items-center justify-between text-xs mode-micro-pill transition-all">
                   <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-amber-gold">emoji_events</span><span class="font-medium text-gray-200 text-[11px]">Trivia Champion</span></div>
                   <span class="retro-led-amber font-bold text-[11px]">${(store.getState()?.currentUser?.displayName ? store.getState().currentUser.displayName.split(' ')[0] : 'Squad Host')} (+450)</span>
                 </div>
               </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-sunset-coral">
+            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-sunset-coral relative z-10">
               <span class="retro-pixel-badge text-[10px]">Launch Squad Room</span>
-              <span>→</span>
+              <span class="mode-card-arrow">→</span>
             </div>
           </div>
 
           <!-- CARD 3: Solo ('Time Capsule') -->
-          <div class="group relative bg-surface rounded-3xl border border-border hover:border-amber-gold/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-amber/20 cursor-pointer" id="card-mode-solo">
-            <div class="space-y-4">
+          <div class="group relative bg-surface rounded-3xl border border-border hover:border-amber-gold/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-amber/20 cursor-pointer bondfire-mode-card" data-card-theme="gold" id="card-mode-solo">
+            <div class="mode-card-foil"></div>
+            <div class="mode-card-corner-tl"></div>
+            <div class="mode-card-corner-br"></div>
+            <div class="space-y-4 relative z-10">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/40 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/40 flex items-center justify-center mode-card-icon shadow-sm">
                   <span class="material-symbols-outlined text-2xl text-amber-gold">person</span>
                 </div>
                 <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-amber-gold/15 text-amber-gold border border-amber-gold/30">
@@ -328,9 +340,9 @@ export function renderHero() {
               <div class="p-3 rounded-2xl bg-canvas border border-border space-y-2">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
                   <span class="retro-pixel-badge text-[9px]">Vault Status</span>
-                  <span class="flex items-center gap-1 text-amber-gold font-mono text-[10px]"><span class="material-symbols-outlined text-[12px]">lock</span><span class="retro-pixel-badge text-[9px]">ENCRYPTED</span></span>
+                  <span class="flex items-center gap-1 text-amber-gold font-mono text-[10px]"><span class="material-symbols-outlined text-[12px] animate-pulse">lock</span><span class="retro-pixel-badge text-[9px]">ENCRYPTED</span></span>
                 </div>
-                <div class="p-2 rounded-xl bg-surface border border-border text-xs space-y-1">
+                <div class="p-2 rounded-xl bg-surface border border-border text-xs space-y-1 mode-micro-pill transition-all">
                   <div class="flex justify-between text-gray-400 text-[9px] font-mono">
                     <span>Sealed Letter #04</span>
                     <span>Opens Dec 31, 2028</span>
@@ -339,17 +351,20 @@ export function renderHero() {
                 </div>
               </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-amber-gold">
+            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-amber-gold relative z-10">
               <span class="retro-pixel-badge text-[10px]">Seal First Capsule</span>
-              <span>→</span>
+              <span class="mode-card-arrow">→</span>
             </div>
           </div>
 
           <!-- CARD 4: Creative Feature ('Pixel Glade & Arcade') -->
-          <div class="group relative bg-surface rounded-3xl border border-border hover:border-mint-green/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-mint/20 cursor-pointer" id="card-mode-glade">
-            <div class="space-y-4">
+          <div class="group relative bg-surface rounded-3xl border border-border hover:border-mint-green/60 transition-all duration-300 p-6 flex flex-col justify-between hover:shadow-glow-mint/20 cursor-pointer bondfire-mode-card" data-card-theme="mint" id="card-mode-glade">
+            <div class="mode-card-foil"></div>
+            <div class="mode-card-corner-tl"></div>
+            <div class="mode-card-corner-br"></div>
+            <div class="space-y-4 relative z-10">
               <div class="flex items-center justify-between">
-                <div class="w-12 h-12 rounded-2xl bg-mint-green/15 border border-mint-green/40 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-2xl bg-mint-green/15 border border-mint-green/40 flex items-center justify-center mode-card-icon shadow-sm">
                   <span class="material-symbols-outlined text-2xl text-mint-green">cabin</span>
                 </div>
                 <span class="retro-pixel-badge text-[10px] px-3 py-1 rounded-full bg-mint-green/15 text-mint-green border border-mint-green/30">
@@ -373,15 +388,15 @@ export function renderHero() {
                   <span class="retro-pixel-badge text-[9px]">Retro Activities</span>
                   <span class="retro-led-mint text-[10px]">Chiptune Live</span>
                 </div>
-                <div class="p-2 rounded-xl bg-surface border border-border text-xs flex items-center justify-between">
-                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-mint-green">palette</span><span class="text-white text-[11px] font-arcade">32×32 Graffiti</span></div>
+                <div class="p-2 rounded-xl bg-surface border border-border text-xs flex items-center justify-between mode-micro-pill transition-all">
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-mint-green mode-pixel-wand">palette</span><span class="text-white text-[11px] font-arcade">32×32 Graffiti</span></div>
                   <span class="retro-pixel-badge text-mint-green text-[9px]">1-Click Print</span>
                 </div>
               </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-mint-green">
+            <div class="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs font-bold text-mint-green relative z-10">
               <span class="retro-pixel-badge text-[10px]">Enter Pixel Glade</span>
-              <span>→</span>
+              <span class="mode-card-arrow">→</span>
             </div>
           </div>
         </div>
@@ -706,6 +721,46 @@ export function bindHeroEvents() {
       store.setView('GLADE');
     });
   }
+
+  // 3D Perspective Tilt & Holographic Laser Foil Cursor Tracking for Mode Cards
+  const modeCards = document.querySelectorAll('.bondfire-mode-card');
+  modeCards.forEach((card) => {
+    let lastAudioTime = 0;
+
+    card.addEventListener('mouseenter', () => {
+      const now = Date.now();
+      if (now - lastAudioTime > 280) {
+        const theme = card.getAttribute('data-card-theme');
+        try {
+          if (theme === 'rose') audio.playTalismanChime(1);
+          else if (theme === 'coral') audio.playTalismanChime(2);
+          else if (theme === 'gold') audio.playTalismanChime(3);
+          else if (theme === 'mint') audio.playLedTick();
+        } catch (_) {}
+        lastAudioTime = now;
+      }
+    });
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // 3D perspective rotation (subtle +/- 7deg for premium feel)
+      const rotateX = ((y - centerY) / centerY) * -7;
+      const rotateY = ((x - centerX) / centerX) * 7;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+      card.style.setProperty('--card-foil-x', `${((x / rect.width) * 100).toFixed(1)}%`);
+      card.style.setProperty('--card-foil-y', `${((y / rect.height) * 100).toFixed(1)}%`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+  });
 
   // Preview Yearbook / Photobook CTAs
   const previewYearbookBtn = document.getElementById('btn-hero-preview-yearbook');
