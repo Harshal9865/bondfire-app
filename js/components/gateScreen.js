@@ -1,12 +1,14 @@
 // ==============================================================================
 // CYBERPUNK SANCTUARY GATEWAY (100% English Cyberpunk Style)
 // Ultra-luxury full-screen cinematic entrance portal with authentic 3D cyberpunk scene,
-// glowing holographic Torii energy core, interactive soundscape, quick mode teleports,
-// and smooth warp entry into Bondfire.
+// retro Cyberpunk Digital Watch / Neon LED Dot-Matrix Ticker, Crazy 3D Tilt
+// Holographic Cards, glowing Torii energy core, and smooth dimensional warp entry.
 // ==============================================================================
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
+
+let watchInterval = null;
 
 export function renderGateScreen() {
   return `
@@ -16,7 +18,7 @@ export function renderGateScreen() {
       <div class="absolute inset-0 bg-cover bg-center sm:bg-bottom bg-no-repeat pointer-events-none z-0" style="background-image: url('assets/cyber_gate_scene.jpg');"></div>
       
       <!-- Cinematic Atmospheric Darkness & Vignette Gradients -->
-      <div class="absolute inset-0 bg-gradient-to-t from-[#080B14] via-[#080B14]/25 to-[#080B14]/85 pointer-events-none z-1"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#080B14] via-[#080B14]/30 to-[#080B14]/85 pointer-events-none z-1"></div>
 
       <!-- Wet Floor Reflection Grid Overlay -->
       <div class="cyber-wet-floor pointer-events-none z-2">
@@ -25,7 +27,7 @@ export function renderGateScreen() {
       </div>
 
       <!-- Floating Cyber Embers / Sparks -->
-      <div class="cyber-embers-container pointer-events-none z-3">
+      <div class="cyber-embers-container pointer-events-none z-3" id="gate-embers-mount">
         <div class="cyber-ember ember-1"></div>
         <div class="cyber-ember ember-2"></div>
         <div class="cyber-ember ember-3"></div>
@@ -48,18 +50,26 @@ export function renderGateScreen() {
           </div>
         </div>
 
-        <!-- Quick Direct Skip Button -->
-        <button id="btn-skip-gate" class="px-3.5 py-1.5 rounded-full bg-[#10131c]/80 hover:bg-[#181d2c] border border-gray-700/60 hover:border-sunset-coral/50 text-gray-300 hover:text-white text-xs font-mono transition-all duration-200 flex items-center gap-1.5 cursor-pointer backdrop-blur-sm group shadow-lg" title="Skip directly to Campfire">
-          <span>Enter Directly</span>
-          <span class="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">east</span>
-        </button>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Overdrive Surge Control -->
+          <button id="btn-gate-overdrive" class="px-3 py-1.5 rounded-full bg-[#10131c]/80 hover:bg-[#1f2538] border border-amber-gold/40 hover:border-amber-gold text-amber-gold hover:text-white text-xs font-mono transition-all duration-200 flex items-center gap-1.5 cursor-pointer backdrop-blur-sm shadow-md" title="Surge Quantum Energy">
+            <span class="material-symbols-outlined text-[14px] animate-spin">bolt</span>
+            <span class="hidden sm:inline">OVERDRIVE</span>
+          </button>
+
+          <!-- Quick Direct Skip Button -->
+          <button id="btn-skip-gate" class="px-3.5 py-1.5 rounded-full bg-[#10131c]/80 hover:bg-[#181d2c] border border-gray-700/60 hover:border-sunset-coral/50 text-gray-300 hover:text-white text-xs font-mono transition-all duration-200 flex items-center gap-1.5 cursor-pointer backdrop-blur-sm group shadow-lg" title="Skip directly to Campfire">
+            <span>Enter Directly</span>
+            <span class="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">east</span>
+          </button>
+        </div>
       </header>
 
       <!-- Centerpiece Hero: Atmospheric Gateway & Master Welcome Typography -->
-      <main class="cyber-torii-frame w-full max-w-3xl mx-auto my-auto px-4 py-6 flex flex-col items-center justify-center text-center z-30 notranslate" translate="no">
+      <main class="cyber-torii-frame w-full max-w-4xl mx-auto my-auto px-4 py-4 sm:py-6 flex flex-col items-center justify-center text-center z-30 notranslate" translate="no">
         
         <!-- Category Pill (100% English Cyberpunk Style) -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#10131c]/85 border border-sunset-coral/50 shadow-[0_0_20px_rgba(255,90,95,0.35)] mb-3 backdrop-blur-md">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#10131c]/85 border border-sunset-coral/50 shadow-[0_0_20px_rgba(255,90,95,0.35)] mb-2 backdrop-blur-md">
           <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-ping"></span>
           <span class="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-sunset-coral uppercase">
             // CYBER SANCTUARY PORTAL :: PROTOCOL 01 //
@@ -71,18 +81,45 @@ export function renderGateScreen() {
           WELCOME TO <span class="bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold bg-clip-text text-transparent">BONDFIRE</span>
         </h1>
 
-        <!-- Elegant Cyberpunk Subtitle (100% English Cyberpunk Style) -->
-        <p class="font-mono text-xs sm:text-sm text-gray-300 max-w-lg mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+        <!-- RETRO CYBERPUNK DIGITAL WATCH / NEON LED DOT-MATRIX TICKER -->
+        <div id="cyber-watch-ticker" class="cyber-watch-ticker-casing my-2 sm:my-3">
+          <div class="flex items-center gap-3 w-full justify-between pb-1 mb-1 border-b border-white/10 text-[9px] font-mono text-gray-400">
+            <span class="flex items-center gap-1.5 text-amber-gold font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-gold animate-pulse"></span>
+              <span>QUANTUM TIME ENGINE // UTC</span>
+            </span>
+            <span class="text-mint-green font-mono">SYS.CHRONO v6.4</span>
+          </div>
+
+          <div class="cyber-watch-led-display">
+            <span id="cyber-watch-digits">00:00:00</span>
+            <span class="cyber-watch-ms" id="cyber-watch-ms">.00</span>
+            <span class="text-[10px] font-mono text-gray-400 ml-1">UTC</span>
+          </div>
+
+          <div class="cyber-watch-telemetry-ribbon" id="cyber-watch-telemetry">
+            <span>● LATENCY: 14MS</span>
+            <span>·</span>
+            <span>FREQ: 432HZ</span>
+            <span>·</span>
+            <span>SYNAPSE: 128 BPM</span>
+            <span>·</span>
+            <span class="text-sunset-coral font-bold">P2P SECURE</span>
+          </div>
+        </div>
+
+        <!-- Elegant Cyberpunk Subtitle -->
+        <p class="font-mono text-xs sm:text-sm text-gray-300 max-w-lg mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
           <span class="text-amber-gold font-bold">"STEP INTO THE CYBER CAMPFIRE — UNLOCK REAL MEMORIES"</span>
           <span class="block sm:inline text-gray-400 mt-1 sm:mt-0 sm:ml-2">Neural intimacy protocol active · Jack in to connect.</span>
         </p>
 
         <!-- Interactive Holographic Gateway Portal Core -->
-        <div class="cyber-portal-core relative my-2 flex flex-col items-center justify-center" id="cyber-portal-core">
+        <div class="cyber-portal-core relative my-1 flex flex-col items-center justify-center" id="cyber-portal-core">
           
           <!-- Concentric Neon Energy Rings -->
-          <div class="portal-energy-ring portal-ring-outer"></div>
-          <div class="portal-energy-ring portal-ring-inner"></div>
+          <div class="portal-energy-ring portal-ring-outer" id="portal-ring-outer"></div>
+          <div class="portal-energy-ring portal-ring-inner" id="portal-ring-inner"></div>
 
           <!-- Master Glowing Call-to-Action Button (English Cyberpunk) -->
           <button id="btn-enter-gate" class="relative group overflow-hidden px-8 sm:px-12 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-[#080B14] font-black text-sm sm:text-base tracking-wider uppercase shadow-[0_0_40px_rgba(255,90,95,0.85)] hover:shadow-[0_0_65px_rgba(255,183,3,0.95)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 cursor-pointer z-10">
@@ -92,34 +129,97 @@ export function renderGateScreen() {
           </button>
         </div>
 
-        <!-- Quick Teleport Sanctuary Options (100% English Cyberpunk) -->
-        <div class="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 z-20">
-          <!-- Duo Mode -->
-          <button id="btn-gate-duo" class="gate-teleport-pill group px-4 py-2 rounded-xl bg-[#0E121E]/75 hover:bg-[#14192b]/90 border border-[#38BDF8]/40 hover:border-[#38BDF8] text-left transition-all duration-200 flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-[1.03] shadow-lg">
-            <span class="text-base sm:text-lg">💖</span>
-            <div>
-              <div class="text-[11px] font-mono font-bold text-[#38BDF8] group-hover:text-white transition-colors">[ DUO SANCTUARY ]</div>
-              <div class="text-[9px] font-mono text-gray-400">2-Player Synapse Link</div>
-            </div>
-          </button>
+        <!-- CRAZY 3D TILT HOLOGRAPHIC DESTINATION CARDS -->
+        <div class="mt-8 w-full">
+          <div class="text-[10px] font-mono tracking-widest text-gray-400 uppercase mb-3 flex items-center justify-center gap-2">
+            <span class="h-px w-8 bg-gray-700"></span>
+            <span>DIRECT WARP DESTINATIONS // LIVE SECTORS</span>
+            <span class="h-px w-8 bg-gray-700"></span>
+          </div>
 
-          <!-- Squad Mode -->
-          <button id="btn-gate-squad" class="gate-teleport-pill group px-4 py-2 rounded-xl bg-[#0E121E]/75 hover:bg-[#14192b]/90 border border-sunset-coral/40 hover:border-sunset-coral text-left transition-all duration-200 flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-[1.03] shadow-lg">
-            <span class="text-base sm:text-lg">🔥</span>
-            <div>
-              <div class="text-[11px] font-mono font-bold text-sunset-coral group-hover:text-white transition-colors">[ SQUAD POD ]</div>
-              <div class="text-[9px] font-mono text-gray-400">4-Player Overdrive Campfire</div>
+          <div class="cyber-card-grid">
+            
+            <!-- CARD 1: DUO SANCTUARY -->
+            <div id="btn-gate-duo" class="cyber-tilt-card gate-teleport-pill group" data-card="duo">
+              <div class="cyber-card-foil"></div>
+              <div class="cyber-card-corner-tl"></div>
+              <div class="cyber-card-corner-br"></div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">💖</span>
+                <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-mint-green">
+                  <span class="w-1.5 h-1.5 rounded-full bg-mint-green animate-ping"></span>
+                  <span>28 ONLINE</span>
+                </span>
+              </div>
+              <div class="text-xs font-mono font-black text-[#38BDF8] group-hover:text-white transition-colors uppercase truncate">[ DUO SANCTUARY ]</div>
+              <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">2-Player Synapse Link</div>
+              <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
+                <span>INTIMACY 99%</span>
+                <span>WARP ➔</span>
+              </div>
             </div>
-          </button>
 
-          <!-- Keepsakes / Stories -->
-          <button id="btn-gate-vault" class="gate-teleport-pill group px-4 py-2 rounded-xl bg-[#0E121E]/75 hover:bg-[#14192b]/90 border border-amber-gold/40 hover:border-amber-gold text-left transition-all duration-200 flex items-center gap-2.5 backdrop-blur-md cursor-pointer hover:scale-[1.03] shadow-lg">
-            <span class="text-base sm:text-lg">⚡</span>
-            <div>
-              <div class="text-[11px] font-mono font-bold text-amber-gold group-hover:text-white transition-colors">[ MEMORY VAULT ]</div>
-              <div class="text-[9px] font-mono text-gray-400">Archived Relics &amp; Keepsakes</div>
+            <!-- CARD 2: SQUAD POD -->
+            <div id="btn-gate-squad" class="cyber-tilt-card gate-teleport-pill group" data-card="squad">
+              <div class="cyber-card-foil"></div>
+              <div class="cyber-card-corner-tl"></div>
+              <div class="cyber-card-corner-br"></div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">🔥</span>
+                <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-sunset-coral">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sunset-coral animate-ping"></span>
+                  <span>94 ONLINE</span>
+                </span>
+              </div>
+              <div class="text-xs font-mono font-black text-sunset-coral group-hover:text-white transition-colors uppercase truncate">[ SQUAD POD ]</div>
+              <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">4-Player Overdrive</div>
+              <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
+                <span>HEARTH 100%</span>
+                <span>WARP ➔</span>
+              </div>
             </div>
-          </button>
+
+            <!-- CARD 3: DESI ARCADIA (NEW INDIAN PARTY GAMES) -->
+            <div id="btn-gate-desi" class="cyber-tilt-card gate-teleport-pill group" data-card="desi">
+              <div class="cyber-card-foil"></div>
+              <div class="cyber-card-corner-tl"></div>
+              <div class="cyber-card-corner-br"></div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">👑</span>
+                <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-amber-gold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-gold animate-ping"></span>
+                  <span>52 PLAYING</span>
+                </span>
+              </div>
+              <div class="text-xs font-mono font-black text-amber-gold group-hover:text-white transition-colors uppercase truncate">[ DESI ARCADIA ]</div>
+              <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">Raja Mantri &amp; Filmi</div>
+              <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
+                <span>ROYAL HEIST</span>
+                <span>WARP ➔</span>
+              </div>
+            </div>
+
+            <!-- CARD 4: MEMORY VAULT & REAL PHOTO ALBUM -->
+            <div id="btn-gate-vault" class="cyber-tilt-card gate-teleport-pill group" data-card="vault">
+              <div class="cyber-card-foil"></div>
+              <div class="cyber-card-corner-tl"></div>
+              <div class="cyber-card-corner-br"></div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">⚡</span>
+                <span class="inline-flex items-center gap-1 text-[8.5px] font-mono text-[#C084FC]">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#C084FC] animate-ping"></span>
+                  <span>140 SAVED</span>
+                </span>
+              </div>
+              <div class="text-xs font-mono font-black text-[#C084FC] group-hover:text-white transition-colors uppercase truncate">[ MEMORY VAULT ]</div>
+              <div class="text-[9.5px] font-mono text-gray-400 mt-0.5">Real Layflat Album</div>
+              <div class="mt-2 text-[8px] font-mono text-gray-500 flex justify-between border-t border-white/5 pt-1">
+                <span>STUDIO 4K</span>
+                <span>WARP ➔</span>
+              </div>
+            </div>
+
+          </div>
         </div>
 
       </main>
@@ -141,7 +241,9 @@ export function bindGateScreenEvents() {
   const skipBtn = document.getElementById('btn-skip-gate');
   const duoBtn = document.getElementById('btn-gate-duo');
   const squadBtn = document.getElementById('btn-gate-squad');
+  const desiBtn = document.getElementById('btn-gate-desi');
   const vaultBtn = document.getElementById('btn-gate-vault');
+  const overdriveBtn = document.getElementById('btn-gate-overdrive');
 
   if (!container) return;
 
@@ -151,11 +253,98 @@ export function bindGateScreenEvents() {
     jukebox.classList.add('hidden');
   }
 
+  // Real-time ticking Cyberpunk Digital Watch updater
+  const digitsEl = document.getElementById('cyber-watch-digits');
+  const msEl = document.getElementById('cyber-watch-ms');
+  
+  if (watchInterval) clearInterval(watchInterval);
+
+  watchInterval = setInterval(() => {
+    if (!document.getElementById('cyber-watch-digits')) {
+      clearInterval(watchInterval);
+      return;
+    }
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const h = pad(now.getUTCHours());
+    const m = pad(now.getUTCMinutes());
+    const s = pad(now.getUTCSeconds());
+    const ms = pad(Math.floor(now.getUTCMilliseconds() / 10));
+
+    if (digitsEl) digitsEl.textContent = `${h}:${m}:${s}`;
+    if (msEl) msEl.textContent = `.${ms}`;
+  }, 40);
+
+  // Crazy 3D Tilt Card Interaction
+  const tiltCards = container.querySelectorAll('.cyber-tilt-card');
+  tiltCards.forEach((card) => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * -12;
+      const rotateY = ((x - centerX) / centerX) * 12;
+
+      card.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.04, 1.04, 1.04)`;
+      card.style.setProperty('--foil-x', `${(x / rect.width * 100).toFixed(1)}%`);
+      card.style.setProperty('--foil-y', `${(y / rect.height * 100).toFixed(1)}%`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+  });
+
+  // Overdrive Quantum Energy Pulse
+  if (overdriveBtn) {
+    let surgeCount = 0;
+    overdriveBtn.addEventListener('click', () => {
+      surgeCount++;
+      audio.playLedTick();
+      audio.playChime();
+
+      const themes = [
+        { outer: '#ff5a5f', inner: '#ffb703' },
+        { outer: '#38bdf8', inner: '#f72585' },
+        { outer: '#4ade80', inner: '#38bdf8' },
+        { outer: '#c084fc', inner: '#ff5a5f' }
+      ];
+      const theme = themes[surgeCount % themes.length];
+      const ringOuter = document.getElementById('portal-ring-outer');
+      const ringInner = document.getElementById('portal-ring-inner');
+
+      if (ringOuter) ringOuter.style.borderColor = theme.outer;
+      if (ringInner) ringInner.style.borderColor = theme.inner;
+
+      // Spawn rapid embers
+      const embersMount = document.getElementById('gate-embers-mount');
+      if (embersMount) {
+        for (let i = 0; i < 4; i++) {
+          const spark = document.createElement('div');
+          spark.className = 'cyber-ember';
+          spark.style.left = `${Math.random() * 80 + 10}%`;
+          spark.style.width = '6px';
+          spark.style.height = '6px';
+          spark.style.background = theme.inner;
+          spark.style.boxShadow = `0 0 14px ${theme.inner}`;
+          spark.style.animationDuration = '4s';
+          embersMount.appendChild(spark);
+          setTimeout(() => spark.remove(), 4000);
+        }
+      }
+    });
+  }
+
   let hasEntered = false;
 
   const triggerEnterSequence = (targetHash = '#/HOME', targetView = 'HOME') => {
     if (hasEntered) return;
     hasEntered = true;
+
+    if (watchInterval) clearInterval(watchInterval);
 
     // 1. Play futuristic warp sound effect
     audio.playGateWarp();
@@ -201,7 +390,7 @@ export function bindGateScreenEvents() {
     });
   }
 
-  // Bind quick teleport mode pills
+  // Bind quick teleport mode pills / 3D cards
   if (duoBtn) {
     duoBtn.addEventListener('mouseenter', () => audio.playTalismanChime(1));
     duoBtn.addEventListener('click', (e) => {
@@ -218,11 +407,19 @@ export function bindGateScreenEvents() {
     });
   }
 
+  if (desiBtn) {
+    desiBtn.addEventListener('mouseenter', () => audio.playRoyalFanfare());
+    desiBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerEnterSequence('#/ARCADE', 'ARCADE');
+    });
+  }
+
   if (vaultBtn) {
     vaultBtn.addEventListener('mouseenter', () => audio.playTalismanChime(3));
     vaultBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      triggerEnterSequence('#/HOME', 'HOME');
+      triggerEnterSequence('#/YEARBOOK', 'YEARBOOK');
     });
   }
 }

@@ -839,9 +839,185 @@ body[data-view="GATE"] #spotify-jukebox-container,
   to { transform: rotate(-360deg); }
 }
 
-/* Quick Teleport Mode Pills */
+/* Quick Teleport Mode Pills & Crazy 3D Cards */
 .gate-teleport-pill {
   user-select: none;
+}
+
+/* ==============================================================================
+   RETRO CYBERPUNK DIGITAL WATCH / NEON LED DOT-MATRIX TICKER
+   ============================================================================== */
+.cyber-watch-ticker-casing {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.6rem 1.4rem;
+  background: linear-gradient(180deg, #161a29 0%, #0c0f18 100%);
+  border: 1.5px solid rgba(255, 90, 95, 0.45);
+  border-radius: 14px;
+  box-shadow: 
+    0 0 25px rgba(255, 90, 95, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8);
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden;
+  backdrop-blur: 12px;
+}
+
+.cyber-watch-ticker-casing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ffb703, #ff5a5f, transparent);
+  animation: cyberWatchScan 4s ease-in-out infinite;
+}
+
+@keyframes cyberWatchScan {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+.cyber-watch-led-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 1.55rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #ff5a5f;
+  text-shadow: 
+    0 0 10px rgba(255, 90, 95, 0.85),
+    0 0 20px rgba(255, 90, 95, 0.5),
+    0 0 35px rgba(255, 183, 3, 0.35);
+}
+
+.cyber-watch-ms {
+  font-size: 0.95rem;
+  color: #ffb703;
+  text-shadow: 0 0 8px rgba(255, 183, 3, 0.8);
+}
+
+.cyber-watch-telemetry-ribbon {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 9.5px;
+  font-family: monospace;
+  letter-spacing: 0.14em;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+}
+
+/* ==============================================================================
+   CRAZY 3D TILT HOLOGRAPHIC TELEPORT CARDS
+   ============================================================================== */
+.cyber-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  perspective: 1200px;
+}
+
+@media (min-width: 640px) {
+  .cyber-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cyber-tilt-card {
+  position: relative;
+  border-radius: 18px;
+  background: rgba(14, 18, 30, 0.82);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.cyber-tilt-card:hover {
+  border-color: rgba(255, 183, 3, 0.6);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 90, 95, 0.35);
+}
+
+/* Holographic Foil Reflection Sheen */
+.cyber-card-foil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--foil-x, 50%) var(--foil-y, 50%), rgba(255, 255, 255, 0.22) 0%, transparent 65%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  mix-blend-mode: overlay;
+  z-index: 5;
+}
+
+.cyber-tilt-card:hover .cyber-card-foil {
+  opacity: 1;
+}
+
+/* Rotating Neon Border Runner */
+.cyber-tilt-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 19px;
+  background: conic-gradient(from var(--border-angle, 0deg), transparent 70%, #ff5a5f 85%, #ffb703 95%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cyber-tilt-card:hover::after {
+  opacity: 1;
+  animation: rotateBorder 3s linear infinite;
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes rotateBorder {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* Cyber Decals & Corner Brackets */
+.cyber-card-corner-tl {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  border-top: 1.5px solid #ff5a5f;
+  border-left: 1.5px solid #ff5a5f;
+}
+
+.cyber-card-corner-br {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-bottom: 1.5px solid #ffb703;
+  border-right: 1.5px solid #ffb703;
 }
 
 /* Gate Entering Sequence (Dimensional Warp) */
@@ -928,5 +1104,84 @@ body[data-view="GATE"] #spotify-jukebox-container,
   line-height: 1;
   text-shadow: 0 0 6px #ff5a5f;
   pointer-events: none;
+}
+
+/* ==============================================================================
+   REAL PHOTO ALBUM STUDIO: POLAROID THEMES & LAYFLAT STYLES
+   ============================================================================== */
+.polaroid-card {
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease;
+  user-select: none;
+}
+
+.polaroid-card:hover {
+  transform: translateY(-6px) scale(1.02) rotate(0deg) !important;
+  z-index: 25;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Polaroid Themes */
+.polaroid-theme-warm {
+  background: #fdfbf7;
+  color: #1a1a1a;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.polaroid-theme-cyber {
+  background: #111422;
+  color: #f1f5f9;
+  border: 1.5px solid #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+}
+.polaroid-theme-cyber .polaroid-caption {
+  color: #94a3b8;
+}
+
+.polaroid-theme-gold {
+  background: linear-gradient(135deg, #231f18 0%, #151412 100%);
+  color: #fef08a;
+  border: 1.5px solid rgba(255, 183, 3, 0.6);
+  box-shadow: 0 0 20px rgba(255, 183, 3, 0.25);
+}
+
+.polaroid-theme-vintage {
+  background: #f4ede2;
+  color: #3e2723;
+  border: 1px solid #d7ccc8;
+  filter: sepia(0.2);
+}
+
+/* Masking Tape Accent */
+.polaroid-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(2px);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+/* Print Styles for Real Album Keepsake Export */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #photobook-print-region, #photobook-print-region * {
+    visibility: visible;
+  }
+  #photobook-print-region {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+  }
 }
 

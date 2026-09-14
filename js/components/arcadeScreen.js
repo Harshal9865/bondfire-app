@@ -1,6 +1,13 @@
 // ==============================================================================
 // BONDFIRE ARCADE: MASTER MULTIPLAYER ENTERTAINMENT HUB
-// Fast, real human party games with living room campers & zero robotic AI jargon
+// Fast, real human party games with living room campers & zero robotic AI jargon.
+// Includes Desi Arcadia Spotlight:
+// 1. Raja Mantri Chor Sipahi (राजा मंत्री चोर सिपाही - The Royal Heist)
+// 2. Bollywood Antakshari & Filmi Masala
+// 3. Spin the Bottle (Truth or Dare)
+// 4. Never Have I Ever
+// 5. Most Likely To...
+// 6. Watch Party & Predict
 // ==============================================================================
 
 import { store } from '../state/store.js';
@@ -13,7 +20,7 @@ export function renderArcadeScreen() {
   const players = room.players || [];
 
   return `
-    <div class="flex flex-col w-full max-w-[880px] mx-auto px-4 pt-6 pb-28 relative select-none z-20">
+    <div class="flex flex-col w-full max-w-[960px] mx-auto px-4 pt-6 pb-28 relative select-none z-20">
       
       <!-- Ambient Backdrops -->
       <div class="absolute top-0 left-1/4 w-96 h-96 bg-sunset-coral/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
@@ -60,8 +67,61 @@ export function renderArcadeScreen() {
         </a>
       </div>
 
-      <!-- GAME GRID: 4 CORE HUMAN MULTIPLAYER GAMES -->
+      <!-- INDIAN PARTY GAMES SPOTLIGHT BANNER -->
+      <div class="mb-6 p-6 rounded-3xl bg-gradient-to-r from-[#1D172A] via-[#241B38] to-[#1D172A] border-2 border-amber-gold/50 shadow-2xl relative overflow-hidden group">
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-gold/15 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform"></div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-gold/20 border border-amber-gold/40 text-amber-gold text-[10px] font-mono font-bold tracking-widest uppercase mb-2">
+              <span>👑 DESI ARCADIA SPOTLIGHT // राजा मंत्री चोर सिपाही</span>
+            </div>
+            <h3 class="font-display text-2xl sm:text-3xl font-black text-white mb-2 flex items-center gap-2">
+              <span>Raja Mantri Chor Sipahi</span>
+              <span class="text-xl">🥷</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-300 max-w-xl leading-relaxed">
+              The legendary 4-player Indian bluffing game with secret digital folded chits! Raja commands <em>"Mera Mantri Kaun?"</em>, Mantri interrogates the court, and the Chor steals points if the innocent Sipahi is accused!
+            </p>
+          </div>
+
+          <button id="arcade-launch-raja" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-gold via-[#ffc633] to-sunset-coral text-dark font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-gold/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+            <span>Play Royal Heist</span>
+            <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- GAME GRID: CORE MULTIPLAYER GAMES -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- GAME: BOLLYWOOD ANTAKSHARI & FILMI MASALA -->
+        <div class="relative p-6 rounded-3xl bg-gradient-to-br from-rose-500/15 via-surface to-surface border-2 border-rose-500/40 shadow-xl flex flex-col justify-between overflow-hidden group hover:border-rose-500 transition-all">
+          <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-rose-500/15 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform"></div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[9px] bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                BOLLYWOOD RELAY
+              </span>
+              <span class="text-xs text-amber-gold font-mono font-bold">15s Shot Clock</span>
+            </div>
+
+            <div class="flex items-center gap-3 mb-2">
+              <span class="material-symbols-outlined text-3xl text-rose-500">movie</span>
+              <h3 class="font-display text-xl font-bold text-white group-hover:text-rose-400 transition-colors">Bollywood Antakshari &amp; Masala</h3>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed mb-4">
+              Iconic letter relay Antakshari, dialogue decoders ("Mogambo Khush Hua!"), and hilarious emoji movie riddles.
+            </p>
+          </div>
+
+          <button id="arcade-launch-bollywood" class="w-full py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-gold text-white font-bold text-xs shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <span>Start Filmi Masala</span>
+            <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+          </button>
+        </div>
 
         <!-- GAME 1: SPIN THE BOTTLE (TRUTH OR DARE) -->
         <div class="relative p-6 rounded-3xl bg-gradient-to-br from-sunset-coral/15 via-surface to-surface border-2 border-sunset-coral/40 shadow-xl flex flex-col justify-between overflow-hidden group hover:border-sunset-coral transition-all">
@@ -81,11 +141,11 @@ export function renderArcadeScreen() {
             </div>
 
             <p class="text-xs text-gray-300 leading-relaxed mb-4">
-              Real inertia bottle physics. Spins and points at real campers in your room with Mild, Spicy & Savage Truths, Dares, and custom dares!
+              Real inertia bottle physics. Spins and points at real campers in your room with Mild, Spicy &amp; Savage Truths and Dares!
             </p>
           </div>
 
-          <button id="arcade-launch-bottle" class="w-full py-3 rounded-2xl bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-xs shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2">
+          <button id="arcade-launch-bottle" class="w-full py-3 rounded-2xl bg-sunset-coral hover:bg-[#FF7064] text-white font-bold text-xs shadow-glow-coral transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
             <span>Spin with Squad</span>
             <span class="material-symbols-outlined text-[16px]">play_arrow</span>
           </button>
@@ -113,7 +173,7 @@ export function renderArcadeScreen() {
             </p>
           </div>
 
-          <button id="arcade-launch-nhie" class="w-full py-3 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-xs shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <button id="arcade-launch-nhie" class="w-full py-3 rounded-2xl bg-duo-rose hover:bg-[#E84E88] text-white font-bold text-xs shadow-lg shadow-duo-rose/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
             <span>Drop a Finger</span>
             <span class="material-symbols-outlined text-[16px]">play_arrow</span>
           </button>
@@ -137,40 +197,12 @@ export function renderArcadeScreen() {
             </div>
 
             <p class="text-xs text-gray-300 leading-relaxed mb-4">
-              Everyone in the room secretly votes on who matches the prompt. Reveal the consensus verdict with live percentage bars and winner crowns!
+              Everyone in the room secretly votes on who matches the prompt. Reveal the consensus verdict with live percentage bars!
             </p>
           </div>
 
-          <button id="arcade-launch-mlt" class="w-full py-3 rounded-2xl bg-amber-gold hover:bg-[#FFBF47] text-dark font-bold text-xs shadow-lg shadow-amber-gold/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <button id="arcade-launch-mlt" class="w-full py-3 rounded-2xl bg-amber-gold hover:bg-[#FFBF47] text-dark font-bold text-xs shadow-lg shadow-amber-gold/20 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
             <span>Start Voting</span>
-            <span class="material-symbols-outlined text-[16px]">play_arrow</span>
-          </button>
-        </div>
-
-        <!-- GAME 4: WATCH PARTY & PREDICT (INTERACTIVE STREAM) -->
-        <div class="relative p-6 rounded-3xl bg-gradient-to-br from-[#7C4DFF]/15 via-surface to-surface border-2 border-[#7C4DFF]/40 shadow-xl flex flex-col justify-between overflow-hidden group hover:border-[#7C4DFF] transition-all">
-          <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-[#7C4DFF]/15 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform"></div>
-          
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <span class="retro-pixel-badge px-2.5 py-0.5 rounded-full text-[9px] bg-[#7C4DFF]/20 text-[#A480FF] border border-[#7C4DFF]/40">
-                WATCH & PLAY 2.0
-              </span>
-              <span class="text-xs text-[#A480FF] font-mono font-bold">Synced Playback</span>
-            </div>
-
-            <div class="flex items-center gap-3 mb-2">
-              <span class="material-symbols-outlined text-3xl text-[#A480FF]">movie</span>
-              <h3 class="font-display text-xl font-bold text-white group-hover:text-[#A480FF] transition-colors">Watch Party Stream</h3>
-            </div>
-
-            <p class="text-xs text-gray-300 leading-relaxed mb-4">
-              Paste any video link to watch synchronized with your friends. Features live retro reaction tokens and prompt predictions.
-            </p>
-          </div>
-
-          <button id="arcade-launch-watch" class="w-full py-3 rounded-2xl bg-[#7C4DFF] hover:bg-[#8D65FF] text-white font-bold text-xs shadow-lg shadow-[#7C4DFF]/30 transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span>Watch Together</span>
             <span class="material-symbols-outlined text-[16px]">play_arrow</span>
           </button>
         </div>
@@ -182,16 +214,43 @@ export function renderArcadeScreen() {
 }
 
 export function bindArcadeEvents() {
+  // Launch Raja Mantri Chor Sipahi
+  const btnRaja = document.getElementById('arcade-launch-raja');
+  if (btnRaja) {
+    btnRaja.addEventListener('click', () => {
+      audio.playRoyalFanfare();
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Raja Mantri Chor Sipahi',
+        onComplete: () => {
+          store.setView('RAJA_MANTRI');
+          window.location.hash = '#/RAJA_MANTRI';
+        }
+      });
+    });
+  }
+
+  // Launch Bollywood Antakshari
+  const btnBolly = document.getElementById('arcade-launch-bollywood');
+  if (btnBolly) {
+    btnBolly.addEventListener('click', () => {
+      audio.playClick();
+      triggerGameCountdown({
+        mode: 'ARCADE',
+        title: 'Bollywood Antakshari',
+        onComplete: () => {
+          store.setView('BOLLYWOOD');
+          window.location.hash = '#/BOLLYWOOD';
+        }
+      });
+    });
+  }
+
   // Launch Spin the Bottle
   const btnBottle = document.getElementById('arcade-launch-bottle');
   if (btnBottle) {
     btnBottle.addEventListener('click', () => {
       audio.playClick();
-      if (store.getState().activeRoom?.roomCode) {
-        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
-          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Spin the Bottle', view: 'BOTTLE' });
-        }).catch(() => {});
-      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Spin the Bottle',
@@ -208,11 +267,6 @@ export function bindArcadeEvents() {
   if (btnNhie) {
     btnNhie.addEventListener('click', () => {
       audio.playClick();
-      if (store.getState().activeRoom?.roomCode) {
-        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
-          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Never Have I Ever', view: 'NHIE' });
-        }).catch(() => {});
-      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Never Have I Ever',
@@ -229,38 +283,12 @@ export function bindArcadeEvents() {
   if (btnMlt) {
     btnMlt.addEventListener('click', () => {
       audio.playClick();
-      if (store.getState().activeRoom?.roomCode) {
-        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
-          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Most Likely To', view: 'MOST_LIKELY_TO' });
-        }).catch(() => {});
-      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Most Likely To',
         onComplete: () => {
           store.setView('MOST_LIKELY_TO');
           window.location.hash = '#/MOST_LIKELY_TO';
-        }
-      });
-    });
-  }
-
-  // Launch Watch Party
-  const btnWatch = document.getElementById('arcade-launch-watch');
-  if (btnWatch) {
-    btnWatch.addEventListener('click', () => {
-      audio.playClick();
-      if (store.getState().activeRoom?.roomCode) {
-        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
-          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Watch Party & Stream', view: 'SHOWS' });
-        }).catch(() => {});
-      }
-      triggerGameCountdown({
-        mode: 'ARCADE',
-        title: 'Watch Party & Stream',
-        onComplete: () => {
-          store.setView('SHOWS');
-          window.location.hash = '#/SHOWS';
         }
       });
     });

@@ -31,6 +31,8 @@ import { renderFooter, bindFooterEvents } from './components/footer.js';
 import { renderSpotifyJukebox, bindSpotifyEvents } from './components/spotifyPlayer.js';
 import { renderRoomsHub, bindRoomsHubEvents } from './components/roomsHubScreen.js';
 import { renderGateScreen, bindGateScreenEvents } from './components/gateScreen.js';
+import { renderRajaMantriGame, bindRajaMantriEvents } from './components/rajaMantriGame.js';
+import { renderBollywoodGame, bindBollywoodEvents } from './components/bollywoodGame.js';
 
 class BondfireApp {
   constructor() {
@@ -144,9 +146,14 @@ class BondfireApp {
       'HERO': 'HOME',
       'PORTAL': 'GATE',
       'TORII': 'GATE',
+      'CHOR_SIPAHI': 'RAJA_MANTRI',
+      'RAJA': 'RAJA_MANTRI',
+      'MANTRI': 'RAJA_MANTRI',
+      'ANTAKSHARI': 'BOLLYWOOD',
+      'FILMI': 'BOLLYWOOD',
     };
     const resolvedHash = aliasMap[hash] || hash;
-    const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE'];
+    const validViews = ['GATE', 'HOME', 'HERO', 'ROOMS', 'MEMORIES', 'SHOWS', 'FRIENDS', 'PROFILE', 'TV_MODE', 'GAME', 'LOBBY', 'YEARBOOK', 'STORE', 'BOTTLE', 'ARCADE', 'NHIE', 'MOST_LIKELY_TO', 'SOLO', 'COUPLE', 'GLADE', 'RAJA_MANTRI', 'BOLLYWOOD'];
     
     // Check if this is the initial boot of opening the website
     const isBoot = this.isInitialBoot;
@@ -231,6 +238,18 @@ class BondfireApp {
       case 'MOST_LIKELY_TO':
         this.appMount.innerHTML = renderMostLikelyToGame();
         bindMostLikelyToEvents();
+        break;
+
+      case 'RAJA_MANTRI':
+      case 'CHOR_SIPAHI':
+        this.appMount.innerHTML = renderRajaMantriGame();
+        bindRajaMantriEvents();
+        break;
+
+      case 'BOLLYWOOD':
+      case 'ANTAKSHARI':
+        this.appMount.innerHTML = renderBollywoodGame();
+        bindBollywoodEvents();
         break;
 
       case 'ROOMS':

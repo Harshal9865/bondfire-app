@@ -1,6 +1,11 @@
 // ==============================================================================
-// THE PHOTOBOOK (YEARBOOK) STUDIO COMPONENT (Screen 3)
-// Enhanced 3D Layflat Studio, Multi-Page Spreads, Real Players, PDF & Keepsakes
+// THE REAL PHOTO ALBUM & PHOTOBOOK STUDIO (Screen 3)
+// 100% Real, Dynamic & Interactive Keepsake Studio:
+// - Live Photo Uploads (File picker & Camera Capture)
+// - Custom Captions, Camper Tags, Polaroid Themes (Warm, Cyber, Gold, Vintage)
+// - 3D Layflat Book Flipping Mode + Polaroid Pinboard Collage Wall
+// - Interactive Sticker Stamps (🔥, 💖, 💀, 🏆, 🤫, 🎉) & Heart Likes
+// - Printable PDF Keepsake Export & Store Order Bridge
 // ==============================================================================
 
 import { store } from '../state/store.js';
@@ -9,335 +14,383 @@ import { ConfettiEngine } from '../visuals/confetti.js';
 import { openPaymentModal } from './demoPaymentModal.js';
 
 let confettiInstance = null;
-let currentSpread = 0; // 0: Pages 1-2 | 1: Pages 3-4 | 2: Pages 5-6
+let currentSpread = 0; // 0: Pages 1-2 | 1: Pages 3-4 | etc.
+let activeStudioMode = 'LAYFLAT'; // 'LAYFLAT' | 'PINBOARD'
+let selectedUploadFile = null;
+let activeLightboxMemory = null;
 
 export function renderYearbookScreen() {
   const state = store.getState();
   const room = state.activeRoom || { id: 'BONDFIRE', podName: 'Our Squad Pod', roomCode: 'BOND' };
+  const memories = state.albumMemories || store.getDefaultAlbumMemories();
+  const totalSpreads = Math.max(1, Math.ceil(memories.length / 2));
 
-  const realPlayers = (state.activeRoom?.players || []).map((p) => p.name).filter(Boolean);
-  const hostUser = state.currentUser?.displayName ? state.currentUser.displayName.split(' ')[0] : 'Host';
-  const p1 = realPlayers[0] || hostUser;
-  const p2 = realPlayers[1] || realPlayers[0] || hostUser;
-  const p3 = realPlayers[2] || realPlayers[0] || hostUser;
-  const p4 = realPlayers[3] || realPlayers[1] || hostUser;
+  // Ensure currentSpread stays in bounds
+  if (currentSpread >= totalSpreads) {
+    currentSpread = Math.max(0, totalSpreads - 1);
+  }
 
-  const awards = [
-    { title: 'MVP Trivia Master', winner: p1, icon: 'hotel_class', reason: 'Highest trivia and memory score in the squad room', color: 'text-amber-gold bg-amber-gold/15 border-amber-gold/30' },
-    { title: 'The Quick Wit', winner: p2, icon: 'local_fire_department', reason: 'Delivered the most creative answers and memorable banter', color: 'text-sunset-coral bg-sunset-coral/15 border-sunset-coral/30' },
-    { title: 'Fastest Buzzer Finger', winner: p3, icon: 'bolt', reason: 'Locked in first answer in under 2.4 seconds', color: 'text-duo-rose bg-duo-rose/15 border-duo-rose/30' },
-    { title: 'The Crowd Favorite', winner: p4, icon: 'favorite', reason: 'Voted most memorable moment by squad consensus', color: 'text-mint-green bg-mint-green/15 border-mint-green/30' },
-  ];
+  // Get the 2 memories for current spread
+  const leftMemory = memories[currentSpread * 2] || null;
+  const rightMemory = memories[currentSpread * 2 + 1] || null;
 
   return `
-    <div class="min-h-screen bg-[#0B0E17] text-white pt-6 pb-24 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto select-none">
+    <div class="min-h-screen bg-[#0B0E17] text-white pt-6 pb-28 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto select-none" id="yearbook-root">
       
       <!-- Top Breadcrumb & Studio Header -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between pb-8 mb-8 border-b border-[#262B40]/80 gap-4">
+      <div class="flex flex-col md:flex-row md:items-end justify-between pb-6 mb-6 border-b border-[#262B40]/80 gap-4">
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold tracking-widest uppercase mb-3">
             <span class="material-symbols-outlined text-[15px]">auto_stories</span>
-            <span>PHOTOBOOK STUDIO // LAYFLAT ARCHIVE</span>
+            <span>REAL PHOTO ALBUM STUDIO // ARCHIVAL KEEPSAKE</span>
           </div>
           <h1 class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            The ${room.podName || 'Squad'} Keepsake
+            ${room.podName || 'The Campfire'} Memory Studio
           </h1>
-          <p class="text-xs sm:text-sm text-gray-400 mt-1 font-mono">Room #${room.roomCode} · Archival Grade Hardcover Photobook</p>
+          <p class="text-xs sm:text-sm text-gray-400 mt-1 font-mono">
+            Room #${room.roomCode || 'BOND'} · ${memories.length} Real Memories Preserved · Archival 240GSM Luster
+          </p>
         </div>
         
-        <div class="flex items-center gap-3 flex-wrap">
-          <div class="px-3.5 py-1.5 rounded-full bg-[#141826] border border-[#2B3147] flex items-center gap-2 font-mono text-xs text-gray-300">
-            <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
-            <span>48 PAGES • ULTRA-HD 240GSM LUSTER</span>
-          </div>
-          <button id="btn-back-home" class="p-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-400 hover:text-white border border-[#2B3147] transition-colors" title="Back to Home">
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <button id="btn-open-upload-modal" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-xs shadow-glow-coral hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+            <span>Drop Memory</span>
+          </button>
+
+          <button id="btn-print-keepsake" class="px-3.5 py-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-300 hover:text-white border border-[#2B3147] text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Print or Export PDF Keepsake">
+            <span class="material-symbols-outlined text-[16px]">print</span>
+            <span class="hidden sm:inline">Print Keepsake</span>
+          </button>
+
+          <a href="#/STORE" class="px-3.5 py-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-amber-gold border border-amber-gold/30 hover:border-amber-gold text-xs font-mono font-bold transition-all flex items-center gap-1.5" title="Order Physical Hardcover Edition">
+            <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+            <span class="hidden sm:inline">Order Book</span>
+          </a>
+
+          <button id="btn-back-home" class="p-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-400 hover:text-white border border-[#2B3147] transition-colors cursor-pointer" title="Back to Home">
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
       </div>
 
-      <!-- PAGE FLIPPER CONTROLS BAR -->
-      <div class="flex items-center justify-between bg-[#121522] border border-[#2B3147] p-3 rounded-2xl mb-6">
-        <button id="btn-prev-spread" class="px-4 py-2 rounded-xl bg-surface-bright hover:bg-[#202538] border border-border text-xs font-bold text-gray-300 hover:text-white flex items-center gap-1.5 transition-all ${currentSpread === 0 ? 'opacity-40 pointer-events-none' : ''}">
-          <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-          <span>Previous Spread</span>
-        </button>
-
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold text-amber-gold">
-            ${currentSpread === 0 ? 'SPREAD 1 OF 3 (PAGES 14–15: HIGHLIGHTS & POLAROIDS)' : currentSpread === 1 ? 'SPREAD 2 OF 3 (PAGES 16–17: POD SUPERLATIVES & AWARDS)' : 'SPREAD 3 OF 3 (PAGES 18–19: UNANIMOUS ROAST VERDICTS)'}
-          </span>
+      <!-- VIEW MODE SWITCHER & PAGE CONTROLS BAR -->
+      <div class="flex flex-col sm:flex-row items-center justify-between bg-[#121522] border border-[#2B3147] p-3 rounded-2xl mb-6 gap-3">
+        
+        <!-- Mode Tabs -->
+        <div class="flex items-center gap-1.5 bg-[#0B0E17] p-1 rounded-xl border border-white/5 w-full sm:w-auto">
+          <button id="tab-mode-layflat" class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeStudioMode === 'LAYFLAT' ? 'bg-amber-gold text-dark shadow-md' : 'text-gray-400 hover:text-white'}">
+            <span class="material-symbols-outlined text-[15px]">menu_book</span>
+            <span>3D Layflat Book</span>
+          </button>
+          <button id="tab-mode-pinboard" class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeStudioMode === 'PINBOARD' ? 'bg-amber-gold text-dark shadow-md' : 'text-gray-400 hover:text-white'}">
+            <span class="material-symbols-outlined text-[15px]">grid_view</span>
+            <span>Polaroid Pinboard</span>
+          </button>
         </div>
 
-        <button id="btn-next-spread" class="px-4 py-2 rounded-xl bg-surface-bright hover:bg-[#202538] border border-border text-xs font-bold text-gray-300 hover:text-white flex items-center gap-1.5 transition-all ${currentSpread === 2 ? 'opacity-40 pointer-events-none' : ''}">
-          <span>Next Spread</span>
-          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-        </button>
-      </div>
+        ${activeStudioMode === 'LAYFLAT' ? `
+          <!-- Page Spread Controls -->
+          <div class="flex items-center gap-3 justify-between w-full sm:w-auto">
+            <button id="btn-prev-spread" class="px-3.5 py-1.5 rounded-xl bg-surface-bright hover:bg-[#202538] border border-border text-xs font-bold text-gray-300 hover:text-white flex items-center gap-1 transition-all cursor-pointer ${currentSpread === 0 ? 'opacity-35 pointer-events-none' : ''}">
+              <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+              <span>Prev</span>
+            </button>
 
-      <!-- MAIN 3D LAYFLAT BOOK CANVAS -->
-      <div class="relative w-full rounded-[36px] bg-gradient-to-b from-[#151928] to-[#0E121E] p-6 sm:p-10 border border-[#2B3147] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_50px_rgba(255,183,3,0.1)] overflow-hidden mb-10">
-        
-        <!-- Book Spine Center Divide Simulation -->
-        <div class="hidden lg:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 bg-gradient-to-r from-black/40 via-black/70 to-black/40 pointer-events-none z-30 shadow-inner"></div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-20">
-          
-          <!-- SPREAD 0: HIGHLIGHTS & AWARDS -->
-          ${currentSpread === 0 ? `
-            <!-- LEFT PAGE: Photo Collage & Live Quote Highlights -->
-            <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[460px]">
-              <div class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"></div>
-
-              <div>
-                <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
-                  <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">SECTION 01 // CRIME SCENE EVIDENCE</span>
-                  <span class="text-xs font-mono text-gray-400">PAGE 14</span>
-                </div>
-
-                <!-- Polaroid Stack -->
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                  <div class="rounded-xl bg-white p-2.5 pb-4 shadow-xl transform -rotate-2 hover:rotate-0 transition-transform">
-                    <div class="w-full h-32 rounded-lg bg-gray-900 overflow-hidden mb-2">
-                      <img src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=600&auto=format&fit=crop&q=80" alt="Cabin Trip" class="w-full h-full object-cover" />
-                    </div>
-                    <div class="text-[11px] font-mono text-gray-800 font-bold truncate">Midnight Deck Fire</div>
-                    <div class="text-[9px] font-mono text-gray-500">October 14 · 3:15 AM</div>
-                  </div>
-
-                  <div class="rounded-xl bg-white p-2.5 pb-4 shadow-xl transform rotate-3 hover:rotate-0 transition-transform mt-3">
-                    <div class="w-full h-32 rounded-lg bg-gray-900 overflow-hidden mb-2">
-                      <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80" alt="Pizza Incident" class="w-full h-full object-cover" />
-                    </div>
-                    <div class="text-[11px] font-mono text-gray-800 font-bold truncate">Scenic Overlook Stop</div>
-                    <div class="text-[9px] font-mono text-gray-500">Exhibit #204</div>
-                  </div>
-                </div>
-
-                <!-- Quote Chip -->
-                <div class="p-4 rounded-2xl bg-[#121522] border border-[#2B3147] relative">
-                  <span class="absolute -top-3 left-4 px-2 py-0.5 rounded-full bg-sunset-coral text-canvas font-mono font-extrabold text-[9px] uppercase">
-                    UNANIMOUS VERDICT
-                  </span>
-                  <p class="text-sm text-gray-200 italic font-sans leading-snug">
-                    "If anyone asks for another scenic detour before morning coffee, ${p2} is officially retiring as group navigator."
-                  </p>
-                  <div class="flex items-center justify-between mt-3 text-[11px] font-mono text-gray-400">
-                    <span>Voted most relatable: ${p2} (85%)</span>
-                    <span class="text-sunset-coral font-bold">VERIFIED INSIDE JOKE</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-gray-400 font-mono">
-                <span>Bondfire Archival Series</span>
-                <span>ISSN 9482-1102</span>
-              </div>
-            </div>
-
-            <!-- RIGHT PAGE: Pod Awards & Superlatives -->
-            <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[460px]">
-              <div class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"></div>
-
-              <div>
-                <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
-                  <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">SECTION 02 // POD SUPERLATIVES</span>
-                  <span class="text-xs font-mono text-gray-400">PAGE 15</span>
-                </div>
-
-                <div class="space-y-3 mb-6">
-                  ${awards.map(award => `
-                    <div class="p-3.5 rounded-2xl bg-[#121522] border ${award.color} hover:border-amber-gold/50 transition-all flex items-center gap-3.5 shadow-sm">
-                      <div class="w-10 h-10 rounded-xl ${award.color} flex items-center justify-center shrink-0">
-                        <span class="material-symbols-outlined text-[20px]">${award.icon}</span>
-                      </div>
-                      <div class="min-w-0 flex-1">
-                        <div class="flex items-center justify-between">
-                          <h4 class="font-display font-bold text-white text-sm truncate">${award.winner}</h4>
-                          <span class="retro-pixel-badge text-[9.5px] text-amber-gold">${award.title}</span>
-                        </div>
-                        <p class="text-xs text-gray-400 font-sans truncate mt-0.5">${award.reason}</p>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
-
-                <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-gold/15 to-sunset-coral/15 border border-amber-gold/30 flex items-center justify-between">
-                  <div>
-                    <span class="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest block">SESSION SCOREBOARD</span>
-                    <div class="text-lg font-display font-black text-white">1,450 Sparks Earned</div>
-                  </div>
-                  <span class="material-symbols-outlined text-amber-gold text-[28px]">workspace_premium</span>
-                </div>
-              </div>
-
-              <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-gray-400 font-mono">
-                <span>Layflat Spine 0.75"</span>
-                <span>Debossed Cover</span>
-              </div>
-            </div>
-          ` : ''}
-
-          <!-- SPREAD 1: SQUAD HALL OF FAME -->
-          ${currentSpread === 1 ? `
-            <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[460px]">
-              <div>
-                <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
-                  <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">SECTION 03 // HALL OF FAME</span>
-                  <span class="text-xs font-mono text-gray-400">PAGE 16</span>
-                </div>
-
-                <h3 class="font-display text-xl font-bold text-white mb-4">Squad Hall of Fame &amp; Legends</h3>
-                <p class="text-xs text-gray-300 leading-relaxed mb-6">
-                  Official verdicts certified by room consensus. The moments that defined our game night.
-                </p>
-
-                <div class="space-y-4">
-                  <div class="p-4 rounded-2xl bg-canvas border border-border">
-                    <div class="flex justify-between items-center text-xs text-amber-gold font-mono mb-1">
-                      <span>MOST VALUABLE CAMPER</span>
-                      <span>100% APPROVAL</span>
-                    </div>
-                    <div class="text-base font-bold text-white">${p1}</div>
-                    <p class="text-xs text-gray-400 mt-1">Carried the group playlist, planned the stops, and brought the best energy.</p>
-                  </div>
-
-                  <div class="p-4 rounded-2xl bg-canvas border border-border">
-                    <div class="flex justify-between items-center text-xs text-sunset-coral font-mono mb-1">
-                      <span>THE QUICK WIT</span>
-                      <span>VERIFIED</span>
-                    </div>
-                    <div class="text-base font-bold text-white">${p2}</div>
-                    <p class="text-xs text-gray-400 mt-1">Delivered the funniest answers and most memorable banter of the night.</p>
-                  </div>
-                </div>
-              </div>
-              <div class="pt-4 border-t border-white/10 text-xs font-mono text-gray-500">Pod Archive Certified</div>
-            </div>
-
-            <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[460px]">
-              <div>
-                <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
-                  <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">SECTION 04 // GROUP CHAT VAULT</span>
-                  <span class="text-xs font-mono text-gray-400">PAGE 17</span>
-                </div>
-
-                <div class="space-y-3">
-                  <div class="p-3.5 rounded-xl bg-canvas border border-border">
-                    <div class="text-[10px] font-mono text-gray-500 mb-1">2:41 AM · Group Chat</div>
-                    <p class="text-xs text-gray-200 italic">“Next time someone says 'it's just a short 15-minute walk', check the elevation map first.”</p>
-                    <div class="text-right text-[10px] font-bold text-sunset-coral mt-1">— ${p1}</div>
-                  </div>
-                  <div class="p-3.5 rounded-xl bg-canvas border border-border">
-                    <div class="text-[10px] font-mono text-gray-500 mb-1">3:18 AM · Group Chat</div>
-                    <p class="text-xs text-gray-200 italic">“Who packed the portable charger? We are running on 3% battery and pure optimism.”</p>
-                    <div class="text-right text-[10px] font-bold text-amber-gold mt-1">— ${p3}</div>
-                  </div>
-                  <div class="p-3.5 rounded-xl bg-canvas border border-border">
-                    <div class="text-[10px] font-mono text-gray-500 mb-1">11:05 AM · Group Chat</div>
-                    <p class="text-xs text-gray-200 italic">“Good morning everyone, that was officially the best game night of the year.”</p>
-                    <div class="text-right text-[10px] font-bold text-mint-green mt-1">— ${p4}</div>
-                  </div>
-                </div>
-              </div>
-              <div class="pt-4 border-t border-white/10 text-xs font-mono text-gray-500">Unedited Chat Ingest</div>
-            </div>
-          ` : ''}
-
-          <!-- SPREAD 2: SIGNATURES & CLOSING VERDICT -->
-          ${currentSpread === 2 ? `
-            <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[460px]">
-              <div>
-                <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
-                  <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">SECTION 05 // SIGNATURE ROSTER</span>
-                  <span class="text-xs font-mono text-gray-400">PAGE 18</span>
-                </div>
-
-                <h3 class="font-display text-xl font-bold text-white mb-3">Official Campers Roster</h3>
-                <p class="text-xs text-gray-300 leading-relaxed mb-6">
-                  Every camper who checked in around the fire during this session.
-                </p>
-
-                <div class="grid grid-cols-2 gap-3">
-                  ${[p1, p2, p3, p4].filter(Boolean).map(name => `
-                    <div class="p-3 rounded-xl bg-canvas border border-border flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-full bg-sunset-coral/20 text-sunset-coral flex items-center justify-center font-bold text-xs">
-                        ${name.substring(0, 1)}
-                      </div>
-                      <div class="min-w-0">
-                        <span class="text-xs font-bold text-white block truncate">${name}</span>
-                        <span class="text-[9px] font-mono text-mint-green font-bold">SIGNED</span>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-              <div class="pt-4 border-t border-white/10 text-xs font-mono text-gray-500">Permanent Record 2026</div>
-            </div>
-
-            <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[460px] text-center">
-              <div class="my-auto space-y-4">
-                <div class="w-16 h-16 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40 flex items-center justify-center mx-auto">
-                  <span class="material-symbols-outlined text-3xl">verified</span>
-                </div>
-                <h3 class="font-display text-2xl font-bold text-white">Archived Forever</h3>
-                <p class="text-xs text-gray-300 max-w-sm mx-auto leading-relaxed">
-                  "Friends come and go, but embarrassing group chat screenshots stay in the Bondfire Photobook forever."
-                </p>
-                <div class="text-xs font-mono text-amber-gold font-bold uppercase tracking-widest pt-2">
-                  THE END OF VOLUME 01
-                </div>
-              </div>
-              <div class="pt-4 border-t border-white/10 text-xs font-mono text-gray-500">Page 19 · Volume Complete</div>
-            </div>
-          ` : ''}
-
-        </div>
-
-      </div>
-
-      <!-- CUSTOMIZER, PDF DOWNLOAD & ORDER BAR -->
-      <div class="rounded-3xl bg-[#121522] border border-[#2B3147] p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl">
-        
-        <!-- Left: Material & Fabric Swatches -->
-        <div class="flex flex-wrap items-center gap-6">
-          <div>
-            <span class="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-wider block mb-2">COVER MATERIAL</span>
-            <div class="flex items-center gap-2" id="fabric-swatches">
-              <button class="fabric-swatch w-8 h-8 rounded-full bg-[#18181A] border-2 border-amber-gold shadow transition-transform scale-110" data-name="Italian Obsidian" title="Italian Obsidian Bookcloth"></button>
-              <button class="fabric-swatch w-8 h-8 rounded-full bg-[#8B263E] border-2 border-transparent hover:border-white transition-transform" data-name="Campfire Crimson" title="Campfire Crimson Velvet"></button>
-              <button class="fabric-swatch w-8 h-8 rounded-full bg-[#1E3A5F] border-2 border-transparent hover:border-white transition-transform" data-name="Midnight Navy" title="Midnight Navy Linen"></button>
-            </div>
-          </div>
-
-          <div class="h-10 w-px bg-[#262B40] hidden sm:block"></div>
-
-          <div>
-            <span class="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-wider block mb-2">FOIL STAMPING</span>
-            <span class="px-3 py-1 rounded-full bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-mono font-bold inline-flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
-              <span>Real 24k Gold Foil Deboss</span>
+            <span class="text-xs font-mono font-bold text-amber-gold px-2">
+              SPREAD ${currentSpread + 1} OF ${totalSpreads} (PAGES ${(currentSpread * 2) + 1}–${(currentSpread * 2) + 2})
             </span>
+
+            <button id="btn-next-spread" class="px-3.5 py-1.5 rounded-xl bg-surface-bright hover:bg-[#202538] border border-border text-xs font-bold text-gray-300 hover:text-white flex items-center gap-1 transition-all cursor-pointer ${currentSpread >= totalSpreads - 1 ? 'opacity-35 pointer-events-none' : ''}">
+              <span>Next</span>
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
+        ` : `
+          <div class="text-xs font-mono text-gray-400 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
+            <span>INTERACTIVE PINBOARD // TAP ANY PHOTO TO ZOOM &amp; STAMP</span>
+          </div>
+        `}
+      </div>
+
+      <!-- MAIN STUDIO WORKSPACE -->
+      <div id="photobook-print-region">
+        ${activeStudioMode === 'LAYFLAT' ? renderLayflatSpread(leftMemory, rightMemory, currentSpread, totalSpreads) : renderPinboardWall(memories)}
+      </div>
+
+      <!-- ALBUM FOOTER QUICK BAR -->
+      <div class="rounded-3xl bg-[#121522] border border-[#2B3147] p-6 mt-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/30 flex items-center justify-center text-amber-gold shrink-0">
+            <span class="material-symbols-outlined text-[24px]">local_fire_department</span>
+          </div>
+          <div>
+            <h4 class="font-display font-bold text-white text-base">Campfire Sparks Synced</h4>
+            <p class="text-xs text-gray-400 font-mono mt-0.5">Every photo uploaded grants +25 Sparks to all room campers.</p>
           </div>
         </div>
 
-        <!-- Right: Actions (PDF Download & Hardcover Order) -->
-        <div class="flex flex-wrap items-center gap-3">
-          <button id="btn-download-pdf" class="px-5 py-3 rounded-full bg-[#202538] hover:bg-[#2A3148] border border-[#363D5A] text-white font-bold text-xs sm:text-sm transition-all flex items-center gap-1.5 active:scale-95 shadow">
-            <span class="material-symbols-outlined text-[16px] text-mint-green">download</span>
-            <span>Download Digital PDF</span>
-          </button>
-
-          <button id="btn-order-hardcover" class="px-7 py-3.5 rounded-full bg-gradient-to-r from-amber-gold via-sunset-coral to-duo-rose text-canvas font-bold text-xs sm:text-sm shadow-glow-amber hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px]">local_shipping</span>
-            <span>Order Layflat Hardcover ($38)</span>
+        <div class="flex items-center gap-3">
+          <button id="btn-quick-add-bottom" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">add_photo_alternate</span>
+            <span>Add Another Memory</span>
           </button>
         </div>
+      </div>
 
+      <!-- INTERACTIVE PHOTO UPLOAD MODAL -->
+      <div id="modal-upload-memory" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-lg rounded-3xl bg-[#131726] border border-[#2B3147] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-gold text-2xl">add_a_photo</span>
+              <h3 class="font-display text-xl font-bold text-white">Drop a Campfire Memory</h3>
+            </div>
+            <button id="btn-close-upload-modal" class="p-1.5 rounded-lg bg-surface-bright hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer">
+              <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+
+          <!-- Image Drop / Picker Area -->
+          <div id="dropzone-upload" class="border-2 border-dashed border-gray-600 hover:border-amber-gold rounded-2xl p-6 text-center cursor-pointer transition-colors mb-4 bg-[#0E111D] relative group">
+            <input type="file" id="input-photo-file" accept="image/*" class="hidden" />
+            
+            <div id="upload-placeholder-content">
+              <span class="material-symbols-outlined text-4xl text-gray-400 group-hover:text-amber-gold group-hover:scale-110 transition-transform">cloud_upload</span>
+              <p class="text-sm font-bold text-gray-200 mt-2">Click to select photo or drag here</p>
+              <p class="text-xs text-gray-500 font-mono mt-1">JPEG, PNG, WEBP, GIF up to 10MB</p>
+            </div>
+
+            <div id="upload-preview-container" class="hidden relative w-full h-48 rounded-xl overflow-hidden">
+              <img id="upload-preview-img" src="" class="w-full h-full object-cover" alt="Preview" />
+              <button id="btn-clear-preview" class="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 hover:bg-black text-white text-xs cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form Fields -->
+          <div class="space-y-3.5 text-left">
+            <div>
+              <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Memory Title</label>
+              <input type="text" id="input-memory-title" placeholder="e.g. 2 AM Maggie Noodles &amp; Spilled Chai" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none transition-colors" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Story / Quote / Confession</label>
+              <textarea id="input-memory-caption" rows="3" placeholder="What happened here? What is the unedited squad verdict?" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none transition-colors"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Camper Tags</label>
+                <input type="text" id="input-memory-tags" placeholder="Aarav, Priya, Host" class="w-full px-3 py-2 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Polaroid Theme</label>
+                <select id="select-memory-theme" class="w-full px-3 py-2 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none">
+                  <option value="POLAROID_WARM">Warm Campfire Amber</option>
+                  <option value="POLAROID_CYBER">Cyber Neon Cyan</option>
+                  <option value="POLAROID_GOLD">24k Gold Luster</option>
+                  <option value="POLAROID_VINTAGE">Vintage Sepia</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btn-submit-memory" class="w-full mt-6 py-3.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-sm uppercase tracking-wider shadow-glow-coral hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">save</span>
+            <span>Permanently Archive Memory</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- LIGHTBOX MODAL FOR ZOOM & STICKERS -->
+      <div id="modal-lightbox" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-2xl rounded-3xl bg-[#121522] border border-[#2B3147] p-6 sm:p-8 shadow-2xl relative" id="lightbox-content">
+          <!-- Populated dynamically -->
+        </div>
       </div>
 
     </div>
   `;
+}
+
+/**
+ * Renders 3D Layflat Double-Page Spread
+ */
+function renderLayflatSpread(leftMem, rightMem, spreadIndex, totalSpreads) {
+  const leftPageNum = (spreadIndex * 2) + 1;
+  const rightPageNum = (spreadIndex * 2) + 2;
+
+  return `
+    <div class="relative w-full rounded-[36px] bg-gradient-to-b from-[#151928] to-[#0E121E] p-6 sm:p-10 border border-[#2B3147] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_50px_rgba(255,183,3,0.1)] overflow-hidden">
+      
+      <!-- Book Spine Center Fold Simulation -->
+      <div class="hidden lg:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 bg-gradient-to-r from-black/40 via-black/70 to-black/40 pointer-events-none z-30 shadow-inner"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-20">
+        
+        <!-- LEFT PAGE -->
+        ${leftMem ? renderBookPage(leftMem, leftPageNum, 'left') : renderEmptyBookPage(leftPageNum)}
+
+        <!-- RIGHT PAGE -->
+        ${rightMem ? renderBookPage(rightMem, rightPageNum, 'right') : renderEmptyBookPage(rightPageNum)}
+
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Individual Photobook Page Markup
+ */
+function renderBookPage(mem, pageNum, side) {
+  const themeClass = getThemeClass(mem.theme);
+
+  return `
+    <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[500px]">
+      <div class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"></div>
+
+      <div>
+        <div class="flex items-center justify-between pb-3 mb-5 border-b border-white/10">
+          <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">
+            ARCHIVE ENTRY #${mem.id.slice(-4)} // ${mem.theme.replace('POLAROID_', '')}
+          </span>
+          <span class="text-xs font-mono text-gray-400">PAGE ${pageNum}</span>
+        </div>
+
+        <!-- Polaroid Visual Frame -->
+        <div class="polaroid-card ${themeClass} p-3.5 pb-5 rounded-xl shadow-xl max-w-md mx-auto mb-5 cursor-pointer group hover:scale-[1.02] transition-transform" data-id="${mem.id}">
+          <div class="polaroid-tape"></div>
+          <div class="w-full h-56 rounded-lg overflow-hidden mb-3 bg-black relative">
+            <img src="${mem.imageUrl}" alt="${mem.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-mono text-gray-300">
+              ${mem.date}
+            </div>
+          </div>
+          
+          <h3 class="font-display font-black text-sm tracking-tight truncate">${mem.title}</h3>
+          
+          <!-- Camper Tags -->
+          <div class="flex items-center gap-1.5 flex-wrap mt-1.5">
+            ${(mem.camperTags || []).map(t => `
+              <span class="px-2 py-0.5 rounded-md bg-black/10 text-[9.5px] font-mono font-bold">${t}</span>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Story Quote Box -->
+        <div class="p-4 rounded-2xl bg-[#121522] border border-[#2B3147] relative">
+          <p class="text-xs sm:text-sm text-gray-200 italic font-sans leading-relaxed">
+            "${mem.caption || 'No caption recorded for this memory.'}"
+          </p>
+          <div class="flex items-center justify-between mt-3 text-[10px] font-mono text-gray-400">
+            <span>By: <strong class="text-white">${mem.author || 'Squad'}</strong></span>
+            <span class="text-amber-gold font-bold">VERIFIED MEMORY</span>
+          </div>
+        </div>
+
+        <!-- Sticker Stamps Strip & Like Button -->
+        <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[10px] font-mono text-gray-500">Stamps:</span>
+            ${(mem.stickers || []).map(stk => `
+              <span class="text-sm bg-white/5 px-2 py-0.5 rounded-md border border-white/10" title="Squad stamp">${stk}</span>
+            `).join('')}
+            <button class="btn-stamp-picker text-xs font-mono text-amber-gold hover:text-white px-2 py-0.5 rounded bg-amber-gold/15 border border-amber-gold/30 hover:bg-amber-gold/25 cursor-pointer ml-1" data-id="${mem.id}">
+              + Stamp
+            </button>
+          </div>
+
+          <button class="btn-like-memory flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold transition-all cursor-pointer active:scale-90" data-id="${mem.id}">
+            <span>❤️</span>
+            <span>${mem.likes || 0}</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between text-xs text-gray-400 font-mono">
+        <span>Bondfire Keepsake Vol. 1</span>
+        <span>Layflat Double-Luster</span>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Blank / Placeholder Page for odd counts
+ */
+function renderEmptyBookPage(pageNum) {
+  return `
+    <div class="rounded-2xl bg-[#141724] border border-dashed border-white/10 p-8 flex flex-col items-center justify-center text-center min-h-[500px]">
+      <span class="material-symbols-outlined text-4xl text-gray-600 mb-3">add_photo_alternate</span>
+      <h4 class="font-display font-bold text-gray-400 text-base">Empty Archival Page</h4>
+      <p class="text-xs text-gray-500 font-mono max-w-xs mt-1">
+        Page ${pageNum} is ready for new memories. Click "Drop Memory" above to add your photos.
+      </p>
+    </div>
+  `;
+}
+
+/**
+ * Freeform Polaroid Pinboard Wall
+ */
+function renderPinboardWall(memories) {
+  const rotations = ['rotate-[-2deg]', 'rotate-[2deg]', 'rotate-[-1deg]', 'rotate-[3deg]', 'rotate-[-3deg]'];
+
+  return `
+    <div class="w-full rounded-[36px] bg-[#121522]/90 border border-[#2B3147] p-6 sm:p-10 shadow-2xl">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        ${memories.map((mem, idx) => {
+          const rot = rotations[idx % rotations.length];
+          const themeClass = getThemeClass(mem.theme);
+
+          return `
+            <div class="polaroid-card ${themeClass} ${rot} p-3 pb-5 rounded-xl shadow-xl cursor-pointer group hover:scale-105 transition-all" data-id="${mem.id}">
+              <div class="polaroid-tape"></div>
+              
+              <div class="w-full h-48 rounded-lg overflow-hidden mb-2.5 bg-black relative">
+                <img src="${mem.imageUrl}" alt="${mem.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-full bg-black/60 text-[9px] font-mono text-gray-300">
+                  ${mem.date}
+                </div>
+              </div>
+
+              <h4 class="font-display font-black text-xs sm:text-sm tracking-tight truncate">${mem.title}</h4>
+              <p class="text-[11px] font-sans line-clamp-2 opacity-80 mt-1">${mem.caption}</p>
+
+              <!-- Footer with stamps & likes -->
+              <div class="flex items-center justify-between mt-3 pt-2 border-t border-black/10 text-[10px] font-mono">
+                <div class="flex items-center gap-1">
+                  ${(mem.stickers || []).slice(0, 3).map(s => `<span>${s}</span>`).join('')}
+                </div>
+                <div class="flex items-center gap-1 text-rose-500 font-bold">
+                  <span>❤️ ${mem.likes || 0}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function getThemeClass(theme) {
+  switch (theme) {
+    case 'POLAROID_CYBER': return 'polaroid-theme-cyber';
+    case 'POLAROID_GOLD': return 'polaroid-theme-gold';
+    case 'POLAROID_VINTAGE': return 'polaroid-theme-vintage';
+    case 'POLAROID_WARM':
+    default: return 'polaroid-theme-warm';
+  }
 }
 
 export function bindYearbookEvents() {
@@ -345,78 +398,314 @@ export function bindYearbookEvents() {
     confettiInstance = new ConfettiEngine('confetti-canvas');
   }
 
-  // Back home button
+  // Back button
   const backBtn = document.getElementById('btn-back-home');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
       audio.playClick();
-      store.setView('HOME');
       window.location.hash = '#/HOME';
     });
   }
 
-  // Page spread navigation
-  const prevBtn = document.getElementById('btn-prev-spread');
-  const nextBtn = document.getElementById('btn-next-spread');
+  // View Mode Tabs
+  const tabLayflat = document.getElementById('tab-mode-layflat');
+  const tabPinboard = document.getElementById('tab-mode-pinboard');
 
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
+  if (tabLayflat) {
+    tabLayflat.addEventListener('click', () => {
+      audio.playClick();
+      activeStudioMode = 'LAYFLAT';
+      reRenderStudio();
+    });
+  }
+
+  if (tabPinboard) {
+    tabPinboard.addEventListener('click', () => {
+      audio.playClick();
+      activeStudioMode = 'PINBOARD';
+      reRenderStudio();
+    });
+  }
+
+  // Spread Flipper Buttons
+  const btnPrev = document.getElementById('btn-prev-spread');
+  const btnNext = document.getElementById('btn-next-spread');
+
+  if (btnPrev) {
+    btnPrev.addEventListener('click', () => {
       if (currentSpread > 0) {
         audio.playClick();
         currentSpread--;
-        store.setView('YEARBOOK');
+        reRenderStudio();
       }
     });
   }
 
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      if (currentSpread < 2) {
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      const memories = store.getState().albumMemories || [];
+      const totalSpreads = Math.max(1, Math.ceil(memories.length / 2));
+      if (currentSpread < totalSpreads - 1) {
         audio.playClick();
-        confettiInstance.burst(25, 0.6);
         currentSpread++;
-        store.setView('YEARBOOK');
+        reRenderStudio();
       }
     });
   }
 
-  // Fabric swatches
-  const swatches = document.querySelectorAll('.fabric-swatch');
-  swatches.forEach(swatch => {
-    swatch.addEventListener('click', () => {
+  // Print Keepsake
+  const printBtn = document.getElementById('btn-print-keepsake');
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      audio.playChime();
+      window.print();
+    });
+  }
+
+  // Upload Modal Open & Close
+  const modalUpload = document.getElementById('modal-upload-memory');
+  const openUploadBtns = [
+    document.getElementById('btn-open-upload-modal'),
+    document.getElementById('btn-quick-add-bottom')
+  ].filter(Boolean);
+
+  openUploadBtns.forEach(b => {
+    b.addEventListener('click', () => {
       audio.playClick();
-      swatches.forEach(s => s.classList.remove('scale-110', 'border-amber-gold'));
-      swatch.classList.add('scale-110', 'border-amber-gold');
+      if (modalUpload) modalUpload.classList.remove('hidden');
     });
   });
 
-  // Download PDF Action
-  const downloadPdfBtn = document.getElementById('btn-download-pdf');
-  if (downloadPdfBtn) {
-    downloadPdfBtn.addEventListener('click', () => {
-      audio.playChime();
-      confettiInstance.burst(50, 1.0);
-      downloadPdfBtn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-mint-green animate-spin">sync</span><span>Compiling 240GSM Pages...</span>`;
-      setTimeout(() => {
-        downloadPdfBtn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-mint-green">done_all</span><span>PDF Downloaded (24.8 MB)!</span>`;
-        setTimeout(() => {
-          downloadPdfBtn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-mint-green">download</span><span>Download Digital PDF</span>`;
-        }, 3500);
-      }, 1400);
+  const closeUploadBtn = document.getElementById('btn-close-upload-modal');
+  if (closeUploadBtn && modalUpload) {
+    closeUploadBtn.addEventListener('click', () => {
+      audio.playClick();
+      modalUpload.classList.add('hidden');
     });
   }
 
-  // Order Hardcover Button -> triggers payment simulator modal
-  const orderHardcover = document.getElementById('btn-order-hardcover');
-  if (orderHardcover) {
-    orderHardcover.addEventListener('click', () => {
+  // Dropzone file handling
+  const dropzone = document.getElementById('dropzone-upload');
+  const fileInput = document.getElementById('input-photo-file');
+  const placeholderContent = document.getElementById('upload-placeholder-content');
+  const previewContainer = document.getElementById('upload-preview-container');
+  const previewImg = document.getElementById('upload-preview-img');
+  const clearPreviewBtn = document.getElementById('btn-clear-preview');
+
+  if (dropzone && fileInput) {
+    dropzone.addEventListener('click', (e) => {
+      if (e.target !== clearPreviewBtn && !clearPreviewBtn?.contains(e.target)) {
+        fileInput.click();
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        handleImageFile(file);
+      }
+    });
+
+    // Drag and drop
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-amber-gold');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-amber-gold');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-amber-gold');
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        handleImageFile(file);
+      }
+    });
+  }
+
+  function handleImageFile(file) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      selectedUploadFile = ev.target.result;
+      if (previewImg) previewImg.src = selectedUploadFile;
+      if (placeholderContent) placeholderContent.classList.add('hidden');
+      if (previewContainer) previewContainer.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  if (clearPreviewBtn) {
+    clearPreviewBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedUploadFile = null;
+      if (fileInput) fileInput.value = '';
+      if (placeholderContent) placeholderContent.classList.remove('hidden');
+      if (previewContainer) previewContainer.classList.add('hidden');
+    });
+  }
+
+  // Submit New Memory
+  const submitBtn = document.getElementById('btn-submit-memory');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', () => {
+      const titleInput = document.getElementById('input-memory-title');
+      const captionInput = document.getElementById('input-memory-caption');
+      const tagsInput = document.getElementById('input-memory-tags');
+      const themeSelect = document.getElementById('select-memory-theme');
+
+      const title = titleInput?.value.trim() || 'Campfire Memory Snap';
+      const caption = captionInput?.value.trim() || 'Laughter and stories around the warm embers.';
+      const tags = tagsInput?.value ? tagsInput.value.split(',').map(s => s.trim()).filter(Boolean) : ['Host (You)'];
+      const theme = themeSelect?.value || 'POLAROID_WARM';
+
+      // Default sample photo if no image was selected
+      const samplePhotos = [
+        'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80'
+      ];
+      const imageUrl = selectedUploadFile || samplePhotos[Math.floor(Math.random() * samplePhotos.length)];
+
+      // Add to store
+      audio.playCameraSnap();
+      store.addAlbumMemory({
+        title,
+        caption,
+        imageUrl,
+        camperTags: tags,
+        theme,
+        stickers: ['🔥']
+      });
+
+      // Reward +25 sparks
+      store.claimDailySparks();
+
+      confettiInstance.burst(50, 1);
+      if (modalUpload) modalUpload.classList.add('hidden');
+
+      // Reset form
+      if (titleInput) titleInput.value = '';
+      if (captionInput) captionInput.value = '';
+      if (tagsInput) tagsInput.value = '';
+      selectedUploadFile = null;
+      if (placeholderContent) placeholderContent.classList.remove('hidden');
+      if (previewContainer) previewContainer.classList.add('hidden');
+
+      reRenderStudio();
+    });
+  }
+
+  // Like Memory Buttons
+  const likeBtns = document.querySelectorAll('.btn-like-memory');
+  likeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
       audio.playChime();
-      openPaymentModal({
-        name: 'Layflat Hardcover Photobook (48 Pages)',
-        price: 38,
-        tier: 'HARDCOVER_PHOTOBOOK',
-        description: 'Bound in Italian Obsidian bookcloth with real gold foil custom stamping.'
+      store.likeAlbumMemory(id);
+      reRenderStudio();
+    });
+  });
+
+  // Stamp Picker Buttons
+  const stampBtns = document.querySelectorAll('.btn-stamp-picker');
+  stampBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const stickers = ['🔥', '💖', '💀', '🏆', '🤫', '🎉'];
+      const randomSticker = stickers[Math.floor(Math.random() * stickers.length)];
+      audio.playClick();
+      store.addAlbumMemorySticker(id, randomSticker);
+      reRenderStudio();
+    });
+  });
+
+  // Polaroid Card Click (Open Lightbox)
+  const polaroids = document.querySelectorAll('.polaroid-card');
+  polaroids.forEach(p => {
+    p.addEventListener('click', () => {
+      const id = p.dataset.id;
+      const memory = (store.getState().albumMemories || []).find(m => m.id === id);
+      if (memory) {
+        openLightbox(memory);
+      }
+    });
+  });
+
+  function openLightbox(memory) {
+    const modalLightbox = document.getElementById('modal-lightbox');
+    const content = document.getElementById('lightbox-content');
+    if (!modalLightbox || !content) return;
+
+    audio.playClick();
+    content.innerHTML = `
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+        <h3 class="font-display text-xl font-bold text-white">${memory.title}</h3>
+        <button id="btn-close-lightbox" class="p-1.5 rounded-lg bg-surface-bright hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="w-full h-80 rounded-2xl overflow-hidden bg-black mb-4">
+        <img src="${memory.imageUrl}" class="w-full h-full object-contain" alt="${memory.title}" />
+      </div>
+
+      <p class="text-sm text-gray-300 italic font-sans mb-4 leading-relaxed">"${memory.caption}"</p>
+
+      <div class="flex items-center justify-between pt-4 border-t border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono text-gray-400">Add Stamp:</span>
+          ${['🔥', '💖', '💀', '🏆', '🎉'].map(stk => `
+            <button class="btn-lightbox-stamp text-lg p-1 hover:scale-125 transition-transform cursor-pointer" data-id="${memory.id}" data-sticker="${stk}">${stk}</button>
+          `).join('')}
+        </div>
+
+        <button class="btn-delete-memory text-xs font-mono text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer" data-id="${memory.id}">
+          <span class="material-symbols-outlined text-[16px]">delete</span>
+          <span>Remove Photo</span>
+        </button>
+      </div>
+    `;
+
+    modalLightbox.classList.remove('hidden');
+
+    const closeBtn = document.getElementById('btn-close-lightbox');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => modalLightbox.classList.add('hidden'));
+    }
+
+    const deleteBtn = content.querySelector('.btn-delete-memory');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => {
+        audio.playClick();
+        store.deleteAlbumMemory(memory.id);
+        modalLightbox.classList.add('hidden');
+        reRenderStudio();
+      });
+    }
+
+    const stampOptions = content.querySelectorAll('.btn-lightbox-stamp');
+    stampOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const stk = opt.dataset.sticker;
+        audio.playClick();
+        store.addAlbumMemorySticker(memory.id, stk);
+        modalLightbox.classList.add('hidden');
+        reRenderStudio();
       });
     });
+  }
+
+  function reRenderStudio() {
+    const mount = document.getElementById('app-mount');
+    if (mount && store.getState().currentView === 'YEARBOOK') {
+      mount.innerHTML = renderYearbookScreen();
+      bindYearbookEvents();
+    }
   }
 }

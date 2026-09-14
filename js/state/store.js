@@ -126,6 +126,59 @@ class ReactiveStore {
     };
   }
 
+  getDefaultAlbumMemories() {
+    return [
+      {
+        id: 'mem_1',
+        title: 'Midnight Campfire Chai & Accidental Confessions',
+        caption: 'Someone spilled half the chai into the embers while arguing about whose turn it was to wash the mess tin.',
+        date: '2026-09-12',
+        author: 'Host (You)',
+        camperTags: ['Host (You)', 'Aarav', 'Pooja'],
+        imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
+        theme: 'POLAROID_WARM',
+        stickers: ['🔥', '🏆'],
+        likes: 12,
+      },
+      {
+        id: 'mem_2',
+        title: 'The Legendary 3 AM Antakshari Standoff',
+        caption: 'Round 14: Nobody knew a single song starting with "Gy", so someone invented an entire Bhojpuri remix on the spot.',
+        date: '2026-09-10',
+        author: 'Pooja',
+        camperTags: ['Pooja', 'Rohan', 'Sneha'],
+        imageUrl: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
+        theme: 'POLAROID_CYBER',
+        stickers: ['💀', '💖'],
+        likes: 18,
+      },
+      {
+        id: 'mem_3',
+        title: 'Golden Hour Hilltop Trek Polaroid',
+        caption: 'Reached the summit right as the sunset turned the valley crimson. 10/10 would freeze our toes off again.',
+        date: '2026-09-08',
+        author: 'Aarav',
+        camperTags: ['Aarav', 'Host (You)'],
+        imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
+        theme: 'POLAROID_GOLD',
+        stickers: ['💖'],
+        likes: 24,
+      },
+      {
+        id: 'mem_4',
+        title: 'Spin the Bottle Verdict: The Goa Trip Receipt',
+        caption: 'The moment someone finally admitted they had lost the hotel keycard inside the beach shack sand.',
+        date: '2026-09-05',
+        author: 'Sneha',
+        camperTags: ['Sneha', 'Rohan'],
+        imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
+        theme: 'POLAROID_VINTAGE',
+        stickers: ['🤫', '💀'],
+        likes: 31,
+      }
+    ];
+  }
+
   loadInitialState() {
     if (typeof localStorage !== 'undefined') {
       try {
@@ -198,6 +251,10 @@ class ReactiveStore {
           if (!parsed.vaultMemories) parsed.vaultMemories = [];
           if (!parsed.memoryGraphNodes) parsed.memoryGraphNodes = this.getDefaultMemoryGraphNodes();
           if (!parsed.weeklyMission) parsed.weeklyMission = this.getDefaultWeeklyMission();
+          if (typeof parsed.userSparks !== 'number') parsed.userSparks = 750;
+          if (!Array.isArray(parsed.unlockedPerks)) parsed.unlockedPerks = ['cyber_flame_plasma'];
+          if (!Array.isArray(parsed.orderHistory)) parsed.orderHistory = [];
+          if (!Array.isArray(parsed.albumMemories)) parsed.albumMemories = this.getDefaultAlbumMemories();
           return parsed;
         }
       } catch (e) {
@@ -210,6 +267,10 @@ class ReactiveStore {
       activeMode: 'PODS', // 'SOLO' | 'US' | 'PODS'
       soundEnabled: true,
       currentUser: this.getDefaultGuestUser(),
+      userSparks: 750,
+      unlockedPerks: ['cyber_flame_plasma'],
+      orderHistory: [],
+      albumMemories: this.getDefaultAlbumMemories(),
       friendsList: [],
       squadsList: [],
       friendRequests: { incoming: [], outgoing: [] },
@@ -774,6 +835,94 @@ class ReactiveStore {
     const customGameDeck = [newGameCard, ...(this.state.customGameDeck || [])];
     this.setState({ vaultMemories, customGameDeck });
     return newMem;
+  }
+
+  // Sparks & Store Economy Methods
+  claimDailySparks() {
+    const currentSparks = this.state.userSparks || 0;
+    const newSparks = currentSparks + 100;
+    this.setState({
+      userSparks: newSparks,
+      lastDailyClaim: Date.now(),
+    });
+    return newSparks;
+  }
+
+  spendSparks(amount, reason = 'Store Purchase') {
+    const currentSparks = this.state.userSparks || 0;
+    if (currentSparks < amount) return false;
+    const newSparks = currentSparks - amount;
+    this.setState({ userSparks: newSparks });
+    return true;
+  }
+
+  unlockPerk(perkId, perkName, sparksCost = 0) {
+    if (sparksCost > 0) {
+      const ok = this.spendSparks(sparksCost, `Unlocked ${perkName}`);
+      if (!ok) return false;
+    }
+    const unlockedPerks = Array.from(new Set([...(this.state.unlockedPerks || []), perkId]));
+    this.setState({ unlockedPerks });
+    return true;
+  }
+
+  recordStoreOrder(order) {
+    const newOrder = {
+      id: order.id || `BF-ORDER-${Math.floor(100000 + Math.random() * 900000)}`,
+      trackingNumber: `BF-TRACK-${Math.floor(10000000 + Math.random() * 90000000)}`,
+      status: 'PROCESSING',
+      createdAt: new Date().toISOString(),
+      ...order,
+    };
+    const orderHistory = [newOrder, ...(this.state.orderHistory || [])];
+    this.setState({ orderHistory });
+    return newOrder;
+  }
+
+  // Real Photo Album Studio Methods
+  addAlbumMemory(memory) {
+    const newMemory = {
+      id: `album_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      date: new Date().toISOString().split('T')[0],
+      author: memory.author || this.state.currentUser?.displayName || 'Host (You)',
+      camperTags: memory.camperTags || ['Host (You)'],
+      stickers: memory.stickers || ['🔥'],
+      likes: 0,
+      theme: memory.theme || 'POLAROID_WARM',
+      ...memory,
+    };
+    const albumMemories = [newMemory, ...(this.state.albumMemories || [])];
+    this.setState({ albumMemories });
+    return newMemory;
+  }
+
+  deleteAlbumMemory(memoryId) {
+    const albumMemories = (this.state.albumMemories || []).filter((m) => m.id !== memoryId);
+    this.setState({ albumMemories });
+    return albumMemories;
+  }
+
+  addAlbumMemorySticker(memoryId, sticker) {
+    const albumMemories = (this.state.albumMemories || []).map((m) => {
+      if (m.id === memoryId) {
+        const stickers = [...(m.stickers || []), sticker];
+        return { ...m, stickers };
+      }
+      return m;
+    });
+    this.setState({ albumMemories });
+    return albumMemories;
+  }
+
+  likeAlbumMemory(memoryId) {
+    const albumMemories = (this.state.albumMemories || []).map((m) => {
+      if (m.id === memoryId) {
+        return { ...m, likes: (m.likes || 0) + 1 };
+      }
+      return m;
+    });
+    this.setState({ albumMemories });
+    return albumMemories;
   }
 
   persist() {
