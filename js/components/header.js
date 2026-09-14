@@ -557,17 +557,12 @@ export function bindHeaderEvents() {
     });
   }
 
-  // User Profile Click -> Go to Profile Screen or Prompt Auth Modal
+  // User Profile Click -> Go to Profile Screen
   const userProfile = document.getElementById('header-user-profile');
   if (userProfile) {
     userProfile.addEventListener('click', () => {
       audio.playClick();
-      const currentUser = store.getState().currentUser;
-      if (currentUser && currentUser.email) {
-        store.setView('PROFILE');
-      } else {
-        openAuthModal('Sign in to access your citizen passport and cloud vault');
-      }
+      store.setView('PROFILE');
     });
   }
 

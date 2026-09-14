@@ -517,8 +517,66 @@ class ReactiveStore {
   }
 
   updateUserProfile(updates) {
-    const currentUser = { ...this.state.currentUser, ...updates };
-    this.setState({ currentUser });
+    if (!updates || typeof updates !== 'object') return;
+    const current = this.state.currentUser || this.getDefaultGuestUser();
+    const currentUser = {
+      ...current,
+      ...updates,
+      privacy: updates.privacy ? { ...(current.privacy || {}), ...updates.privacy } : current.privacy,
+      stats: updates.stats ? { ...(current.stats || {}), ...updates.stats } : current.stats,
+    };
+
+    // Sync host name and avatar in active room if present
+    let activeRoom = this.state.activeRoom;
+    if (activeRoom && Array.isArray(activeRoom.players)) {
+      const updatedPlayers = activeRoom.players.map((p) => {
+        if (p.role === 'HOST' || p.id === 'usr_host' || p.id === currentUser.id) {
+          return {
+            ...p,
+            name: currentUser.displayName || p.name,
+            avatar: currentUser.avatarUrl || p.avatar,
+          };
+        }
+        return p;
+      });
+      activeRoom = { ...activeRoom, players: updatedPlayers };
+    }
+
+    this.setState({ currentUser, ...(activeRoom ? { activeRoom } : {}) });
+  }
+
+  setUserTier(tier) {
+    this.updateUserProfile({ tier });
+  }
+
+  logoutUser() {
+    const guestUser = this.getDefaultGuestUser();
+    this.setState({ currentUser: guestUser });
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.removeItem('bondfire_auth_token');
+        localStorage.removeItem('bondfire_google_credential');
+      } catch (_) {}
+    }
+    return guestUser;
+  }
+
+  createPod(podData = {}) {
+    const user = this.state.currentUser || this.getDefaultGuestUser();
+    const newPod = {
+      id: `pod_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      name: podData.name || 'New Squad Pod',
+      memberCount: 1,
+      role: 'HOST',
+      theme: podData.theme || 'SQUAD_NIGHT',
+      createdAt: new Date().toISOString(),
+      ...podData,
+    };
+    const pods = [newPod, ...(user.pods || [])];
+    const squadsList = [newPod, ...(this.state.squadsList || [])];
+    this.updateUserProfile({ pods });
+    this.setState({ squadsList });
+    return newPod;
   }
 
   getSettings() {

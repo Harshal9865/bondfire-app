@@ -300,9 +300,17 @@ function bindPaymentModalEvents() {
         processStage.classList.add('hidden');
         successStage.classList.remove('hidden');
 
-        // Upgrade state tier
-        if (currentOrder && currentOrder.tier) {
-          store.setUserTier(currentOrder.tier);
+        // Upgrade state tier & sparks
+        if (currentOrder) {
+          if (currentOrder.tier) {
+            store.setUserTier(currentOrder.tier);
+          }
+          if (currentOrder.item && currentOrder.item.toLowerCase().includes('spark')) {
+            const user = store.getState().currentUser || {};
+            const currentSparks = user.sparks !== undefined ? user.sparks : 50;
+            const sparksAmount = currentOrder.item.includes('1200') ? 1200 : (currentOrder.item.includes('3000') ? 3000 : 500);
+            store.updateUserProfile({ sparks: currentSparks + sparksAmount });
+          }
         }
 
         // Trigger celebration confetti
