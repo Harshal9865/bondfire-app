@@ -67,53 +67,7 @@ class ReactiveStore {
   }
 
   getDefaultMemoryGraphNodes() {
-    return [
-      {
-        id: 'node_1',
-        category: 'QUOTES',
-        title: '“Maine pehle hi bola tha”',
-        contextSnippet: 'Said at 2:00 AM before train departure · Delivered with 100% smug confidence',
-        eventDate: '2024-10-15',
-        sentimentTag: 'FUNNY',
-        status: 'APPROVED',
-      },
-      {
-        id: 'node_2',
-        category: 'FOOD',
-        title: 'Biryani vs Pulao Group Chat Civil War',
-        contextSnippet: '600-word heated thesis in WhatsApp · 22 voice notes exchanged',
-        eventDate: '2024-08-12',
-        sentimentTag: 'CHAOTIC',
-        status: 'APPROVED',
-      },
-      {
-        id: 'node_3',
-        category: 'RUNNING_JOKES',
-        title: 'The "5 Minutes Away" Legend',
-        contextSnippet: 'Texting "Just entering parking" while still getting ready at home',
-        eventDate: '2024-11-04',
-        sentimentTag: 'ROAST',
-        status: 'APPROVED',
-      },
-      {
-        id: 'node_4',
-        category: 'PLACES',
-        title: 'Beach Shack 3 AM Sand Search',
-        contextSnippet: '4 flashlights looking for the scooter key that was in their own pocket',
-        eventDate: '2024-10-16',
-        sentimentTag: 'NOSTALGIC',
-        status: 'APPROVED',
-      },
-      {
-        id: 'node_5',
-        category: 'SONGS',
-        title: 'Ilahi Sing-Along in Rented Dzire',
-        contextSnippet: 'Everyone hitting the high pitch completely out of tune',
-        eventDate: '2024-10-17',
-        sentimentTag: 'EMOTIONAL',
-        status: 'PENDING_APPROVAL',
-      },
-    ];
+    return [];
   }
 
   getDefaultWeeklyMission() {
@@ -199,7 +153,11 @@ class ReactiveStore {
             parsed.friendRequests = { incoming: [], outgoing: [] };
           }
           if (!parsed.customGameDeck) parsed.customGameDeck = [];
-          if (!parsed.vaultMemories) parsed.vaultMemories = [];
+          if (!parsed.vaultMemories) {
+            parsed.vaultMemories = [];
+          } else {
+            parsed.vaultMemories = parsed.vaultMemories.filter((m) => !['s_lore_1', 's_lore_2', 's_lore_3'].includes(m.id));
+          }
           if (!parsed.memoryGraphNodes) parsed.memoryGraphNodes = this.getDefaultMemoryGraphNodes();
           if (!parsed.weeklyMission) parsed.weeklyMission = this.getDefaultWeeklyMission();
           if (typeof parsed.userSparks !== 'number') parsed.userSparks = 750;
@@ -789,6 +747,14 @@ class ReactiveStore {
     const customGameDeck = [newGameCard, ...(this.state.customGameDeck || [])];
     this.setState({ vaultMemories, customGameDeck });
     return newMem;
+  }
+
+  deleteCustomMemory(id) {
+    const vaultMemories = (this.state.vaultMemories || []).filter((m) => m.id !== id);
+    const customGameDeck = (this.state.customGameDeck || []).filter((c) => c.id !== id);
+    const duoWhisperNotes = (this.state.duoWhisperNotes || []).filter((w) => w.id !== id);
+    const duoVoiceNotes = (this.state.duoVoiceNotes || []).filter((v) => v.id !== id);
+    this.setState({ vaultMemories, customGameDeck, duoWhisperNotes, duoVoiceNotes });
   }
 
   // Sparks & Store Economy Methods

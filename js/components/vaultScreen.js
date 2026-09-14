@@ -12,53 +12,13 @@ import { renderVaultUpload, bindVaultUploadEvents } from './uploadVaultInteracti
 let confetti = null;
 let activeVaultCategory = 'ALL'; // 'ALL' | 'QUOTES' | 'AUDIO' | 'CAPSULES'
 
-// Authentic Squad Lore Starter Examples (No fake photo duplicates!)
-const SAMPLE_VAULT_LORE = [
-  {
-    id: 's_lore_1',
-    category: 'QUOTES',
-    type: 'INSIDE JOKE',
-    title: 'The 3 AM Electric Kettle Incident',
-    quote: 'Who boiled water in the hotel kettle with Maggi masala already inside and blew the entire cottage fuse?',
-    author: 'Harshal',
-    timestamp: 'Trip Archive',
-    badge: 'Ready for Live Game',
-    badgeColor: 'text-amber-gold border-amber-gold/30',
-  },
-  {
-    id: 's_lore_2',
-    category: 'AUDIO',
-    type: 'VOICE NOTE',
-    title: 'Ghats Road Trip Singalong',
-    quote: '15-second voice memo recorded at midnight screaming 90s Bollywood tracks with the windows down.',
-    author: 'Priya',
-    timestamp: 'Lonavala Drive',
-    badge: 'Voice Memo',
-    badgeColor: 'text-mint-green border-mint-green/30',
-    duration: '0:18',
-  },
-  {
-    id: 's_lore_3',
-    category: 'CAPSULES',
-    type: 'TIME CAPSULE',
-    title: 'Goa Reunion Pact 2027',
-    quote: 'Sealed squad pact: Nobody checks work email or Slack until Monday 9 AM or pays ₹1,000 fine into the squad pizza fund.',
-    author: 'Room Campers',
-    timestamp: 'Locked until Oct 2027',
-    badge: 'Time Locked',
-    badgeColor: 'text-sunset-coral border-sunset-coral/30',
-    isLocked: true,
-    unlockDate: 'Oct 24, 2027',
-  },
-];
-
 export function renderVaultScreen() {
   const state = store.getState();
   const room = state.activeRoom || { roomCode: 'BONDFIRE', podName: 'Our Squad' };
   const user = state.currentUser;
   const userName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'You';
 
-  // Dynamic User Memories Aggregated from Store
+  // Dynamic User Memories Aggregated from Store (100% Real User Lore - Zero Mock Data)
   const userCustomMemories = (state.vaultMemories || []).map((m) => ({
     ...m,
     category: m.isTimeCapsule ? 'CAPSULES' : (m.category === 'AUDIO' ? 'AUDIO' : 'QUOTES'),
@@ -103,8 +63,8 @@ export function renderVaultScreen() {
     ...squadCards,
   ];
 
-  // Combine with starter lore if user has few entries
-  const displayedItems = allDynamicMemories.length > 0 ? allDynamicMemories : SAMPLE_VAULT_LORE;
+  // 100% Real User Lore — Zero hardcoded mock items!
+  const displayedItems = allDynamicMemories;
 
   const filteredMemories = displayedItems.filter((m) => {
     if (activeVaultCategory === 'ALL') return true;
@@ -298,34 +258,43 @@ export function renderVaultScreen() {
                   <span>From: <strong class="text-white">${m.author || userName}</strong></span>
                 </span>
 
-                ${m.isLocked ? `
-                  <span class="text-[11px] font-mono text-sunset-coral flex items-center gap-1 font-bold">
-                    <span class="material-symbols-outlined text-[14px]">timer</span>
-                    <span>Sealed</span>
-                  </span>
-                ` : `
-                  <button class="btn-vault-play-in-game text-amber-gold hover:text-sunset-coral font-bold transition-colors flex items-center gap-1 text-xs" data-title="${m.title || 'Memory'}" data-quote="${m.quote || ''}" data-author="${m.author || userName}">
-                    <span>Play in Live Game</span>
-                    <span class="material-symbols-outlined text-[14px]">sports_esports</span>
+                <div class="flex items-center gap-2">
+                  ${m.isLocked ? `
+                    <span class="text-[11px] font-mono text-sunset-coral flex items-center gap-1 font-bold">
+                      <span class="material-symbols-outlined text-[14px]">timer</span>
+                      <span>Sealed</span>
+                    </span>
+                  ` : `
+                    <button class="btn-vault-play-in-game text-amber-gold hover:text-sunset-coral font-bold transition-colors flex items-center gap-1 text-xs cursor-pointer" data-title="${m.title || 'Memory'}" data-quote="${m.quote || ''}" data-author="${m.author || userName}">
+                      <span>Play in Live Game</span>
+                      <span class="material-symbols-outlined text-[14px]">sports_esports</span>
+                    </button>
+                  `}
+                  <button class="btn-vault-delete-entry text-gray-500 hover:text-rose-400 transition-colors p-1 rounded-lg cursor-pointer" data-id="${m.id}" title="Remove entry from Vault">
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
                   </button>
-                `}
+                </div>
               </div>
             </div>
           `).join('')}
         </div>
       ` : `
-        <div class="p-8 rounded-3xl bg-surface border-2 border-dashed border-amber-gold/30 text-center flex flex-col items-center justify-center gap-3 mb-8">
-          <div class="w-16 h-16 rounded-2xl bg-amber-gold/15 text-amber-gold flex items-center justify-center border border-amber-gold/30">
+        <div class="p-8 sm:p-12 rounded-3xl bg-surface/60 border-2 border-dashed border-border hover:border-amber-gold/40 text-center flex flex-col items-center justify-center gap-4 mb-10 transition-all backdrop-blur-sm">
+          <div class="w-16 h-16 rounded-2xl bg-amber-gold/15 text-amber-gold flex items-center justify-center border border-amber-gold/30 shadow-[0_0_20px_rgba(255,183,3,0.15)]">
             <span class="material-symbols-outlined text-3xl">inventory_2</span>
           </div>
-          <h3 class="font-display text-lg font-bold text-white">No entries found in this category</h3>
-          <p class="text-xs text-gray-300 max-w-sm leading-relaxed">
-            Archive your squad inside jokes, voice notes, or seal a time capsule to keep your squad lore alive forever.
-          </p>
-          <button id="btn-empty-add-memory" class="mt-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-[16px]">add_circle</span>
-            <span>+ Add to Squad Vault</span>
-          </button>
+          <div class="space-y-1.5 max-w-md">
+            <h3 class="font-display text-lg sm:text-xl font-bold text-white">No Lore Archived in Vault Yet</h3>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              Your squad vault is private and waiting for your real memories. Add an inside joke, record a voice note, or seal a time capsule below — Bondfire will encrypt them and auto-generate live trivia rounds!
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button id="btn-empty-add-memory" class="px-6 py-3 rounded-full bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">add_circle</span>
+              <span>+ Add Inside Joke or Quote</span>
+            </button>
+          </div>
         </div>
       `}
 
@@ -527,6 +496,21 @@ export function bindVaultEvents() {
         store.setView('ARCADE');
         window.location.hash = '#/ARCADE';
       }, 700);
+    });
+  });
+
+  // Delete memory button -> removes from store and re-renders
+  const deleteBtns = document.querySelectorAll('.btn-vault-delete-entry');
+  deleteBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playTick();
+      const id = btn.dataset.id;
+      if (id) {
+        store.deleteCustomMemory(id);
+        showVaultToast('Entry removed from Vault');
+        store.setView('MEMORIES');
+      }
     });
   });
 }
