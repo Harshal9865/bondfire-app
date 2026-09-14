@@ -93,5 +93,20 @@ assert(appCode.includes('sessionStorage.getItem(\'bondfire_session_started\')'),
 assert(appCode.includes('targetView = resolvedHash'), 'app.js must preserve active hash view during refresh/reload');
 console.log('  ✅ PASS: app.js preserves active view on refresh and avoids unwanted gate redirection');
 
-console.log('\n🎉 All 10 Cyberpunk Sanctuary Gateway & Clean Navbar tests passed successfully!\n');
+// 11. Validate screen-size responsive gate image sizing & real-time viewport adaptation
+assert(gateScreenCode.includes('cyber-gate-scene-backdrop'), 'gateScreen.js must mount responsive backdrop container');
+assert(gateScreenCode.includes('cyber-gate-ambient-glow'), 'gateScreen.js must include ambient glow layer');
+assert(gateScreenCode.includes('cyber-gate-dynamic-frame'), 'gateScreen.js must mount dynamic frame');
+assert(gateScreenCode.includes('cyber-gate-responsive-img'), 'gateScreen.js must render responsive gate image');
+assert(gateScreenCode.includes('btn-gate-screen-fit'), 'gateScreen.js must include screen fit toggle button');
+assert(gateScreenCode.includes('updateGateImageSizing'), 'gateScreen.js must implement updateGateImageSizing()');
+assert(gateScreenCode.includes("addEventListener('resize', updateGateImageSizing"), 'gateScreen.js must bind resize event listener');
+assert(cssCode.includes('.cyber-gate-scene-backdrop'), 'css must define .cyber-gate-scene-backdrop');
+assert(cssCode.includes('.cyber-gate-responsive-img'), 'css must define .cyber-gate-responsive-img');
+assert(cssCode.includes('@media (max-width: 640px)'), 'css must define mobile responsive sizing for gate image');
+assert(cssCode.includes('@media (min-aspect-ratio: 21/9)'), 'css must define ultrawide responsive framing for gate image');
+console.log('  ✅ PASS: gateScreen.js and css/components.css implement screen-size responsive gate image sizing');
+
+console.log('\n🎉 All 11 Cyberpunk Sanctuary Gateway & Clean Navbar tests passed successfully!\n');
+
 

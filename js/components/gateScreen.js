@@ -12,8 +12,23 @@ export function renderGateScreen() {
   return `
     <div id="cyber-gate-screen" class="cyber-gate-universe select-none notranslate" translate="no">
       
-      <!-- Authentic Cyberpunk Torii Paifang 3D Scene Backdrop -->
-      <div class="absolute inset-0 bg-cover bg-center sm:bg-bottom bg-no-repeat pointer-events-none z-0" style="background-image: url('assets/cyber_gate_scene.jpg');"></div>
+      <!-- Authentic Cyberpunk Torii Paifang 3D Scene Backdrop (Adaptive Screen Resizing) -->
+      <div class="cyber-gate-scene-backdrop absolute inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center" id="cyber-gate-scene-container" data-fit-mode="AUTO">
+        <!-- Ambient Neon Glow & Color Bleed (Eliminates Letterbox Artifacts across all screen sizes) -->
+        <div class="cyber-gate-ambient-glow absolute inset-0 bg-cover bg-center filter blur-3xl opacity-40 scale-110 pointer-events-none" style="background-image: url('assets/cyber_gate_scene.jpg');"></div>
+        
+        <!-- Primary Responsive Gate Scene (Dynamic Auto-Scaling to Screen Size & Aspect Ratio) -->
+        <div id="cyber-gate-dynamic-frame" class="cyber-gate-dynamic-frame absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 ease-out">
+          <img 
+            id="cyber-gate-scene-img" 
+            src="assets/cyber_gate_scene.jpg" 
+            alt="Cyberpunk Sanctuary Gate Scene" 
+            class="cyber-gate-responsive-img w-full h-full object-cover transition-all duration-500 ease-out select-none pointer-events-none"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      </div>
       
       <!-- Cinematic Atmospheric Darkness & Vignette Gradients -->
       <div class="absolute inset-0 bg-gradient-to-t from-[#080B14] via-[#080B14]/30 to-[#080B14]/85 pointer-events-none z-1"></div>
@@ -49,6 +64,12 @@ export function renderGateScreen() {
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Screen Fit Mode Toggle (Auto Fit / Full Arch / Cinematic Cover) -->
+          <button id="btn-gate-screen-fit" class="px-2.5 sm:px-3 py-1.5 rounded-full bg-[#10131c]/80 hover:bg-[#1f2538] border border-cyan-400/40 hover:border-cyan-400 text-cyan-300 hover:text-white text-xs font-mono transition-all duration-200 flex items-center gap-1.5 cursor-pointer backdrop-blur-sm shadow-md" title="Adapt Gate Image Sizing (Auto Fit / Full Arch / Cinematic Cover)">
+            <span class="material-symbols-outlined text-[14px]">aspect_ratio</span>
+            <span id="gate-fit-label" class="text-[10px] sm:text-[11px] font-bold">AUTO FIT</span>
+          </button>
+
           <!-- Overdrive Surge Control -->
           <button id="btn-gate-overdrive" class="px-3 py-1.5 rounded-full bg-[#10131c]/80 hover:bg-[#1f2538] border border-amber-gold/40 hover:border-amber-gold text-amber-gold hover:text-white text-xs font-mono transition-all duration-200 flex items-center gap-1.5 cursor-pointer backdrop-blur-sm shadow-md" title="Surge Quantum Energy">
             <span class="material-symbols-outlined text-[14px] animate-spin">bolt</span>
@@ -378,4 +399,89 @@ export function bindGateScreenEvents() {
       triggerEnterSequence('#/YEARBOOK', 'YEARBOOK');
     });
   }
+
+  // ==============================================================================
+  // DYNAMIC SCREEN-SIZE RESPONSIVE GATE IMAGE CALIBRATION
+  // Calculates live aspect ratio and dynamically positions & scales the 3D scene
+  // so the iconic Torii archway and glowing portal are visible without aggressive cuts
+  // ==============================================================================
+  const updateGateImageSizing = () => {
+    const screenEl = document.getElementById('cyber-gate-screen');
+    const containerEl = document.getElementById('cyber-gate-scene-container');
+    const imgEl = document.getElementById('cyber-gate-scene-img');
+    const fitLabel = document.getElementById('gate-fit-label');
+    if (!screenEl || !containerEl || !imgEl) return;
+
+    const vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+    const vh = window.innerHeight || document.documentElement.clientHeight || 768;
+    const aspect = vw / Math.max(vh, 1);
+    const fitMode = containerEl.getAttribute('data-fit-mode') || 'AUTO';
+
+    screenEl.setAttribute('data-screen-aspect', aspect < 0.88 ? 'portrait' : (aspect > 2.05 ? 'ultrawide' : 'landscape'));
+    screenEl.style.setProperty('--gate-vw', `${vw}px`);
+    screenEl.style.setProperty('--gate-vh', `${vh}px`);
+    screenEl.style.setProperty('--gate-aspect', aspect.toFixed(3));
+
+    if (fitMode === 'ARCH') {
+      // Full Arch containment mode: guarantees 100% of the Torii arch and pagoda roof eaves are visible
+      imgEl.style.objectFit = 'contain';
+      imgEl.style.objectPosition = 'center center';
+      imgEl.style.transform = aspect < 1.0 ? 'scale(1.02)' : 'scale(1.0)';
+      if (fitLabel) fitLabel.textContent = 'FULL ARCH';
+    } else if (fitMode === 'COVER') {
+      // Cinematic Cover mode: fills entire viewport edge-to-edge
+      imgEl.style.objectFit = 'cover';
+      imgEl.style.objectPosition = aspect < 1.0 ? 'center 38%' : 'center bottom';
+      imgEl.style.transform = 'scale(1.05)';
+      if (fitLabel) fitLabel.textContent = 'COVER';
+    } else {
+      // AUTO FIT mode: smart responsive resizing according to exact screen width & aspect ratio
+      if (fitLabel) fitLabel.textContent = 'AUTO FIT';
+      if (aspect < 0.65) {
+        // Ultra-tall mobile phone (e.g. iPhone 14/15, Samsung Galaxy, Pixel portrait)
+        imgEl.style.objectFit = 'cover';
+        imgEl.style.objectPosition = 'center 34%';
+        imgEl.style.transform = 'scale(1.08)';
+      } else if (aspect < 0.95) {
+        // Standard phone & tablet portrait
+        imgEl.style.objectFit = 'cover';
+        imgEl.style.objectPosition = 'center 38%';
+        imgEl.style.transform = 'scale(1.04)';
+      } else if (aspect > 2.1) {
+        // Ultrawide screen (21:9 or greater)
+        imgEl.style.objectFit = 'cover';
+        imgEl.style.objectPosition = 'center 50%';
+        imgEl.style.transform = 'scale(1.0)';
+      } else {
+        // Standard 16:9 / 16:10 desktop or laptop
+        imgEl.style.objectFit = 'cover';
+        imgEl.style.objectPosition = 'center bottom';
+        imgEl.style.transform = 'scale(1.0)';
+      }
+    }
+  };
+
+  // Run initial calculation immediately
+  updateGateImageSizing();
+
+  // Listen for screen resize, orientation changes, and window zoom
+  window.addEventListener('resize', updateGateImageSizing, { passive: true });
+  window.addEventListener('orientationchange', updateGateImageSizing, { passive: true });
+
+  // Handle screen fit mode toggle button (AUTO FIT -> FULL ARCH -> COVER)
+  const fitBtn = document.getElementById('btn-gate-screen-fit');
+  if (fitBtn) {
+    const modes = ['AUTO', 'ARCH', 'COVER'];
+    fitBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playLedTick();
+      const containerEl = document.getElementById('cyber-gate-scene-container');
+      if (!containerEl) return;
+      const currentMode = containerEl.getAttribute('data-fit-mode') || 'AUTO';
+      const nextIndex = (modes.indexOf(currentMode) + 1) % modes.length;
+      containerEl.setAttribute('data-fit-mode', modes[nextIndex]);
+      updateGateImageSizing();
+    });
+  }
 }
+
