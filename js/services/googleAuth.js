@@ -27,9 +27,11 @@ export class GoogleAuthService {
     if (typeof window !== 'undefined' && window.google && window.google.accounts && document.getElementById(elementId)) {
       try {
         const container = document.getElementById(elementId);
-        // Calculate responsive button width: 220px on small mobile up to 360px on tablet/desktop
-        const screenWidth = window.innerWidth || 360;
-        const targetWidth = Math.min(Math.max(screenWidth - 72, 220), 360);
+        container.innerHTML = '';
+        
+        // Calculate responsive button width matching modal inner layout
+        const containerWidth = container.parentElement?.clientWidth || window.innerWidth - 64;
+        const targetWidth = Math.min(Math.max(containerWidth - 8, 240), 380);
 
         window.google.accounts.id.renderButton(
           container,
@@ -43,6 +45,14 @@ export class GoogleAuthService {
             logo_alignment: 'left',
           }
         );
+
+        // Hide redundant fallback button when official GSI button renders cleanly
+        setTimeout(() => {
+          if (container.children.length > 0) {
+            const fallbackBtn = document.getElementById('btn-google-auth-trigger');
+            if (fallbackBtn) fallbackBtn.classList.add('hidden');
+          }
+        }, 100);
       } catch (e) {
         console.warn('Google renderButton notice:', e);
       }

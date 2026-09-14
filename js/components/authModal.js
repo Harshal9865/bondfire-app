@@ -87,23 +87,23 @@ function renderAuthModalMarkup(reason) {
         </div>
 
         <!-- Google Identity Services (GSI) Button & Native Chooser -->
-        <div class="relative z-10 flex flex-col items-center gap-2 mb-4">
-          <div id="google-official-btn-container" class="w-full flex justify-center min-h-[44px] overflow-hidden rounded-full p-[1px] bg-gradient-to-r from-white/15 via-white/5 to-white/15 shadow-sm"></div>
+        <div class="relative z-10 flex flex-col items-center gap-2 mb-4 w-full">
+          <div id="google-official-btn-container" class="w-full flex justify-center items-center min-h-[44px]"></div>
           
-          <button type="button" id="btn-google-auth-trigger" class="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-gold/40 text-gray-200 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer">
-            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+          <button type="button" id="btn-google-auth-trigger" class="w-full py-3 px-4 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 hover:border-sunset-coral/50 text-white text-xs font-bold flex items-center justify-center gap-2.5 shadow-md transition-all active:scale-[0.98] cursor-pointer group">
+            <svg class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <span>One-Click Google Sign In / Switch Account</span>
+            <span>Continue with Google</span>
           </button>
         </div>
 
         <div class="relative z-10 flex items-center gap-3 mb-4">
           <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/15"></div>
-          <span class="text-[9.5px] uppercase font-mono text-gray-400 font-bold tracking-widest">Or Email Magic Link</span>
+          <span class="text-[9.5px] uppercase font-mono text-gray-400 font-bold tracking-widest">Or Email Credentials</span>
           <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/15"></div>
         </div>
 
@@ -126,10 +126,16 @@ function renderAuthModalMarkup(reason) {
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10.5px] font-bold text-gray-400 uppercase tracking-wider block">Passkey or Password</label>
+            <div class="flex items-center justify-between">
+              <label class="text-[10.5px] font-bold text-gray-400 uppercase tracking-wider block">Passkey or Password</label>
+              <button type="button" id="btn-forgot-password" class="text-[10px] text-sunset-coral hover:underline font-mono">Forgot?</button>
+            </div>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-500">key</span>
-              <input type="password" id="auth-pass-input" required value="" placeholder="Secret passphrase" class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#0B0E17]/80 border border-white/10 focus:border-sunset-coral focus:ring-2 focus:ring-sunset-coral/20 text-sm text-white placeholder:text-gray-600 focus:outline-none transition-all" />
+              <input type="password" id="auth-pass-input" required value="" placeholder="Secret passphrase" class="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#0B0E17]/80 border border-white/10 focus:border-sunset-coral focus:ring-2 focus:ring-sunset-coral/20 text-sm text-white placeholder:text-gray-600 focus:outline-none transition-all" />
+              <button type="button" id="btn-toggle-password-visibility" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 transition-colors cursor-pointer" title="Toggle password visibility">
+                <span class="material-symbols-outlined text-[18px]" id="password-visibility-icon">visibility</span>
+              </button>
             </div>
           </div>
 
@@ -195,6 +201,42 @@ function bindAuthModalEvents() {
         closeAuthModal();
         store.setView('PROFILE');
       }
+    });
+  }
+
+  // Password Visibility Toggle
+  const togglePassBtn = document.getElementById('btn-toggle-password-visibility');
+  const passInput = document.getElementById('auth-pass-input');
+  const passIcon = document.getElementById('password-visibility-icon');
+  if (togglePassBtn && passInput && passIcon) {
+    togglePassBtn.addEventListener('click', () => {
+      const isPassword = passInput.type === 'password';
+      passInput.type = isPassword ? 'text' : 'password';
+      passIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+    });
+  }
+
+  // Forgot Password Handler
+  const forgotBtn = document.getElementById('btn-forgot-password');
+  if (forgotBtn) {
+    forgotBtn.addEventListener('click', () => {
+      audio.playClick();
+      const emailInput = document.getElementById('auth-email-input');
+      const email = emailInput?.value.trim();
+      if (!email) {
+        if (emailInput) {
+          emailInput.focus();
+          emailInput.placeholder = 'Enter email to reset password';
+          emailInput.classList.add('ring-2', 'ring-sunset-coral');
+          setTimeout(() => emailInput.classList.remove('ring-2', 'ring-sunset-coral'), 2000);
+        }
+        return;
+      }
+      const sb = getSupabase();
+      if (sb) {
+        sb.auth.resetPasswordForEmail(email);
+      }
+      alert(`Password reset link sent to ${email} if registered.`);
     });
   }
 

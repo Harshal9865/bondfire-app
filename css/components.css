@@ -1662,4 +1662,30 @@ body[data-theme-accent="VIOLET_DREAM"] {
   transition: all 0.3s ease;
 }
 
+/* ==============================================================================
+   AUTH MODAL & GOOGLE IDENTITY SERVICES POLISH
+   ============================================================================== */
+#google-official-btn-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 44px;
+  position: relative;
+  overflow: visible !important;
+}
+
+#google-official-btn-container iframe {
+  margin: 0 auto !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#google-official-btn-container iframe:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+
 
