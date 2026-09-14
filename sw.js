@@ -1,9 +1,9 @@
 // ==============================================================================
-// BONDFIRE SERVICE WORKER (v23)
+// BONDFIRE SERVICE WORKER (v24)
 // Network-first for dynamic code and navigation, with resilient offline fallback
 // ==============================================================================
 
-const CACHE_NAME = 'bondfire-v23';
+const CACHE_NAME = 'bondfire-v24';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -24,6 +24,7 @@ const PRECACHE_ASSETS = [
   '/js/visuals/audioSynth.js',
   '/js/visuals/confetti.js',
   '/js/services/webrtcService.js',
+  '/assets/cyber_gate_scene.jpg',
 ];
 
 self.addEventListener('install', (event) => {
