@@ -1093,67 +1093,95 @@ body[data-view="GATE"] #spotify-jukebox-container,
 .cyber-tilt-card {
   position: relative;
   border-radius: 18px;
-  background: rgba(14, 18, 30, 0.82);
-  backdrop-filter: blur(16px);
+  background: rgba(14, 18, 30, 0.88);
+  backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 1rem 0.9rem;
   text-align: left;
   cursor: pointer;
   transform-style: preserve-3d;
-  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s ease, border-color 0.28s ease;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  will-change: transform, box-shadow;
+}
+
+/* Individual Gate Destination Themes */
+.cyber-tilt-card[data-card="duo"] {
+  --gate-card-color: #38bdf8;
+  --gate-card-glow: rgba(56, 189, 248, 0.4);
+}
+.cyber-tilt-card[data-card="squad"] {
+  --gate-card-color: #ff5a5f;
+  --gate-card-glow: rgba(255, 90, 95, 0.45);
+}
+.cyber-tilt-card[data-card="desi"] {
+  --gate-card-color: #ffb703;
+  --gate-card-glow: rgba(255, 183, 3, 0.4);
+}
+.cyber-tilt-card[data-card="vault"] {
+  --gate-card-color: #c084fc;
+  --gate-card-glow: rgba(192, 132, 252, 0.4);
 }
 
 .cyber-tilt-card:hover {
-  border-color: rgba(255, 183, 3, 0.6);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 90, 95, 0.35);
+  border-color: var(--gate-card-color, rgba(255, 183, 3, 0.75));
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 28px var(--gate-card-glow, rgba(255, 90, 95, 0.35)), inset 0 0 14px rgba(255, 255, 255, 0.04);
 }
 
-/* Holographic Foil Reflection Sheen */
-.cyber-card-foil {
+/* Soft Ambient Hearth Glow Layer */
+.cyber-card-glow-layer {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--foil-x, 50%) var(--foil-y, 50%), rgba(255, 255, 255, 0.22) 0%, transparent 65%);
-  pointer-events: none;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 0%, var(--gate-card-glow, rgba(255, 90, 95, 0.35)), transparent 72%);
   opacity: 0;
-  transition: opacity 0.3s ease;
-  mix-blend-mode: overlay;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cyber-tilt-card:hover .cyber-card-glow-layer {
+  opacity: 0.38;
+}
+
+/* Sleek Cyber Neon Top Lightbar */
+.cyber-card-lightbar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 75%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gate-card-color, #ff5a5f), transparent);
+  box-shadow: 0 0 12px var(--gate-card-color, #ff5a5f);
+  border-radius: 2px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  opacity: 0;
+  pointer-events: none;
   z-index: 5;
 }
 
-.cyber-tilt-card:hover .cyber-card-foil {
+.cyber-tilt-card:hover .cyber-card-lightbar {
+  transform: translateX(-50%) scaleX(1);
   opacity: 1;
 }
 
-/* Rotating Neon Border Runner */
-.cyber-tilt-card::after {
-  content: '';
+/* Clean Holographic Foil Sheen (Preserved for compatibility) */
+.cyber-card-foil {
   position: absolute;
-  inset: -1px;
-  border-radius: 19px;
-  background: conic-gradient(from var(--border-angle, 0deg), transparent 70%, #ff5a5f 85%, #ffb703 95%, transparent 100%);
+  inset: 0;
+  background: radial-gradient(circle at var(--foil-x, 50%) var(--foil-y, 50%), var(--gate-card-glow, rgba(255, 255, 255, 0.15)) 0%, transparent 65%);
   pointer-events: none;
-  z-index: 2;
   opacity: 0;
   transition: opacity 0.3s ease;
+  mix-blend-mode: screen;
+  z-index: 1;
 }
 
-.cyber-tilt-card:hover::after {
-  opacity: 1;
-  animation: rotateBorder 3s linear infinite;
-}
-
-@property --border-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes rotateBorder {
-  to {
-    --border-angle: 360deg;
-  }
+.cyber-tilt-card:hover .cyber-card-foil {
+  opacity: 0.25;
 }
 
 /* Cyber Decals & Corner Brackets */
@@ -1163,8 +1191,12 @@ body[data-view="GATE"] #spotify-jukebox-container,
   left: 4px;
   width: 6px;
   height: 6px;
-  border-top: 1.5px solid #ff5a5f;
-  border-left: 1.5px solid #ff5a5f;
+  border-top: 1.5px solid var(--gate-card-color, #ff5a5f);
+  border-left: 1.5px solid var(--gate-card-color, #ff5a5f);
+  opacity: 0.35;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .cyber-card-corner-br {
@@ -1173,8 +1205,22 @@ body[data-view="GATE"] #spotify-jukebox-container,
   right: 4px;
   width: 6px;
   height: 6px;
-  border-bottom: 1.5px solid #ffb703;
-  border-right: 1.5px solid #ffb703;
+  border-bottom: 1.5px solid var(--gate-card-color, #ffb703);
+  border-right: 1.5px solid var(--gate-card-color, #ffb703);
+  opacity: 0.35;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.cyber-tilt-card:hover .cyber-card-corner-tl {
+  opacity: 1;
+  transform: translate(-1.5px, -1.5px);
+}
+
+.cyber-tilt-card:hover .cyber-card-corner-br {
+  opacity: 1;
+  transform: translate(1.5px, 1.5px);
 }
 
 /* Gate Entering Sequence (Dimensional Warp) */
