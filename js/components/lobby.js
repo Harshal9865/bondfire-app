@@ -78,8 +78,11 @@ export const ROOM_TEMPLATES = [
 
 export function renderLobby() {
   const state = store.getState();
-  const room = state.activeRoom;
   const user = state.currentUser;
+  let room = state.activeRoom;
+  if (!room) {
+    room = store.createNewRoom();
+  }
   const hostName = (user && user.isLoggedIn && user.displayName) ? user.displayName.split(' ')[0] : 'Host';
   const currentTemplate = ROOM_TEMPLATES.find((t) => t.id === (room.roomTemplate || 'SQUAD_NIGHT')) || ROOM_TEMPLATES[0];
 

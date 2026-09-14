@@ -71,6 +71,8 @@ class BondfireApp {
           reg.update();
         })
         .catch((err) => console.warn('PWA Service Worker registration warning:', err));
+    }
+
     // 4b. Mount Global Campfire Jukebox
     const jukeboxMount = document.getElementById('jukebox-mount');
     if (jukeboxMount) {
