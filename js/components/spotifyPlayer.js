@@ -65,7 +65,7 @@ export function renderSpotifyJukebox() {
 
   return `
     <!-- Floating Campfire Jukebox Widget (Full Song Player) -->
-    <div id="spotify-jukebox-container" class="fixed bottom-[74px] sm:bottom-[78px] md:bottom-6 right-3 sm:right-5 z-40 md:z-50 flex flex-col items-end pointer-events-auto">
+    <div id="spotify-jukebox-container" class="fixed bottom-[104px] sm:bottom-[108px] md:bottom-6 right-3 sm:right-5 z-40 md:z-50 flex flex-col items-end pointer-events-auto">
       
       <!-- Collapsible Jukebox Panel -->
       <div id="spotify-jukebox-modal" class="w-[calc(100vw-24px)] max-w-sm sm:w-96 rounded-3xl bg-[#0e121e]/95 backdrop-blur-2xl border-2 border-amber-gold/50 shadow-2xl p-3.5 sm:p-4 mb-2 flex flex-col gap-3 transition-all duration-300 max-h-[72vh] overflow-y-auto ${isJukeboxOpen ? '' : 'hidden'}">

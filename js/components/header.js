@@ -700,6 +700,7 @@ export function bindHeaderEvents() {
   const hideBottomNav = () => {
     if (!bottomNav) return;
     bottomNav.classList.add('nav-hidden');
+    document.body.classList.add('has-nav-hidden');
     if (restoreNavBtn) {
       restoreNavBtn.classList.remove('hidden');
       restoreNavBtn.classList.add('flex');
@@ -709,6 +710,7 @@ export function bindHeaderEvents() {
   const showBottomNav = () => {
     if (!bottomNav) return;
     bottomNav.classList.remove('nav-hidden');
+    document.body.classList.remove('has-nav-hidden');
     if (restoreNavBtn) {
       restoreNavBtn.classList.add('hidden');
       restoreNavBtn.classList.remove('flex');

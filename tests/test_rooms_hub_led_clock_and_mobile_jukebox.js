@@ -36,8 +36,8 @@ function test(name, fn) {
 test('spotifyPlayer.js elevates jukebox container above mobile bottom navigation bar', () => {
   const jukeboxHtml = renderSpotifyJukebox();
   assert.ok(
-    jukeboxHtml.includes('bottom-[74px]') || jukeboxHtml.includes('bottom-[78px]') || jukeboxHtml.includes('bottom-[80px]'),
-    'Jukebox container must be elevated above mobile dock (~68px) to prevent overlapping bottom menu'
+    jukeboxHtml.includes('bottom-[104px]') || jukeboxHtml.includes('bottom-[108px]') || jukeboxHtml.includes('bottom-[110px]'),
+    'Jukebox container must be elevated above mobile dock (~90px) and hide button to prevent overlap'
   );
   assert.ok(jukeboxHtml.includes('hidden sm:inline'), 'Text label must be compact on small mobile screens');
   assert.ok(jukeboxHtml.includes('w-[calc(100vw-24px)]'), 'Jukebox modal must fit cleanly on mobile screens');
