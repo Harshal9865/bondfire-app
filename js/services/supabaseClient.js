@@ -342,7 +342,42 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
       console.log('⚡ [Supabase Broadcast Received]', payload);
       if (!payload || !store) return;
 
-      if (payload.action === 'START_GAME') {
+      if (payload.action === 'START_COUNTDOWN') {
+        const currentRoom = store.getState().activeRoom;
+        const targetMode = payload.gameMode || currentRoom?.selectedGameMode || 'SQUAD';
+
+        // Pre-configure game state on camper device
+        store.setState({
+          activeRoom: {
+            ...currentRoom,
+            selectedGameMode: targetMode,
+          },
+          activeGame: {
+            ...store.getState().activeGame,
+            mode: targetMode,
+            roundIndex: payload.roundIndex || 1,
+            dynamicDeck: payload.dynamicDeck || store.getState().activeGame?.dynamicDeck,
+            selectedOption: null,
+            isAnswerRevealed: false,
+          },
+        });
+
+        const finalizeCamperCountdown = () => {
+          store.setState({ currentView: 'GAME' });
+          window.location.hash = '#/GAME';
+        };
+
+        // Launch pre-game rules example & countdown on camper devices immediately
+        if (typeof document !== 'undefined' && !document.getElementById('game-countdown-overlay')) {
+          import('../components/gameCountdownOverlay.js').then(({ triggerGameCountdown }) => {
+            triggerGameCountdown({
+              mode: targetMode,
+              title: payload.title || currentRoom?.podName || 'Bondfire Arena',
+              onComplete: finalizeCamperCountdown,
+            });
+          }).catch(finalizeCamperCountdown);
+        }
+      } else if (payload.action === 'START_GAME') {
         const currentRoom = store.getState().activeRoom;
         const targetMode = payload.gameMode || currentRoom?.selectedGameMode || 'RED_FLAG_COURT';
 
@@ -374,6 +409,39 @@ export function syncRealtimeRoom(roomCode, playerInfo = {}) {
           }).catch(finalizeStart);
         } else {
           finalizeStart();
+        }
+      } else if (payload.action === 'START_BOTTLE') {
+        const finalizeBottle = () => {
+          store.setState({ currentView: 'BOTTLE' });
+          window.location.hash = '#/BOTTLE';
+        };
+        if (typeof document !== 'undefined' && !document.getElementById('game-countdown-overlay')) {
+          import('../components/gameCountdownOverlay.js').then(({ triggerGameCountdown }) => {
+            triggerGameCountdown({
+              mode: 'ARCADE',
+              title: payload.title || 'Spin the Bottle',
+              onComplete: finalizeBottle,
+            });
+          }).catch(finalizeBottle);
+        } else {
+          finalizeBottle();
+        }
+      } else if (payload.action === 'START_ARCADE_GAME') {
+        const targetView = payload.view || 'ARCADE';
+        const finalizeArcade = () => {
+          store.setView(targetView);
+          window.location.hash = `#/${targetView}`;
+        };
+        if (typeof document !== 'undefined' && !document.getElementById('game-countdown-overlay')) {
+          import('../components/gameCountdownOverlay.js').then(({ triggerGameCountdown }) => {
+            triggerGameCountdown({
+              mode: payload.mode || 'ARCADE',
+              title: payload.title || 'Arcade Game',
+              onComplete: finalizeArcade,
+            });
+          }).catch(finalizeArcade);
+        } else {
+          finalizeArcade();
         }
       } else if (payload.action === 'SELECT_OPTION') {
         const activeGame = store.getState().activeGame;

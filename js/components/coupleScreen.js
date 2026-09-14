@@ -781,6 +781,11 @@ export function bindCoupleEvents() {
       audio.playClick();
       const activeRoom = store.getState().activeRoom;
 
+      // Broadcast immediately to partner device so both devices run countdown together!
+      import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+        broadcastRoomAction('START_DUO_SESSION', { roomCode: activeRoom?.roomCode });
+      }).catch((e) => console.warn(e));
+
       triggerGameCountdown({
         mode: 'US',
         title: 'Us Mode · Date Night Compatibility',
@@ -788,12 +793,6 @@ export function bindCoupleEvents() {
           store.setState({
             activeRoom: { ...activeRoom, sessionStarted: true },
           });
-
-          // Broadcast to partner device
-          import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
-            broadcastRoomAction('START_DUO_SESSION', { roomCode: activeRoom.roomCode });
-          }).catch((e) => console.warn(e));
-
           store.setView('COUPLE');
         },
       });

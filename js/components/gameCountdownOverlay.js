@@ -238,8 +238,10 @@ const COUNTDOWN_STEPS = [
  */
 export function triggerGameCountdown({ mode = 'SQUAD', title, onComplete, skipExample = false }) {
   const mount = document.getElementById('countdown-mount') || document.body;
-  if (!confettiInstance) {
-    confettiInstance = new ConfettiEngine('confetti-canvas');
+  if (!confettiInstance && typeof ConfettiEngine !== 'undefined') {
+    try {
+      confettiInstance = new ConfettiEngine('confetti-canvas');
+    } catch (_) {}
   }
 
   const exampleData = getExampleForMode(mode, title);
@@ -253,7 +255,26 @@ export function triggerGameCountdown({ mode = 'SQUAD', title, onComplete, skipEx
   overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center select-none overflow-hidden';
   overlay.style.backgroundColor = 'rgba(11, 14, 23, 0.96)';
   overlay.style.backdropFilter = 'blur(20px)';
+  overlay.style.webkitBackdropFilter = 'blur(20px)';
   mount.appendChild(overlay);
+
+  // Persistent Emergency Skip/Close button
+  const emergencyCloseBtn = document.createElement('button');
+  emergencyCloseBtn.id = 'btn-countdown-emergency-close';
+  emergencyCloseBtn.type = 'button';
+  emergencyCloseBtn.className = 'absolute top-4 right-4 z-[120] p-2 sm:p-2.5 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 transition-all flex items-center justify-center cursor-pointer shadow-lg backdrop-blur-md active:scale-95 group';
+  emergencyCloseBtn.title = 'Skip & Jump to Game';
+  emergencyCloseBtn.innerHTML = `
+    <span class="material-symbols-outlined text-lg sm:text-xl group-hover:rotate-90 transition-transform">close</span>
+  `;
+  emergencyCloseBtn.addEventListener('click', () => {
+    try { audio.playClick(); } catch (_) {}
+    overlay.remove();
+    if (typeof onComplete === 'function') {
+      try { onComplete(); } catch (err) { console.error(err); }
+    }
+  });
+  overlay.appendChild(emergencyCloseBtn);
 
   if (skipExample) {
     runExpandingCircleCountdown(overlay, onComplete);
@@ -270,86 +291,90 @@ function renderExampleStage(overlay, exampleData, customTitle, onComplete) {
   const totalSeconds = 5;
   let timerInterval = null;
 
-  overlay.innerHTML = `
-    <div class="relative w-full max-w-lg mx-4 p-5 sm:p-7 rounded-3xl bg-surface border-2 border-amber-gold/50 shadow-2xl flex flex-col gap-4 text-on-surface transform transition-all duration-300 animate-countdown-punch select-none">
-      <!-- Ambient Glow Behind Card -->
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 bg-sunset-coral/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  const cardContainer = document.createElement('div');
+  cardContainer.id = 'countdown-card-container';
+  cardContainer.className = 'relative w-full max-w-lg mx-4 p-5 sm:p-7 rounded-3xl bg-surface border-2 border-amber-gold/50 shadow-2xl flex flex-col gap-4 text-on-surface transform transition-all duration-300 animate-countdown-punch select-none z-[105]';
 
-      <!-- Top Header & Timer Row -->
-      <div class="flex items-center justify-between gap-2">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-[10.5px] font-bold font-mono uppercase tracking-wide">
-          <span class="material-symbols-outlined text-[14px]">tips_and_updates</span>
-          <span>${exampleData.badge}</span>
-        </div>
-        
-        <!-- Normal Countdown Timer Pill -->
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-bright border border-border text-xs font-mono font-bold text-white shrink-0">
-          <span class="w-2 h-2 rounded-full bg-sunset-coral animate-ping"></span>
-          <span>Starts in <strong id="example-timer-count" class="text-sunset-coral font-black">${secondsRemaining}s</strong></span>
-        </div>
-      </div>
+  cardContainer.innerHTML = `
+    <!-- Ambient Glow Behind Card -->
+    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 bg-sunset-coral/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-      <!-- Normal Linear Progress Bar on Example -->
-      <div class="w-full bg-surface-bright/80 rounded-full h-1.5 overflow-hidden border border-border/80">
-        <div id="example-timer-bar" class="h-full bg-gradient-to-r from-sunset-coral via-amber-gold to-duo-rose transition-all duration-1000 ease-linear rounded-full" style="width: 100%;"></div>
+    <!-- Top Header & Timer Row -->
+    <div class="flex items-center justify-between gap-2">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-[10.5px] font-bold font-mono uppercase tracking-wide">
+        <span class="material-symbols-outlined text-[14px]">tips_and_updates</span>
+        <span>${exampleData.badge}</span>
       </div>
+      
+      <!-- Normal Countdown Timer Pill -->
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-bright border border-border text-xs font-mono font-bold text-white shrink-0">
+        <span class="w-2 h-2 rounded-full bg-sunset-coral animate-ping"></span>
+        <span>Starts in <strong id="example-timer-count" class="text-sunset-coral font-black">${secondsRemaining}s</strong></span>
+      </div>
+    </div>
 
-      <!-- Title & Summary -->
-      <div>
-        <h2 class="font-display text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
-          ${customTitle || exampleData.title}
-        </h2>
-        <p class="text-xs sm:text-sm text-gray-300 mt-1 leading-relaxed">
-          ${exampleData.summary}
-        </p>
-      </div>
+    <!-- Normal Linear Progress Bar on Example -->
+    <div class="w-full bg-surface-bright/80 rounded-full h-1.5 overflow-hidden border border-border/80">
+      <div id="example-timer-bar" class="h-full bg-gradient-to-r from-sunset-coral via-amber-gold to-duo-rose transition-all duration-1000 ease-linear rounded-full" style="width: 100%;"></div>
+    </div>
 
-      <!-- Interactive Sample Card Demo -->
-      <div class="p-3.5 sm:p-4 rounded-2xl bg-canvas border border-border/80 flex flex-col gap-2.5">
-        <div class="flex items-center justify-between border-b border-border/50 pb-1.5">
-          <span class="text-[10px] font-mono text-amber-gold uppercase font-bold tracking-wider">${exampleData.sampleCard.tag}</span>
-          <span class="text-[10px] font-mono text-mint-green font-bold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-mint-green"></span>
-            Live Sample
-          </span>
-        </div>
-        <p class="text-xs sm:text-sm text-white font-bold italic leading-snug">
-          “${exampleData.sampleCard.question}”
-        </p>
-        <div class="grid grid-cols-2 gap-2 pt-1" id="example-options-grid">
-          ${exampleData.sampleCard.options.map((opt, idx) => `
-            <button type="button" class="btn-sample-option p-2.5 rounded-xl border text-xs font-medium text-left flex items-center justify-between transition-all cursor-pointer ${idx === exampleData.sampleCard.correctIndex ? 'bg-sunset-coral/20 border-sunset-coral text-white font-bold shadow-sm' : 'bg-surface-bright/60 border-border/60 text-gray-300 hover:bg-surface-bright'}" data-index="${idx}">
-              <span class="truncate">${opt}</span>
-              ${idx === exampleData.sampleCard.correctIndex ? '<span class="material-symbols-outlined text-[14px] text-sunset-coral shrink-0">check_circle</span>' : ''}
-            </button>
-          `).join('')}
-        </div>
-        <div class="text-[10.5px] font-mono text-gray-400 flex items-center gap-1 pt-1">
-          <span class="material-symbols-outlined text-amber-gold text-[14px] shrink-0">electric_bolt</span>
-          <span class="truncate">${exampleData.scoringHint}</span>
-        </div>
-      </div>
+    <!-- Title & Summary -->
+    <div>
+      <h2 class="font-display text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
+        ${customTitle || exampleData.title}
+      </h2>
+      <p class="text-xs sm:text-sm text-gray-300 mt-1 leading-relaxed">
+        ${exampleData.summary}
+      </p>
+    </div>
 
-      <!-- Footer & Action Controls -->
-      <div class="flex items-center justify-between pt-1">
-        <span class="text-[10px] font-mono text-gray-400">Normal timer auto-advances to fullscreen countdown</span>
-        <button id="btn-skip-example" type="button" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-black text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
-          <span>Skip &amp; Start Now</span>
-          <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
-        </button>
+    <!-- Interactive Sample Card Demo -->
+    <div class="p-3.5 sm:p-4 rounded-2xl bg-canvas border border-border/80 flex flex-col gap-2.5">
+      <div class="flex items-center justify-between border-b border-border/50 pb-1.5">
+        <span class="text-[10px] font-mono text-amber-gold uppercase font-bold tracking-wider">${exampleData.sampleCard.tag}</span>
+        <span class="text-[10px] font-mono text-mint-green font-bold flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-mint-green"></span>
+          Live Sample
+        </span>
       </div>
+      <p class="text-xs sm:text-sm text-white font-bold italic leading-snug">
+        “${exampleData.sampleCard.question}”
+      </p>
+      <div class="grid grid-cols-2 gap-2 pt-1" id="example-options-grid">
+        ${exampleData.sampleCard.options.map((opt, idx) => `
+          <button type="button" class="btn-sample-option p-2.5 rounded-xl border text-xs font-medium text-left flex items-center justify-between transition-all cursor-pointer ${idx === exampleData.sampleCard.correctIndex ? 'bg-sunset-coral/20 border-sunset-coral text-white font-bold shadow-sm' : 'bg-surface-bright/60 border-border/60 text-gray-300 hover:bg-surface-bright'}" data-index="${idx}">
+            <span class="truncate">${opt}</span>
+            ${idx === exampleData.sampleCard.correctIndex ? '<span class="material-symbols-outlined text-[14px] text-sunset-coral shrink-0">check_circle</span>' : ''}
+          </button>
+        `).join('')}
+      </div>
+      <div class="text-[10.5px] font-mono text-gray-400 flex items-center gap-1 pt-1">
+        <span class="material-symbols-outlined text-amber-gold text-[14px] shrink-0">electric_bolt</span>
+        <span class="truncate">${exampleData.scoringHint}</span>
+      </div>
+    </div>
+
+    <!-- Footer & Action Controls -->
+    <div class="flex items-center justify-between pt-1">
+      <span class="text-[10px] font-mono text-gray-400">Normal timer auto-advances to fullscreen countdown</span>
+      <button id="btn-skip-example" type="button" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-black text-xs shadow-glow-coral hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
+        <span>Skip &amp; Start Now</span>
+        <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+      </button>
     </div>
   `;
 
-  const countEl = document.getElementById('example-timer-count');
-  const barEl = document.getElementById('example-timer-bar');
-  const skipBtn = document.getElementById('btn-skip-example');
+  overlay.appendChild(cardContainer);
+
+  const countEl = cardContainer.querySelector('#example-timer-count');
+  const barEl = cardContainer.querySelector('#example-timer-bar');
+  const skipBtn = cardContainer.querySelector('#btn-skip-example');
 
   // Allow clicking sample choices interactively
-  const optionBtns = overlay.querySelectorAll('.btn-sample-option');
+  const optionBtns = cardContainer.querySelectorAll('.btn-sample-option');
   optionBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      audio.playClick();
+      try { audio.playClick(); } catch (_) {}
       optionBtns.forEach((b) => {
         b.className = 'btn-sample-option p-2.5 rounded-xl border text-xs font-medium text-left flex items-center justify-between transition-all cursor-pointer bg-surface-bright/60 border-border/60 text-gray-300';
         const icon = b.querySelector('.material-symbols-outlined');
@@ -362,7 +387,7 @@ function renderExampleStage(overlay, exampleData, customTitle, onComplete) {
 
   const proceedToCountdown = () => {
     if (timerInterval) clearInterval(timerInterval);
-    audio.playClick();
+    try { audio.playClick(); } catch (_) {}
     runExpandingCircleCountdown(overlay, onComplete);
   };
 
@@ -375,7 +400,7 @@ function renderExampleStage(overlay, exampleData, customTitle, onComplete) {
       const pct = Math.max(0, (secondsRemaining / totalSeconds) * 100);
       barEl.style.width = `${pct}%`;
     }
-    audio.playTick();
+    try { audio.playTick(); } catch (_) {}
     if (secondsRemaining <= 0) {
       clearInterval(timerInterval);
       runExpandingCircleCountdown(overlay, onComplete);
@@ -388,26 +413,68 @@ function renderExampleStage(overlay, exampleData, customTitle, onComplete) {
  * Expands in a circle from center (50%, 50%) until it covers 100% of all screens in 5 distinct colors.
  */
 function runExpandingCircleCountdown(overlay, onComplete) {
-  audio.playChime();
+  try { audio.playChime(); } catch (_) {}
   let stepIndex = 0;
+  let isDone = false;
 
-  // Clear overlay and convert to 100% fullscreen layer
-  overlay.innerHTML = '';
-  overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center select-none overflow-hidden';
+  // Crucial: Strip backdropFilter so screen NEVER locks in a blur!
+  overlay.style.backdropFilter = 'none';
+  overlay.style.webkitBackdropFilter = 'none';
   overlay.style.backgroundColor = 'transparent';
 
+  // Remove the example card container, keeping emergency close button
+  const existingCard = document.getElementById('countdown-card-container');
+  if (existingCard) existingCard.remove();
+
+  // Safety watchdog timer: guarantees overlay is cleaned up within 7.5s no matter what
+  const watchdogTimer = setTimeout(() => {
+    if (!isDone) {
+      console.warn('[Bondfire Countdown] Safety watchdog triggered, completing countdown.');
+      finishSequence();
+    }
+  }, 7500);
+
+  function finishSequence() {
+    if (isDone) return;
+    isDone = true;
+    clearTimeout(watchdogTimer);
+    try {
+      overlay.style.transition = 'opacity 0.3s ease-out';
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        try { overlay.remove(); } catch (_) {}
+        if (typeof onComplete === 'function') {
+          try { onComplete(); } catch (err) { console.error('[Countdown] onComplete error:', err); }
+        }
+      }, 300);
+    } catch (_) {
+      try { overlay.remove(); } catch (_) {}
+      if (typeof onComplete === 'function') {
+        try { onComplete(); } catch (err) { console.error('[Countdown] onComplete error:', err); }
+      }
+    }
+  }
+
   function playNextStep() {
+    if (isDone) return;
+
     if (stepIndex >= COUNTDOWN_STEPS.length) {
       // Finished 1 -> Flash Ignite Burst!
-      renderIgniteBlast(overlay, onComplete);
+      renderIgniteBlast(overlay, finishSequence);
       return;
     }
 
     const step = COUNTDOWN_STEPS[stepIndex];
     stepIndex++;
 
-    // Procedural synth audio tick for each number
-    audio.playBip();
+    // Procedural synth audio tick for each number with safe fallback
+    try {
+      if (typeof audio.playBip === 'function') {
+        audio.playBip();
+      } else if (typeof audio.playTick === 'function') {
+        audio.playTick();
+      }
+    } catch (_) {}
 
     // Create expanding circular wave layer starting at center (50%, 50%) and expanding to all 4 corners
     const circleWaveLayer = document.createElement('div');
@@ -450,11 +517,11 @@ function runExpandingCircleCountdown(overlay, onComplete) {
 /**
  * Stage 3: The IGNITE explosion on 0
  */
-function renderIgniteBlast(overlay, onComplete) {
-  audio.playCorrect();
-  audio.playChime();
+function renderIgniteBlast(overlay, onFinish) {
+  try { audio.playCorrect(); } catch (_) {}
+  try { audio.playChime(); } catch (_) {}
   if (confettiInstance) {
-    confettiInstance.burst(80);
+    try { confettiInstance.burst(80); } catch (_) {}
   }
 
   const blastLayer = document.createElement('div');
@@ -479,13 +546,9 @@ function renderIgniteBlast(overlay, onComplete) {
 
   // Smooth dissolve and finish
   setTimeout(() => {
-    overlay.style.transition = 'opacity 0.4s ease-out';
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.remove();
-      if (typeof onComplete === 'function') {
-        onComplete();
-      }
-    }, 400);
+    if (typeof onFinish === 'function') {
+      onFinish();
+    }
   }, 900);
 }
+

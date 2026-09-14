@@ -1185,9 +1185,17 @@ export function bindGameEvents() {
       const newMode = btn.dataset.mode;
       if (gameModeModal) gameModeModal.style.display = 'none';
 
+      // Broadcast START_COUNTDOWN immediately so all campers in the room see countdown synchronously
+      const roomTitle = store.getState().activeRoom?.podName || 'Bondfire Arena';
+      broadcastRoomAction('START_COUNTDOWN', {
+        gameMode: newMode,
+        title: roomTitle,
+        roundIndex: 1,
+      });
+
       triggerGameCountdown({
         mode: newMode,
-        title: store.getState().activeRoom?.podName || 'Bondfire Arena',
+        title: roomTitle,
         onComplete: () => {
           store.setGameMode(newMode);
           store.setState({

@@ -187,6 +187,11 @@ export function bindArcadeEvents() {
   if (btnBottle) {
     btnBottle.addEventListener('click', () => {
       audio.playClick();
+      if (store.getState().activeRoom?.roomCode) {
+        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Spin the Bottle', view: 'BOTTLE' });
+        }).catch(() => {});
+      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Spin the Bottle',
@@ -203,6 +208,11 @@ export function bindArcadeEvents() {
   if (btnNhie) {
     btnNhie.addEventListener('click', () => {
       audio.playClick();
+      if (store.getState().activeRoom?.roomCode) {
+        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Never Have I Ever', view: 'NHIE' });
+        }).catch(() => {});
+      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Never Have I Ever',
@@ -219,6 +229,11 @@ export function bindArcadeEvents() {
   if (btnMlt) {
     btnMlt.addEventListener('click', () => {
       audio.playClick();
+      if (store.getState().activeRoom?.roomCode) {
+        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Most Likely To', view: 'MOST_LIKELY_TO' });
+        }).catch(() => {});
+      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Most Likely To',
@@ -235,6 +250,11 @@ export function bindArcadeEvents() {
   if (btnWatch) {
     btnWatch.addEventListener('click', () => {
       audio.playClick();
+      if (store.getState().activeRoom?.roomCode) {
+        import('../services/supabaseClient.js').then(({ broadcastRoomAction }) => {
+          broadcastRoomAction('START_ARCADE_GAME', { mode: 'ARCADE', title: 'Watch Party & Stream', view: 'SHOWS' });
+        }).catch(() => {});
+      }
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Watch Party & Stream',

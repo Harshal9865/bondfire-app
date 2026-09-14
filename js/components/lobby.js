@@ -481,9 +481,20 @@ export function bindLobbyEvents() {
 
       // Run visual rules example & 5-4-3-2-1 expanding circle countdown
       const chosenMode = state.activeRoom?.selectedGameMode || 'SQUAD';
+      const roomTitle = state.activeRoom?.podName || 'Squad Party Arena';
+      const deckPayload = store.getState().activeGame?.dynamicDeck || null;
+
+      // Broadcast START_COUNTDOWN immediately to all connected campers so everyone sees example & countdown together!
+      broadcastRoomAction('START_COUNTDOWN', { 
+        gameMode: chosenMode,
+        title: roomTitle,
+        dynamicDeck: deckPayload,
+        roundIndex: 1,
+      });
+
       triggerGameCountdown({
         mode: chosenMode,
-        title: state.activeRoom?.podName || 'Squad Party Arena',
+        title: roomTitle,
         onComplete: () => {
           store.setState({ currentView: 'GAME' });
           broadcastRoomAction('START_GAME', { 
@@ -581,6 +592,10 @@ export function bindLobbyEvents() {
   if (btnBottle) {
     btnBottle.addEventListener('click', () => {
       audio.playChime();
+      broadcastRoomAction('START_BOTTLE', {
+        mode: 'BOTTLE',
+        title: 'Spin the Bottle',
+      });
       triggerGameCountdown({
         mode: 'ARCADE',
         title: 'Spin the Bottle',

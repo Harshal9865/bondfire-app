@@ -279,6 +279,7 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
 
 @keyframes expandingCircleWave {
   0% {
+    -webkit-clip-path: circle(0% at 50% 50%);
     clip-path: circle(0% at 50% 50%);
     opacity: 0.95;
     transform: scale(0.9);
@@ -288,6 +289,7 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
     transform: scale(1);
   }
   100% {
+    -webkit-clip-path: circle(150% at 50% 50%);
     clip-path: circle(150% at 50% 50%);
     opacity: 1;
     transform: scale(1);
@@ -329,7 +331,7 @@ button, nav, .mode-btn, .nav-link-btn, .mobile-filter-pill, .glass-pill, [role="
 
 .animate-circle-wave {
   animation: expandingCircleWave 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: clip-path, transform, opacity;
+  will-change: -webkit-clip-path, clip-path, transform, opacity;
 }
 
 .animate-countdown-punch {
