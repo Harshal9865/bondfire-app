@@ -16,7 +16,7 @@ export function renderHeader() {
 
   return `
     <header class="sticky top-0 w-full z-50 bg-[#0B0E17]/85 backdrop-blur-2xl border-b border-[#262B40]/70 select-none transition-all duration-300">
-      <div class="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-7 h-14 sm:h-15 md:h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <div class="w-full max-w-[1700px] mx-auto px-3 sm:px-4 md:px-6 lg:px-7 h-14 sm:h-15 md:h-16 flex items-center justify-between gap-1.5 sm:gap-3 md:gap-4">
         
         <!-- Left: Brand Identity -->
         <div class="flex items-center gap-2 sm:gap-2.5 cursor-pointer group shrink-0" id="nav-brand-logo">
@@ -32,7 +32,7 @@ export function renderHeader() {
               Bondfire
               <span class="text-[7.5px] sm:text-[8.5px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-sunset-coral/20 text-sunset-coral border border-sunset-coral/30">Beta</span>
             </span>
-            <span class="hidden sm:block text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-medium tracking-wide whitespace-nowrap">formerly Huddle</span>
+            <span class="hidden xl:block text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-medium tracking-wide whitespace-nowrap">formerly Huddle</span>
           </div>
         </div>
 
@@ -55,8 +55,41 @@ export function renderHeader() {
             </button>
           </div>
 
-          <!-- Extended Direct Experience Links (Large Desktops >= 1280px) -->
-          <div class="hidden xl:flex items-center gap-0.5 pr-1 pl-1 shrink-0" id="header-links">
+          <!-- Compact Explore Dropdown Trigger (Tablets & Laptops md to 2xl) -->
+          <div class="relative 2xl:hidden flex items-center pl-1 pr-0.5">
+            <button id="btn-header-explore-dropdown" class="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer whitespace-nowrap" title="Explore Vault, Friends & Games">
+              <span class="material-symbols-outlined text-[15px] text-amber-gold">auto_awesome</span>
+              <span>Explore</span>
+              <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="header-explore-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-1.5 rounded-2xl bg-[#0E121E]/95 backdrop-blur-xl border border-border/80 shadow-2xl z-50 flex flex-col gap-0.5">
+              <button class="nav-link-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all text-left" data-view="MEMORIES">
+                <span class="material-symbols-outlined text-[16px] text-amber-gold">inventory_2</span>
+                <span>Vault Memories</span>
+              </button>
+              <button class="nav-link-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all text-left" data-view="YEARBOOK">
+                <span class="material-symbols-outlined text-[16px] text-sunset-coral">auto_stories</span>
+                <span>Squad Photobook</span>
+              </button>
+              <button class="nav-link-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all text-left" data-view="FRIENDS">
+                <span class="material-symbols-outlined text-[16px] text-mint-green">group</span>
+                <span>Campers & Friends</span>
+              </button>
+              <button class="nav-link-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all text-left" data-view="ARCADE">
+                <span class="material-symbols-outlined text-[16px] text-duo-rose">sports_esports</span>
+                <span>Pixel Arcade</span>
+              </button>
+              <button class="nav-link-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all text-left" data-view="STORE">
+                <span class="material-symbols-outlined text-[16px] text-secondary">shopping_bag</span>
+                <span>Sparks Store</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Extended Direct Experience Links (Large Desktops >= 1536px) -->
+          <div class="hidden 2xl:flex items-center gap-0.5 pr-1 pl-1 shrink-0" id="header-links">
             <div class="w-[1px] h-4 bg-border/80 mx-1.5 shrink-0"></div>
             <button class="nav-link-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${currentView === 'MEMORIES' || currentView === 'VAULT' ? 'bg-amber-gold/20 text-amber-gold border border-amber-gold/40 font-bold' : 'text-gray-400 hover:text-amber-gold'} transition-all" data-view="MEMORIES">
               <span class="material-symbols-outlined text-[15px]">inventory_2</span>
@@ -82,14 +115,14 @@ export function renderHeader() {
         </nav>
 
         <!-- Right: Action Suite -->
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <!-- Audio Synthesizer Toggle -->
-          <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-surface border border-border/80 text-gray-400 hover:text-white hover:border-amber-gold/50 flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 shrink-0" id="btn-sound-toggle" title="Toggle Procedural Audio">
+          <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-surface border border-border/80 text-gray-400 hover:text-white hover:border-amber-gold/50 flex items-center justify-center transition-all duration-200 shadow-sm active:scale-95 shrink-0 cursor-pointer" id="btn-sound-toggle" title="Toggle Procedural Audio">
             <span class="material-symbols-outlined text-[15px] sm:text-[17px]">${state.soundEnabled ? 'volume_up' : 'volume_off'}</span>
           </button>
 
           <!-- Campfire Jukebox Quick Toggle (Spotify Brand Styling) -->
-          <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#121212] border border-[#1DB954]/60 text-[#1DB954] hover:bg-[#1DB954]/20 hover:border-[#1DB954] hover:scale-105 shadow-[0_0_12px_rgba(29,185,84,0.35)] flex items-center justify-center transition-all duration-200 active:scale-95 shrink-0 group" id="btn-header-jukebox" title="Campfire Music &amp; Spotify Jukebox">
+          <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#121212] border border-[#1DB954]/60 text-[#1DB954] hover:bg-[#1DB954]/20 hover:border-[#1DB954] hover:scale-105 shadow-[0_0_12px_rgba(29,185,84,0.35)] flex items-center justify-center transition-all duration-200 active:scale-95 shrink-0 group cursor-pointer" id="btn-header-jukebox" title="Campfire Music &amp; Spotify Jukebox">
             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current text-[#1DB954] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
               <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
             </svg>
@@ -107,20 +140,20 @@ export function renderHeader() {
           </div>
 
           <!-- Primary CTA Button (Desktop >= 1024px) -->
-          <button class="hidden lg:flex relative group overflow-hidden px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer" id="btn-header-create-room">
+          <button class="hidden lg:flex relative group overflow-hidden px-3 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-bold text-xs shadow-glow-coral hover:shadow-glow-amber transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer" id="btn-header-create-room">
             <span class="material-symbols-outlined text-[16px] text-canvas">add_circle</span>
             <span>Create Room</span>
           </button>
 
           <!-- Citizen Passport Profile or Sign-In Trigger -->
           ${user && user.isLoggedIn && user.email ? `
-            <div class="flex items-center gap-2 pl-1 cursor-pointer group shrink-0" id="header-user-profile" title="Citizen Passport: ${user.displayName || user.email}">
+            <div class="flex items-center gap-1.5 sm:gap-2 pl-0.5 mr-0.5 sm:mr-1 cursor-pointer group shrink-0" id="header-user-profile" title="Citizen Passport: ${user.displayName || user.email}">
               <div class="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-sunset-coral/60 overflow-hidden shadow-sm group-hover:border-amber-gold transition-colors shrink-0">
                 <img src="${user.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=BondfireHost'}" alt="User Avatar" class="w-full h-full object-cover" />
                 <span class="w-2 h-2 rounded-full bg-mint-green border-2 border-canvas absolute bottom-0 right-0" title="Verified Online"></span>
               </div>
               <div class="hidden xl:flex flex-col text-left shrink-0">
-                <span class="text-xs font-bold text-white leading-tight truncate max-w-[90px]">${user.displayName ? user.displayName.split(' ')[0] : 'Citizen'}</span>
+                <span class="text-xs font-bold text-white leading-tight truncate max-w-[80px]">${user.displayName ? user.displayName.split(' ')[0] : 'Citizen'}</span>
                 <span class="text-[9px] font-mono text-amber-gold flex items-center gap-0.5 leading-none">
                   <span class="material-symbols-outlined text-[10px]">bolt</span>
                   ${user.sparks || 120}
@@ -128,7 +161,7 @@ export function renderHeader() {
               </div>
             </div>
           ` : `
-            <button id="btn-google-auth-header" class="btn-google-sign-in flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface-bright hover:bg-surface border border-white/10 hover:border-amber-gold/40 text-white transition-all duration-200 active:scale-95 shadow-sm group shrink-0 cursor-pointer" type="button" title="Sign In with Google">
+            <button id="btn-google-auth-header" class="btn-google-sign-in flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 mr-0.5 sm:mr-1 rounded-full bg-surface-bright hover:bg-surface border border-white/10 hover:border-amber-gold/40 text-white transition-all duration-200 active:scale-95 shadow-sm group shrink-0 cursor-pointer" type="button" title="Sign In with Google">
               <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -389,6 +422,33 @@ export function bindHeaderEvents() {
         audio.playClick();
         const view = btn.dataset.view;
         store.setView(view);
+      }
+    });
+  }
+
+  // Explore Dropdown Toggle & Clicks (Tablets & Laptops)
+  const exploreBtn = document.getElementById('btn-header-explore-dropdown');
+  const exploreMenu = document.getElementById('header-explore-menu');
+  if (exploreBtn && exploreMenu) {
+    exploreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      exploreMenu.classList.toggle('hidden');
+    });
+
+    exploreMenu.addEventListener('click', (e) => {
+      const btn = e.target.closest('.nav-link-btn');
+      if (btn) {
+        audio.playClick();
+        const view = btn.dataset.view;
+        exploreMenu.classList.add('hidden');
+        store.setView(view);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!exploreBtn.contains(e.target) && !exploreMenu.contains(e.target)) {
+        exploreMenu.classList.add('hidden');
       }
     });
   }
