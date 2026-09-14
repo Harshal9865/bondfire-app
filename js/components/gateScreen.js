@@ -35,12 +35,12 @@ export function renderGateScreen() {
 
       <!-- Top HUD Bar -->
       <header class="w-full max-w-6xl mx-auto pt-4 sm:pt-6 px-4 sm:px-8 flex items-center justify-between z-30 notranslate" translate="no">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-[#0E121E]/80 border border-sunset-coral/50 flex items-center justify-center shadow-[0_0_12px_rgba(255,90,95,0.4)]">
+        <div class="flex items-center gap-3 cursor-pointer group" id="gate-brand-logo" title="Go to Home">
+          <div class="w-8 h-8 rounded-lg bg-[#0E121E]/80 border border-sunset-coral/50 flex items-center justify-center shadow-[0_0_12px_rgba(255,90,95,0.4)] transition-transform group-hover:scale-105">
             <span class="material-symbols-outlined text-[16px] text-sunset-coral animate-pulse">local_fire_department</span>
           </div>
           <div>
-            <div class="text-[11px] font-mono font-bold tracking-widest text-white uppercase flex items-center gap-2">
+            <div class="text-[11px] font-mono font-bold tracking-widest text-white uppercase flex items-center gap-2 group-hover:text-sunset-coral transition-colors">
               <span>BONDFIRE SANCTUARY</span>
               <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-ping"></span>
             </div>
@@ -324,6 +324,16 @@ export function bindGateScreenEvents() {
     enterBtn.addEventListener('mouseenter', () => audio.playTalismanChime(4));
     enterBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      triggerEnterSequence('#/HOME', 'HOME');
+    });
+  }
+
+  // Bind brand logo click to load Home page
+  const gateLogo = document.getElementById('gate-brand-logo');
+  if (gateLogo) {
+    gateLogo.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
       triggerEnterSequence('#/HOME', 'HOME');
     });
   }

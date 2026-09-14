@@ -233,11 +233,21 @@ export function bindFooterEvents() {
 
   const footerLogo = document.getElementById('footer-brand-logo');
   if (footerLogo) {
-    footerLogo.addEventListener('click', () => {
+    footerLogo.setAttribute('role', 'button');
+    footerLogo.setAttribute('tabindex', '0');
+    footerLogo.setAttribute('title', 'Bondfire Home');
+    const navigateToHome = (e) => {
+      if (e) e.preventDefault();
       audio.playClick();
-      store.setView('GATE');
-      window.location.hash = '#/GATE';
+      store.setView('HOME');
+      window.location.hash = '#/HOME';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    footerLogo.addEventListener('click', navigateToHome);
+    footerLogo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        navigateToHome(e);
+      }
     });
   }
 

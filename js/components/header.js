@@ -396,13 +396,24 @@ export function renderHeader() {
 }
 
 export function bindHeaderEvents() {
-  // Brand Logo Click -> Open Cyber Gate Portal
+  // Brand Logo Click -> Go to Home Page
   const logo = document.getElementById('nav-brand-logo');
   if (logo) {
-    logo.addEventListener('click', () => {
+    logo.setAttribute('role', 'button');
+    logo.setAttribute('tabindex', '0');
+    logo.setAttribute('title', 'Bondfire Home');
+    const navigateToHome = (e) => {
+      if (e) e.preventDefault();
       audio.playClick();
-      store.setView('GATE');
-      window.location.hash = '#/GATE';
+      store.setView('HOME');
+      window.location.hash = '#/HOME';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    logo.addEventListener('click', navigateToHome);
+    logo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        navigateToHome(e);
+      }
     });
   }
 

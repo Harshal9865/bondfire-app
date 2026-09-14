@@ -78,14 +78,14 @@ console.log('  ✅ PASS: css/components.css contains full Cyber Gate, portal ene
 // 8. Validate homeScrollStory.js has clean English divider without Torii icons
 const homeStoryCode = fs.readFileSync(path.join(rootDir, 'js/components/homeScrollStory.js'), 'utf-8');
 assert(homeStoryCode.includes('BONDFIRE MEMORY MATRIX'), 'homeScrollStory.js must include English Cyber Matrix divider');
-// 9. Validate brand logo click in header.js and footer.js opens GATE
-assert(headerCode.includes("store.setView('GATE')"), 'header.js logo click must route to GATE');
-assert(headerCode.includes("window.location.hash = '#/GATE'"), 'header.js logo click must set hash to #/GATE');
+// 9. Validate brand logo click in header.js and footer.js opens HOME
+assert(headerCode.includes("store.setView('HOME')"), 'header.js logo click must route to HOME');
+assert(headerCode.includes("window.location.hash = '#/HOME'"), 'header.js logo click must set hash to #/HOME');
 
 const footerCode = fs.readFileSync(path.join(rootDir, 'js/components/footer.js'), 'utf-8');
-assert(footerCode.includes("store.setView('GATE')"), 'footer.js logo click must route to GATE');
-assert(footerCode.includes("window.location.hash = '#/GATE'"), 'footer.js logo click must set hash to #/GATE');
-console.log('  ✅ PASS: clicking brand logo in header or footer routes user directly to Cyber Gate');
+assert(footerCode.includes("store.setView('HOME')"), 'footer.js logo click must route to HOME');
+assert(footerCode.includes("window.location.hash = '#/HOME'"), 'footer.js logo click must set hash to #/HOME');
+console.log('  ✅ PASS: clicking brand logo in header or footer routes user directly to Home page');
 
 // 10. Validate app.js preserves active hash on refresh and only routes to gate on clean entry or logo click
 assert(appCode.includes('isReload'), 'app.js must detect browser reload/refresh');
