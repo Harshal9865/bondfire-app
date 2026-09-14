@@ -1,36 +1,38 @@
 // ==============================================================================
 // THE REAL PHOTO ALBUM & PHOTOBOOK STUDIO (Screen 3)
-// 100% Real, Dynamic & Interactive Keepsake Studio:
-// - Live Photo Uploads (File picker & Camera Capture)
-// - Custom Captions, Camper Tags, Polaroid Themes (Warm, Cyber, Gold, Vintage)
-// - 3D Layflat Book Flipping Mode + Polaroid Pinboard Collage Wall
-// - Interactive Sticker Stamps (🔥, 💖, 💀, 🏆, 🤫, 🎉) & Heart Likes
-// - Printable PDF Keepsake Export & Store Order Bridge
+// 100% Real, Dynamic, User-Driven Memory Engine:
+// 1. First asks user to upload photos (multi-file dropzone & camera)
+// 2. Automatically generates 3D Layflat Photobook & Polaroid Pinboard
+// 3. Empowers user to write memory stories, titles, camper tags & stickers
+// 4. ZERO HARDCODED MOCKS - Everything is generated from user photos!
 // ==============================================================================
 
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 import { ConfettiEngine } from '../visuals/confetti.js';
-import { openPaymentModal } from './demoPaymentModal.js';
 
 let confettiInstance = null;
 let currentSpread = 0; // 0: Pages 1-2 | 1: Pages 3-4 | etc.
 let activeStudioMode = 'LAYFLAT'; // 'LAYFLAT' | 'PINBOARD'
-let selectedUploadFile = null;
-let activeLightboxMemory = null;
+let queuedPhotos = []; // Array of DataURLs/files selected before generating
+let editingMemoryId = null; // Memory currently open in the Story Writer modal
 
 export function renderYearbookScreen() {
   const state = store.getState();
-  const room = state.activeRoom || { id: 'BONDFIRE', podName: 'Our Squad Pod', roomCode: 'BOND' };
-  const memories = state.albumMemories || store.getDefaultAlbumMemories();
-  const totalSpreads = Math.max(1, Math.ceil(memories.length / 2));
+  const memories = state.albumMemories || [];
+  const albumTitle = state.albumTitle || 'Our Squad Keepsake Album';
 
-  // Ensure currentSpread stays in bounds
+  // If user has not uploaded any photos yet, prompt them to upload and auto-generate!
+  if (memories.length === 0) {
+    return renderUploadOnboarding(state);
+  }
+
+  // Calculate spreads
+  const totalSpreads = Math.max(1, Math.ceil(memories.length / 2));
   if (currentSpread >= totalSpreads) {
     currentSpread = Math.max(0, totalSpreads - 1);
   }
 
-  // Get the 2 memories for current spread
   const leftMemory = memories[currentSpread * 2] || null;
   const rightMemory = memories[currentSpread * 2 + 1] || null;
 
@@ -42,21 +44,21 @@ export function renderYearbookScreen() {
         <div>
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold tracking-widest uppercase mb-3">
             <span class="material-symbols-outlined text-[15px]">auto_stories</span>
-            <span>REAL PHOTO ALBUM STUDIO // ARCHIVAL KEEPSAKE</span>
+            <span>GENERATED PHOTOBOOK STUDIO // 100% REAL MEMORIES</span>
           </div>
           <h1 class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            ${room.podName || 'The Campfire'} Memory Studio
+            ${albumTitle}
           </h1>
           <p class="text-xs sm:text-sm text-gray-400 mt-1 font-mono">
-            Room #${room.roomCode || 'BOND'} · ${memories.length} Real Memories Preserved · Archival 240GSM Luster
+            ${memories.length} Photos Assembled · Archival 240GSM Luster · Write stories &amp; stamp memories
           </p>
         </div>
         
         <!-- Action Buttons -->
         <div class="flex items-center gap-2.5 flex-wrap">
-          <button id="btn-open-upload-modal" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-xs shadow-glow-coral hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+          <button id="btn-add-more-photos" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-xs shadow-glow-coral hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">add_a_photo</span>
-            <span>Drop Memory</span>
+            <span>+ Add Photos</span>
           </button>
 
           <button id="btn-print-keepsake" class="px-3.5 py-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-300 hover:text-white border border-[#2B3147] text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Print or Export PDF Keepsake">
@@ -64,9 +66,14 @@ export function renderYearbookScreen() {
             <span class="hidden sm:inline">Print Keepsake</span>
           </button>
 
+          <button id="btn-start-new-album" class="px-3.5 py-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-rose-400 hover:text-rose-300 border border-rose-500/30 text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer" title="Create New Album">
+            <span class="material-symbols-outlined text-[16px]">refresh</span>
+            <span class="hidden sm:inline">New Album</span>
+          </button>
+
           <a href="#/STORE" class="px-3.5 py-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-amber-gold border border-amber-gold/30 hover:border-amber-gold text-xs font-mono font-bold transition-all flex items-center gap-1.5" title="Order Physical Hardcover Edition">
             <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
-            <span class="hidden sm:inline">Order Book</span>
+            <span class="hidden sm:inline">Order Book ($38)</span>
           </a>
 
           <button id="btn-back-home" class="p-2.5 rounded-xl bg-[#141826] hover:bg-[#202538] text-gray-400 hover:text-white border border-[#2B3147] transition-colors cursor-pointer" title="Back to Home">
@@ -110,7 +117,7 @@ export function renderYearbookScreen() {
         ` : `
           <div class="text-xs font-mono text-gray-400 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-mint-green animate-pulse"></span>
-            <span>INTERACTIVE PINBOARD // TAP ANY PHOTO TO ZOOM &amp; STAMP</span>
+            <span>INTERACTIVE PINBOARD // CLICK "WRITE STORY" ON ANY CARD</span>
           </div>
         `}
       </div>
@@ -120,79 +127,62 @@ export function renderYearbookScreen() {
         ${activeStudioMode === 'LAYFLAT' ? renderLayflatSpread(leftMemory, rightMemory, currentSpread, totalSpreads) : renderPinboardWall(memories)}
       </div>
 
-      <!-- ALBUM FOOTER QUICK BAR -->
-      <div class="rounded-3xl bg-[#121522] border border-[#2B3147] p-6 mt-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-amber-gold/15 border border-amber-gold/30 flex items-center justify-center text-amber-gold shrink-0">
-            <span class="material-symbols-outlined text-[24px]">local_fire_department</span>
-          </div>
-          <div>
-            <h4 class="font-display font-bold text-white text-base">Campfire Sparks Synced</h4>
-            <p class="text-xs text-gray-400 font-mono mt-0.5">Every photo uploaded grants +25 Sparks to all room campers.</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <button id="btn-quick-add-bottom" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
-            <span class="material-symbols-outlined text-[16px]">add_photo_alternate</span>
-            <span>Add Another Memory</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- INTERACTIVE PHOTO UPLOAD MODAL -->
-      <div id="modal-upload-memory" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+      <!-- INLINE STORY WRITER MODAL -->
+      <div id="modal-edit-story" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="w-full max-w-lg rounded-3xl bg-[#131726] border border-[#2B3147] p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
           
           <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-gold text-2xl">add_a_photo</span>
-              <h3 class="font-display text-xl font-bold text-white">Drop a Campfire Memory</h3>
+              <span class="material-symbols-outlined text-amber-gold text-2xl">edit_note</span>
+              <h3 class="font-display text-xl font-bold text-white">Write Memory Story</h3>
             </div>
-            <button id="btn-close-upload-modal" class="p-1.5 rounded-lg bg-surface-bright hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer">
+            <button id="btn-close-story-modal" class="p-1.5 rounded-lg bg-surface-bright hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
 
-          <!-- Image Drop / Picker Area -->
-          <div id="dropzone-upload" class="border-2 border-dashed border-gray-600 hover:border-amber-gold rounded-2xl p-6 text-center cursor-pointer transition-colors mb-4 bg-[#0E111D] relative group">
-            <input type="file" id="input-photo-file" accept="image/*" class="hidden" />
-            
-            <div id="upload-placeholder-content">
-              <span class="material-symbols-outlined text-4xl text-gray-400 group-hover:text-amber-gold group-hover:scale-110 transition-transform">cloud_upload</span>
-              <p class="text-sm font-bold text-gray-200 mt-2">Click to select photo or drag here</p>
-              <p class="text-xs text-gray-500 font-mono mt-1">JPEG, PNG, WEBP, GIF up to 10MB</p>
+          <!-- Memory Preview Mini Thumbnail -->
+          <div class="flex items-center gap-3 p-3 rounded-2xl bg-[#0B0E17] border border-white/5 mb-4">
+            <div class="w-16 h-16 rounded-xl overflow-hidden bg-black shrink-0">
+              <img id="story-modal-thumb" src="" class="w-full h-full object-cover" alt="Thumb" />
             </div>
-
-            <div id="upload-preview-container" class="hidden relative w-full h-48 rounded-xl overflow-hidden">
-              <img id="upload-preview-img" src="" class="w-full h-full object-cover" alt="Preview" />
-              <button id="btn-clear-preview" class="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 hover:bg-black text-white text-xs cursor-pointer">
-                <span class="material-symbols-outlined text-[16px]">delete</span>
-              </button>
+            <div class="min-w-0 flex-1">
+              <span class="text-[10px] font-mono text-gray-400 uppercase">ARCHIVED ENTRY</span>
+              <h4 id="story-modal-heading" class="font-display font-bold text-white text-sm truncate">Memory Title</h4>
             </div>
           </div>
 
           <!-- Form Fields -->
-          <div class="space-y-3.5 text-left">
+          <div class="space-y-4 text-left">
             <div>
               <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Memory Title</label>
-              <input type="text" id="input-memory-title" placeholder="e.g. 2 AM Maggie Noodles &amp; Spilled Chai" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none transition-colors" />
+              <input type="text" id="input-edit-title" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none" placeholder="e.g. 3 AM Chai Incident" />
             </div>
 
             <div>
-              <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Story / Quote / Confession</label>
-              <textarea id="input-memory-caption" rows="3" placeholder="What happened here? What is the unedited squad verdict?" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none transition-colors"></textarea>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-mono font-bold text-gray-300 uppercase">What happened here? (Story / Quote)</label>
+              </div>
+              <textarea id="input-edit-caption" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none leading-relaxed" placeholder="Write the inside joke, confession, or what made this moment unforgettable..."></textarea>
+              
+              <!-- Quick Prompt Suggestions -->
+              <div class="flex items-center gap-1.5 flex-wrap mt-2">
+                <span class="text-[10px] font-mono text-gray-500">Quick Sparks:</span>
+                <button class="btn-prompt-chip text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-amber-gold border border-white/10 cursor-pointer" data-text="The moment we realized nobody knew the route back.">"The moment we realized..."</button>
+                <button class="btn-prompt-chip text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-sunset-coral border border-white/10 cursor-pointer" data-text="Unanimous verdict: officially the funniest memory of the trip.">"Unanimous verdict..."</button>
+                <button class="btn-prompt-chip text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-mint-green border border-white/10 cursor-pointer" data-text="3 AM confession: someone lost the room keycard inside the sand.">"3 AM confession..."</button>
+              </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Camper Tags</label>
-                <input type="text" id="input-memory-tags" placeholder="Aarav, Priya, Host" class="w-full px-3 py-2 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none" />
+                <input type="text" id="input-edit-tags" class="w-full px-3 py-2 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none" placeholder="Aarav, Priya, Host" />
               </div>
 
               <div>
                 <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Polaroid Theme</label>
-                <select id="select-memory-theme" class="w-full px-3 py-2 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none">
+                <select id="select-edit-theme" class="w-full px-3 py-2 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none">
                   <option value="POLAROID_WARM">Warm Campfire Amber</option>
                   <option value="POLAROID_CYBER">Cyber Neon Cyan</option>
                   <option value="POLAROID_GOLD">24k Gold Luster</option>
@@ -202,18 +192,30 @@ export function renderYearbookScreen() {
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <button id="btn-submit-memory" class="w-full mt-6 py-3.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-sm uppercase tracking-wider shadow-glow-coral hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">save</span>
-            <span>Permanently Archive Memory</span>
+          <!-- Save Button -->
+          <button id="btn-save-story" class="w-full mt-6 py-3.5 rounded-xl bg-gradient-to-r from-sunset-coral to-amber-gold text-canvas font-black text-sm uppercase tracking-wider shadow-glow-coral hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">check</span>
+            <span>Save Memory Story</span>
           </button>
         </div>
       </div>
 
-      <!-- LIGHTBOX MODAL FOR ZOOM & STICKERS -->
-      <div id="modal-lightbox" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="w-full max-w-2xl rounded-3xl bg-[#121522] border border-[#2B3147] p-6 sm:p-8 shadow-2xl relative" id="lightbox-content">
-          <!-- Populated dynamically -->
+      <!-- ADD MORE PHOTOS MODAL -->
+      <div id="modal-add-more" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-lg rounded-3xl bg-[#131726] border border-[#2B3147] p-6 sm:p-8 shadow-2xl relative">
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+            <h3 class="font-display text-xl font-bold text-white">Add More Photos to Album</h3>
+            <button id="btn-close-add-more" class="p-1.5 rounded-lg bg-surface-bright text-gray-400 hover:text-white cursor-pointer">
+              <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+
+          <div id="dropzone-add-more" class="border-2 border-dashed border-gray-600 hover:border-amber-gold rounded-2xl p-6 text-center cursor-pointer transition-colors mb-4 bg-[#0E111D]">
+            <input type="file" id="input-add-more-files" multiple accept="image/*" class="hidden" />
+            <span class="material-symbols-outlined text-4xl text-gray-400">cloud_upload</span>
+            <p class="text-sm font-bold text-gray-200 mt-2">Select photos to append to this album</p>
+            <p class="text-xs text-gray-500 font-mono mt-1">Upload any number of pictures</p>
+          </div>
         </div>
       </div>
 
@@ -222,7 +224,115 @@ export function renderYearbookScreen() {
 }
 
 /**
- * Renders 3D Layflat Double-Page Spread
+ * Step 1: Onboarding Stage - Prompts User to Upload Photos First
+ */
+function renderUploadOnboarding(state) {
+  const room = state.activeRoom || {};
+
+  return `
+    <div class="min-h-screen bg-[#0B0E17] text-white pt-8 pb-28 px-4 sm:px-6 lg:px-12 max-w-4xl mx-auto select-none">
+      
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-gold/15 border border-amber-gold/30 text-amber-gold text-xs font-mono font-bold tracking-widest uppercase mb-4">
+          <span class="material-symbols-outlined text-[16px]">auto_stories</span>
+          <span>PHOTOBOOK STUDIO // 100% USER GENERATED</span>
+        </div>
+        
+        <h1 class="font-display text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+          Upload Photos to Generate Your Photobook
+        </h1>
+        
+        <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto font-sans leading-relaxed">
+          No hardcoded mockups. Select photos from your device — Bondfire will automatically arrange your 3D layflat spreads, polaroid wall, and let you write stories for every memory.
+        </p>
+      </div>
+
+      <!-- Upload Generator Card -->
+      <div class="rounded-3xl bg-[#121522] border border-[#2B3147] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        
+        <!-- Multi-Photo Dropzone -->
+        <div id="onboarding-dropzone" class="border-2 border-dashed border-gray-600 hover:border-amber-gold rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all bg-[#0B0E17] group mb-6">
+          <input type="file" id="onboarding-file-input" multiple accept="image/*" class="hidden" />
+          
+          <div class="w-16 h-16 rounded-2xl bg-amber-gold/15 border border-amber-gold/30 flex items-center justify-center text-amber-gold mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-3xl">add_photo_alternate</span>
+          </div>
+
+          <h3 class="font-display font-bold text-lg sm:text-xl text-white mb-1">
+            Choose Photos from Your Device
+          </h3>
+          <p class="text-xs sm:text-sm text-gray-400 font-mono mb-4">
+            Click here or drag &amp; drop photos (Select 1, 4, 10 or more images)
+          </p>
+
+          <span class="px-4 py-2 rounded-full bg-surface-bright border border-white/10 text-xs font-mono text-gray-300 group-hover:border-amber-gold transition-colors inline-block">
+            Browse Photo Files
+          </span>
+        </div>
+
+        <!-- Thumbnails of Selected Photos -->
+        <div id="queued-photos-container" class="hidden mb-6">
+          <div class="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
+            <span class="text-xs font-mono font-bold text-amber-gold uppercase tracking-wider" id="queued-count-badge">
+              0 PHOTOS SELECTED
+            </span>
+            <button id="btn-clear-queued" class="text-xs font-mono text-rose-400 hover:text-rose-300 cursor-pointer">
+              Clear All
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-3" id="queued-thumbnails-grid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Album Metadata Form -->
+        <div class="space-y-4 text-left border-t border-white/10 pt-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Album Title</label>
+              <input type="text" id="input-album-title" value="${room.podName ? `${room.podName} Keepsake` : 'Campfire Memories 2026'}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none" placeholder="e.g. Goa Trip &amp; Late Night Banter" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Album Style Theme</label>
+              <select id="select-album-theme" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-sm outline-none">
+                <option value="POLAROID_WARM">Warm Campfire Amber (Kodak Luster)</option>
+                <option value="POLAROID_CYBER">Cyber Neon Cyan (Midnight Luster)</option>
+                <option value="POLAROID_GOLD">24k Gold Obsidian (Debossed Foil)</option>
+                <option value="POLAROID_VINTAGE">Vintage Sepia (Nostalgic Grain)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono font-bold text-gray-300 uppercase mb-1">Campers Present</label>
+            <input type="text" id="input-album-campers" value="${(room.players || []).map(p => p.name).join(', ') || 'Host (You)'}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0E17] border border-[#2B3147] focus:border-amber-gold text-white text-xs outline-none" placeholder="Aarav, Priya, Sneha" />
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="btn-generate-album" class="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold text-canvas font-black text-sm uppercase tracking-wider shadow-glow-coral hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+          <span>Generate Photobook Album Now</span>
+        </button>
+
+      </div>
+
+      <!-- Quick Back Button -->
+      <div class="text-center mt-6">
+        <a href="#/HOME" class="text-xs font-mono text-gray-500 hover:text-gray-300 transition-colors">
+          ← Back to Campfire Home
+        </a>
+      </div>
+
+    </div>
+  `;
+}
+
+/**
+ * 3D Layflat Double-Page Spread
  */
 function renderLayflatSpread(leftMem, rightMem, spreadIndex, totalSpreads) {
   const leftPageNum = (spreadIndex * 2) + 1;
@@ -235,38 +345,37 @@ function renderLayflatSpread(leftMem, rightMem, spreadIndex, totalSpreads) {
       <div class="hidden lg:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 bg-gradient-to-r from-black/40 via-black/70 to-black/40 pointer-events-none z-30 shadow-inner"></div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-20">
-        
         <!-- LEFT PAGE -->
-        ${leftMem ? renderBookPage(leftMem, leftPageNum, 'left') : renderEmptyBookPage(leftPageNum)}
+        ${leftMem ? renderBookPage(leftMem, leftPageNum) : renderEmptyBookPage(leftPageNum)}
 
         <!-- RIGHT PAGE -->
-        ${rightMem ? renderBookPage(rightMem, rightPageNum, 'right') : renderEmptyBookPage(rightPageNum)}
-
+        ${rightMem ? renderBookPage(rightMem, rightPageNum) : renderEmptyBookPage(rightPageNum)}
       </div>
     </div>
   `;
 }
 
 /**
- * Individual Photobook Page Markup
+ * Individual Page Markup with Inline Story Writer
  */
-function renderBookPage(mem, pageNum, side) {
+function renderBookPage(mem, pageNum) {
   const themeClass = getThemeClass(mem.theme);
+  const hasStory = mem.caption && mem.caption.trim().length > 0;
 
   return `
-    <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[500px]">
+    <div class="rounded-2xl bg-[#181C2B] border border-white/5 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[520px]">
       <div class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"></div>
 
       <div>
         <div class="flex items-center justify-between pb-3 mb-5 border-b border-white/10">
           <span class="text-xs font-mono text-amber-gold font-bold uppercase tracking-wider">
-            ARCHIVE ENTRY #${mem.id.slice(-4)} // ${mem.theme.replace('POLAROID_', '')}
+            ENTRY #${mem.id.slice(-4)} // USER MEMORY
           </span>
           <span class="text-xs font-mono text-gray-400">PAGE ${pageNum}</span>
         </div>
 
-        <!-- Polaroid Visual Frame -->
-        <div class="polaroid-card ${themeClass} p-3.5 pb-5 rounded-xl shadow-xl max-w-md mx-auto mb-5 cursor-pointer group hover:scale-[1.02] transition-transform" data-id="${mem.id}">
+        <!-- Polaroid Frame -->
+        <div class="polaroid-card ${themeClass} p-3.5 pb-5 rounded-xl shadow-xl max-w-md mx-auto mb-5 group">
           <div class="polaroid-tape"></div>
           <div class="w-full h-56 rounded-lg overflow-hidden mb-3 bg-black relative">
             <img src="${mem.imageUrl}" alt="${mem.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -275,7 +384,13 @@ function renderBookPage(mem, pageNum, side) {
             </div>
           </div>
           
-          <h3 class="font-display font-black text-sm tracking-tight truncate">${mem.title}</h3>
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-black text-sm tracking-tight truncate">${mem.title}</h3>
+            <button class="btn-trigger-edit-story text-xs font-mono text-amber-gold hover:underline flex items-center gap-1 cursor-pointer" data-id="${mem.id}">
+              <span class="material-symbols-outlined text-[14px]">edit</span>
+              <span>Edit Story</span>
+            </button>
+          </div>
           
           <!-- Camper Tags -->
           <div class="flex items-center gap-1.5 flex-wrap mt-1.5">
@@ -285,23 +400,33 @@ function renderBookPage(mem, pageNum, side) {
           </div>
         </div>
 
-        <!-- Story Quote Box -->
+        <!-- User Written Story / Memory Box -->
         <div class="p-4 rounded-2xl bg-[#121522] border border-[#2B3147] relative">
-          <p class="text-xs sm:text-sm text-gray-200 italic font-sans leading-relaxed">
-            "${mem.caption || 'No caption recorded for this memory.'}"
-          </p>
-          <div class="flex items-center justify-between mt-3 text-[10px] font-mono text-gray-400">
-            <span>By: <strong class="text-white">${mem.author || 'Squad'}</strong></span>
-            <span class="text-amber-gold font-bold">VERIFIED MEMORY</span>
+          ${hasStory ? `
+            <p class="text-xs sm:text-sm text-gray-200 italic font-sans leading-relaxed">
+              "${mem.caption}"
+            </p>
+          ` : `
+            <div class="text-center py-2">
+              <p class="text-xs text-gray-400 font-mono mb-2">No story written yet for this photo.</p>
+              <button class="btn-trigger-edit-story px-3 py-1.5 rounded-lg bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-mono font-bold hover:bg-amber-gold/25 transition-colors cursor-pointer" data-id="${mem.id}">
+                ✍️ Write About This Memory
+              </button>
+            </div>
+          `}
+          
+          <div class="flex items-center justify-between mt-3 text-[10px] font-mono text-gray-400 border-t border-white/5 pt-2">
+            <span>Author: <strong class="text-white">${mem.author || 'Host'}</strong></span>
+            <span class="text-amber-gold font-bold">100% REAL MEMORY</span>
           </div>
         </div>
 
-        <!-- Sticker Stamps Strip & Like Button -->
+        <!-- Stickers & Likes -->
         <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
           <div class="flex items-center gap-1.5 flex-wrap">
             <span class="text-[10px] font-mono text-gray-500">Stamps:</span>
             ${(mem.stickers || []).map(stk => `
-              <span class="text-sm bg-white/5 px-2 py-0.5 rounded-md border border-white/10" title="Squad stamp">${stk}</span>
+              <span class="text-sm bg-white/5 px-2 py-0.5 rounded-md border border-white/10">${stk}</span>
             `).join('')}
             <button class="btn-stamp-picker text-xs font-mono text-amber-gold hover:text-white px-2 py-0.5 rounded bg-amber-gold/15 border border-amber-gold/30 hover:bg-amber-gold/25 cursor-pointer ml-1" data-id="${mem.id}">
               + Stamp
@@ -317,23 +442,20 @@ function renderBookPage(mem, pageNum, side) {
       </div>
 
       <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between text-xs text-gray-400 font-mono">
-        <span>Bondfire Keepsake Vol. 1</span>
-        <span>Layflat Double-Luster</span>
+        <span>Bondfire Photobook</span>
+        <span>Archival Luster</span>
       </div>
     </div>
   `;
 }
 
-/**
- * Blank / Placeholder Page for odd counts
- */
 function renderEmptyBookPage(pageNum) {
   return `
-    <div class="rounded-2xl bg-[#141724] border border-dashed border-white/10 p-8 flex flex-col items-center justify-center text-center min-h-[500px]">
+    <div class="rounded-2xl bg-[#141724] border border-dashed border-white/10 p-8 flex flex-col items-center justify-center text-center min-h-[520px]">
       <span class="material-symbols-outlined text-4xl text-gray-600 mb-3">add_photo_alternate</span>
       <h4 class="font-display font-bold text-gray-400 text-base">Empty Archival Page</h4>
       <p class="text-xs text-gray-500 font-mono max-w-xs mt-1">
-        Page ${pageNum} is ready for new memories. Click "Drop Memory" above to add your photos.
+        Page ${pageNum} is open. Click "+ Add Photos" above to add more memories.
       </p>
     </div>
   `;
@@ -353,18 +475,26 @@ function renderPinboardWall(memories) {
           const themeClass = getThemeClass(mem.theme);
 
           return `
-            <div class="polaroid-card ${themeClass} ${rot} p-3 pb-5 rounded-xl shadow-xl cursor-pointer group hover:scale-105 transition-all" data-id="${mem.id}">
+            <div class="polaroid-card ${themeClass} ${rot} p-3 pb-5 rounded-xl shadow-xl transition-all" data-id="${mem.id}">
               <div class="polaroid-tape"></div>
               
               <div class="w-full h-48 rounded-lg overflow-hidden mb-2.5 bg-black relative">
-                <img src="${mem.imageUrl}" alt="${mem.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <img src="${mem.imageUrl}" alt="${mem.title}" class="w-full h-full object-cover" />
                 <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-full bg-black/60 text-[9px] font-mono text-gray-300">
                   ${mem.date}
                 </div>
               </div>
 
-              <h4 class="font-display font-black text-xs sm:text-sm tracking-tight truncate">${mem.title}</h4>
-              <p class="text-[11px] font-sans line-clamp-2 opacity-80 mt-1">${mem.caption}</p>
+              <div class="flex items-center justify-between">
+                <h4 class="font-display font-black text-xs sm:text-sm tracking-tight truncate">${mem.title}</h4>
+                <button class="btn-trigger-edit-story text-[11px] font-mono text-amber-gold hover:underline cursor-pointer" data-id="${mem.id}">
+                  Write
+                </button>
+              </div>
+
+              <p class="text-[11px] font-sans line-clamp-2 opacity-80 mt-1">
+                ${mem.caption || 'Tap Write to record memory story.'}
+              </p>
 
               <!-- Footer with stamps & likes -->
               <div class="flex items-center justify-between mt-3 pt-2 border-t border-black/10 text-[10px] font-mono">
@@ -407,7 +537,7 @@ export function bindYearbookEvents() {
     });
   }
 
-  // View Mode Tabs
+  // Mode tabs
   const tabLayflat = document.getElementById('tab-mode-layflat');
   const tabPinboard = document.getElementById('tab-mode-pinboard');
 
@@ -427,7 +557,7 @@ export function bindYearbookEvents() {
     });
   }
 
-  // Spread Flipper Buttons
+  // Spread flipper buttons
   const btnPrev = document.getElementById('btn-prev-spread');
   const btnNext = document.getElementById('btn-next-spread');
 
@@ -453,7 +583,7 @@ export function bindYearbookEvents() {
     });
   }
 
-  // Print Keepsake
+  // Print keepsake
   const printBtn = document.getElementById('btn-print-keepsake');
   if (printBtn) {
     printBtn.addEventListener('click', () => {
@@ -462,156 +592,280 @@ export function bindYearbookEvents() {
     });
   }
 
-  // Upload Modal Open & Close
-  const modalUpload = document.getElementById('modal-upload-memory');
-  const openUploadBtns = [
-    document.getElementById('btn-open-upload-modal'),
-    document.getElementById('btn-quick-add-bottom')
-  ].filter(Boolean);
-
-  openUploadBtns.forEach(b => {
-    b.addEventListener('click', () => {
-      audio.playClick();
-      if (modalUpload) modalUpload.classList.remove('hidden');
-    });
-  });
-
-  const closeUploadBtn = document.getElementById('btn-close-upload-modal');
-  if (closeUploadBtn && modalUpload) {
-    closeUploadBtn.addEventListener('click', () => {
-      audio.playClick();
-      modalUpload.classList.add('hidden');
+  // Start new album / reset
+  const startNewBtn = document.getElementById('btn-start-new-album');
+  if (startNewBtn) {
+    startNewBtn.addEventListener('click', () => {
+      if (confirm('Start a fresh photobook? Your current album can be cleared or re-uploaded.')) {
+        audio.playClick();
+        store.clearAlbum();
+        queuedPhotos = [];
+        reRenderStudio();
+      }
     });
   }
 
-  // Dropzone file handling
-  const dropzone = document.getElementById('dropzone-upload');
-  const fileInput = document.getElementById('input-photo-file');
-  const placeholderContent = document.getElementById('upload-placeholder-content');
-  const previewContainer = document.getElementById('upload-preview-container');
-  const previewImg = document.getElementById('upload-preview-img');
-  const clearPreviewBtn = document.getElementById('btn-clear-preview');
+  // Onboarding File Upload Handling (Step 1)
+  const onboardingDropzone = document.getElementById('onboarding-dropzone');
+  const onboardingFileInput = document.getElementById('onboarding-file-input');
+  const queuedContainer = document.getElementById('queued-photos-container');
+  const queuedGrid = document.getElementById('queued-thumbnails-grid');
+  const queuedBadge = document.getElementById('queued-count-badge');
+  const clearQueuedBtn = document.getElementById('btn-clear-queued');
+  const generateAlbumBtn = document.getElementById('btn-generate-album');
 
-  if (dropzone && fileInput) {
-    dropzone.addEventListener('click', (e) => {
-      if (e.target !== clearPreviewBtn && !clearPreviewBtn?.contains(e.target)) {
-        fileInput.click();
+  if (onboardingDropzone && onboardingFileInput) {
+    onboardingDropzone.addEventListener('click', () => {
+      onboardingFileInput.click();
+    });
+
+    onboardingFileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length) {
+        processFiles(files);
       }
     });
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        handleImageFile(file);
-      }
-    });
-
-    // Drag and drop
-    dropzone.addEventListener('dragover', (e) => {
+    onboardingDropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropzone.classList.add('border-amber-gold');
+      onboardingDropzone.classList.add('border-amber-gold');
     });
 
-    dropzone.addEventListener('dragleave', () => {
-      dropzone.classList.remove('border-amber-gold');
+    onboardingDropzone.addEventListener('dragleave', () => {
+      onboardingDropzone.classList.remove('border-amber-gold');
     });
 
-    dropzone.addEventListener('drop', (e) => {
+    onboardingDropzone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropzone.classList.remove('border-amber-gold');
-      const file = e.dataTransfer.files?.[0];
-      if (file) {
-        handleImageFile(file);
+      onboardingDropzone.classList.remove('border-amber-gold');
+      const files = Array.from(e.dataTransfer.files || []);
+      if (files.length) {
+        processFiles(files);
       }
     });
   }
 
-  function handleImageFile(file) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      selectedUploadFile = ev.target.result;
-      if (previewImg) previewImg.src = selectedUploadFile;
-      if (placeholderContent) placeholderContent.classList.add('hidden');
-      if (previewContainer) previewContainer.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-  }
-
-  if (clearPreviewBtn) {
-    clearPreviewBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectedUploadFile = null;
-      if (fileInput) fileInput.value = '';
-      if (placeholderContent) placeholderContent.classList.remove('hidden');
-      if (previewContainer) previewContainer.classList.add('hidden');
+  function processFiles(files) {
+    let loaded = 0;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        queuedPhotos.push({
+          imageUrl: ev.target.result,
+          title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')
+        });
+        loaded++;
+        if (loaded === files.length) {
+          renderQueuedThumbnails();
+        }
+      };
+      reader.readAsDataURL(file);
     });
   }
 
-  // Submit New Memory
-  const submitBtn = document.getElementById('btn-submit-memory');
-  if (submitBtn) {
-    submitBtn.addEventListener('click', () => {
-      const titleInput = document.getElementById('input-memory-title');
-      const captionInput = document.getElementById('input-memory-caption');
-      const tagsInput = document.getElementById('input-memory-tags');
-      const themeSelect = document.getElementById('select-memory-theme');
+  function renderQueuedThumbnails() {
+    if (!queuedContainer || !queuedGrid) return;
 
-      const title = titleInput?.value.trim() || 'Campfire Memory Snap';
-      const caption = captionInput?.value.trim() || 'Laughter and stories around the warm embers.';
-      const tags = tagsInput?.value ? tagsInput.value.split(',').map(s => s.trim()).filter(Boolean) : ['Host (You)'];
+    if (queuedPhotos.length === 0) {
+      queuedContainer.classList.add('hidden');
+      return;
+    }
+
+    queuedContainer.classList.remove('hidden');
+    if (queuedBadge) queuedBadge.textContent = `${queuedPhotos.length} PHOTOS READY`;
+
+    queuedGrid.innerHTML = queuedPhotos.map((photo, idx) => `
+      <div class="relative w-full h-20 rounded-xl overflow-hidden bg-black border border-white/10 group">
+        <img src="${photo.imageUrl}" class="w-full h-full object-cover" alt="Preview" />
+        <button class="btn-remove-queued absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-rose-500 text-white text-[10px] flex items-center justify-center cursor-pointer" data-index="${idx}">
+          ✕
+        </button>
+      </div>
+    `).join('');
+
+    const removeBtns = queuedGrid.querySelectorAll('.btn-remove-queued');
+    removeBtns.forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(b.dataset.index, 10);
+        queuedPhotos.splice(idx, 1);
+        renderQueuedThumbnails();
+      });
+    });
+  }
+
+  if (clearQueuedBtn) {
+    clearQueuedBtn.addEventListener('click', () => {
+      queuedPhotos = [];
+      renderQueuedThumbnails();
+    });
+  }
+
+  // Generate Photobook CTA
+  if (generateAlbumBtn) {
+    generateAlbumBtn.addEventListener('click', () => {
+      const titleInput = document.getElementById('input-album-title');
+      const themeSelect = document.getElementById('select-album-theme');
+      const campersInput = document.getElementById('input-album-campers');
+
+      const title = titleInput?.value.trim() || 'Our Squad Keepsake';
       const theme = themeSelect?.value || 'POLAROID_WARM';
+      const campers = campersInput?.value ? campersInput.value.split(',').map(s => s.trim()).filter(Boolean) : ['Host (You)'];
 
-      // Default sample photo if no image was selected
-      const samplePhotos = [
-        'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80'
-      ];
-      const imageUrl = selectedUploadFile || samplePhotos[Math.floor(Math.random() * samplePhotos.length)];
+      if (queuedPhotos.length === 0) {
+        alert('Please select at least 1 photo to generate your photobook!');
+        return;
+      }
 
-      // Add to store
       audio.playCameraSnap();
-      store.addAlbumMemory({
-        title,
-        caption,
-        imageUrl,
-        camperTags: tags,
+      store.createAlbumFromUploads({
+        albumTitle: title,
         theme,
-        stickers: ['🔥']
+        photos: queuedPhotos,
+        camperTags: campers
       });
 
-      // Reward +25 sparks
-      store.claimDailySparks();
-
-      confettiInstance.burst(50, 1);
-      if (modalUpload) modalUpload.classList.add('hidden');
-
-      // Reset form
-      if (titleInput) titleInput.value = '';
-      if (captionInput) captionInput.value = '';
-      if (tagsInput) tagsInput.value = '';
-      selectedUploadFile = null;
-      if (placeholderContent) placeholderContent.classList.remove('hidden');
-      if (previewContainer) previewContainer.classList.add('hidden');
-
+      confettiInstance.burst(60, 1);
+      queuedPhotos = [];
       reRenderStudio();
     });
   }
 
-  // Like Memory Buttons
-  const likeBtns = document.querySelectorAll('.btn-like-memory');
-  likeBtns.forEach(btn => {
+  // Add More Photos Modal
+  const addMoreBtn = document.getElementById('btn-add-more-photos');
+  const addMoreModal = document.getElementById('modal-add-more');
+  const closeAddMoreBtn = document.getElementById('btn-close-add-more');
+  const dropzoneAddMore = document.getElementById('dropzone-add-more');
+  const addMoreFilesInput = document.getElementById('input-add-more-files');
+
+  if (addMoreBtn && addMoreModal) {
+    addMoreBtn.addEventListener('click', () => {
+      audio.playClick();
+      addMoreModal.classList.remove('hidden');
+    });
+  }
+
+  if (closeAddMoreBtn && addMoreModal) {
+    closeAddMoreBtn.addEventListener('click', () => {
+      addMoreModal.classList.add('hidden');
+    });
+  }
+
+  if (dropzoneAddMore && addMoreFilesInput) {
+    dropzoneAddMore.addEventListener('click', () => addMoreFilesInput.click());
+
+    addMoreFilesInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+
+      let loaded = 0;
+      const newItems = [];
+      files.forEach(f => {
+        const r = new FileReader();
+        r.onload = (ev) => {
+          newItems.push({
+            imageUrl: ev.target.result,
+            title: f.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')
+          });
+          loaded++;
+          if (loaded === files.length) {
+            audio.playCameraSnap();
+            store.createAlbumFromUploads({
+              albumTitle: store.getState().albumTitle || 'Squad Photobook',
+              photos: newItems
+            });
+            confettiInstance.burst(40, 1);
+            addMoreModal.classList.add('hidden');
+            reRenderStudio();
+          }
+        };
+        r.readAsDataURL(f);
+      });
+    });
+  }
+
+  // Story Writer Modal
+  const storyModal = document.getElementById('modal-edit-story');
+  const closeStoryBtn = document.getElementById('btn-close-story-modal');
+  const saveStoryBtn = document.getElementById('btn-save-story');
+
+  const editStoryBtns = document.querySelectorAll('.btn-trigger-edit-story');
+  editStoryBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      audio.playChime();
-      store.likeAlbumMemory(id);
-      reRenderStudio();
+      const mem = (store.getState().albumMemories || []).find(m => m.id === id);
+      if (!mem || !storyModal) return;
+
+      editingMemoryId = id;
+      audio.playClick();
+
+      const thumbEl = document.getElementById('story-modal-thumb');
+      const headingEl = document.getElementById('story-modal-heading');
+      const titleInput = document.getElementById('input-edit-title');
+      const captionInput = document.getElementById('input-edit-caption');
+      const tagsInput = document.getElementById('input-edit-tags');
+      const themeSelect = document.getElementById('select-edit-theme');
+
+      if (thumbEl) thumbEl.src = mem.imageUrl;
+      if (headingEl) headingEl.textContent = mem.title;
+      if (titleInput) titleInput.value = mem.title || '';
+      if (captionInput) captionInput.value = mem.caption || '';
+      if (tagsInput) tagsInput.value = (mem.camperTags || []).join(', ');
+      if (themeSelect) themeSelect.value = mem.theme || 'POLAROID_WARM';
+
+      storyModal.classList.remove('hidden');
     });
   });
 
-  // Stamp Picker Buttons
+  if (closeStoryBtn && storyModal) {
+    closeStoryBtn.addEventListener('click', () => {
+      storyModal.classList.add('hidden');
+    });
+  }
+
+  // Quick Prompt Chips
+  const promptChips = document.querySelectorAll('.btn-prompt-chip');
+  promptChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const captionInput = document.getElementById('input-edit-caption');
+      if (captionInput) {
+        captionInput.value = chip.dataset.text;
+        audio.playClick();
+      }
+    });
+  });
+
+  // Save Story Button
+  if (saveStoryBtn && storyModal) {
+    saveStoryBtn.addEventListener('click', () => {
+      if (!editingMemoryId) return;
+
+      const titleInput = document.getElementById('input-edit-title');
+      const captionInput = document.getElementById('input-edit-caption');
+      const tagsInput = document.getElementById('input-edit-tags');
+      const themeSelect = document.getElementById('select-edit-theme');
+
+      const title = titleInput?.value.trim() || 'Untitled Memory';
+      const caption = captionInput?.value.trim() || '';
+      const tags = tagsInput?.value ? tagsInput.value.split(',').map(s => s.trim()).filter(Boolean) : ['Host'];
+      const theme = themeSelect?.value || 'POLAROID_WARM';
+
+      audio.playChime();
+      store.updateAlbumMemory(editingMemoryId, {
+        title,
+        caption,
+        camperTags: tags,
+        theme
+      });
+
+      storyModal.classList.add('hidden');
+      editingMemoryId = null;
+      reRenderStudio();
+    });
+  }
+
+  // Sticker Stamps
   const stampBtns = document.querySelectorAll('.btn-stamp-picker');
   stampBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -625,81 +879,17 @@ export function bindYearbookEvents() {
     });
   });
 
-  // Polaroid Card Click (Open Lightbox)
-  const polaroids = document.querySelectorAll('.polaroid-card');
-  polaroids.forEach(p => {
-    p.addEventListener('click', () => {
-      const id = p.dataset.id;
-      const memory = (store.getState().albumMemories || []).find(m => m.id === id);
-      if (memory) {
-        openLightbox(memory);
-      }
+  // Like Buttons
+  const likeBtns = document.querySelectorAll('.btn-like-memory');
+  likeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      audio.playChime();
+      store.likeAlbumMemory(id);
+      reRenderStudio();
     });
   });
-
-  function openLightbox(memory) {
-    const modalLightbox = document.getElementById('modal-lightbox');
-    const content = document.getElementById('lightbox-content');
-    if (!modalLightbox || !content) return;
-
-    audio.playClick();
-    content.innerHTML = `
-      <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
-        <h3 class="font-display text-xl font-bold text-white">${memory.title}</h3>
-        <button id="btn-close-lightbox" class="p-1.5 rounded-lg bg-surface-bright hover:bg-white/10 text-gray-400 hover:text-white cursor-pointer">
-          <span class="material-symbols-outlined text-[20px]">close</span>
-        </button>
-      </div>
-
-      <div class="w-full h-80 rounded-2xl overflow-hidden bg-black mb-4">
-        <img src="${memory.imageUrl}" class="w-full h-full object-contain" alt="${memory.title}" />
-      </div>
-
-      <p class="text-sm text-gray-300 italic font-sans mb-4 leading-relaxed">"${memory.caption}"</p>
-
-      <div class="flex items-center justify-between pt-4 border-t border-white/10">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-mono text-gray-400">Add Stamp:</span>
-          ${['🔥', '💖', '💀', '🏆', '🎉'].map(stk => `
-            <button class="btn-lightbox-stamp text-lg p-1 hover:scale-125 transition-transform cursor-pointer" data-id="${memory.id}" data-sticker="${stk}">${stk}</button>
-          `).join('')}
-        </div>
-
-        <button class="btn-delete-memory text-xs font-mono text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer" data-id="${memory.id}">
-          <span class="material-symbols-outlined text-[16px]">delete</span>
-          <span>Remove Photo</span>
-        </button>
-      </div>
-    `;
-
-    modalLightbox.classList.remove('hidden');
-
-    const closeBtn = document.getElementById('btn-close-lightbox');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => modalLightbox.classList.add('hidden'));
-    }
-
-    const deleteBtn = content.querySelector('.btn-delete-memory');
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', () => {
-        audio.playClick();
-        store.deleteAlbumMemory(memory.id);
-        modalLightbox.classList.add('hidden');
-        reRenderStudio();
-      });
-    }
-
-    const stampOptions = content.querySelectorAll('.btn-lightbox-stamp');
-    stampOptions.forEach(opt => {
-      opt.addEventListener('click', () => {
-        const stk = opt.dataset.sticker;
-        audio.playClick();
-        store.addAlbumMemorySticker(memory.id, stk);
-        modalLightbox.classList.add('hidden');
-        reRenderStudio();
-      });
-    });
-  }
 
   function reRenderStudio() {
     const mount = document.getElementById('app-mount');

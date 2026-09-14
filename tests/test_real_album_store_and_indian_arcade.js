@@ -14,32 +14,27 @@ const rootDir = path.resolve(__dirname, '..');
 
 console.log('⚡ Starting Real Album, Store, Cyber Gate & Indian Arcade Test Suite...\n');
 
-// 1. Check gateScreen.js for Cyberpunk Watch Ticker and 3D Tilt Cards
+// 1. Check gateScreen.js for clean portal without watch ticker and with 3D Tilt Cards
 const gateScreenPath = path.join(rootDir, 'js/components/gateScreen.js');
 const gateScreenCode = fs.readFileSync(gateScreenPath, 'utf8');
 
-assert(gateScreenCode.includes('id="cyber-watch-ticker"'), 'gateScreen.js must render cyber-watch-ticker');
-assert(gateScreenCode.includes('id="cyber-watch-digits"'), 'gateScreen.js must render cyber-watch-digits');
-assert(gateScreenCode.includes('id="cyber-watch-ms"'), 'gateScreen.js must render cyber-watch-ms');
-assert(gateScreenCode.includes('id="cyber-watch-telemetry"'), 'gateScreen.js must render cyber-watch-telemetry');
+assert(!gateScreenCode.includes('id="cyber-watch-ticker"'), 'gateScreen.js must NOT contain cyber-watch-ticker per user request');
 assert(gateScreenCode.includes('cyber-tilt-card'), 'gateScreen.js must render 3D tilt cards');
 assert(gateScreenCode.includes('cyber-card-foil'), 'gateScreen.js must render holographic foil overlay');
 assert(gateScreenCode.includes('id="btn-gate-desi"'), 'gateScreen.js must feature Desi Arcadia Indian party warp card');
 assert(gateScreenCode.includes('id="btn-gate-overdrive"'), 'gateScreen.js must implement Overdrive Quantum Energy Pulse');
-console.log('  ✅ PASS: gateScreen.js implements Cyber Watch Ticker, 3D Tilt Cards, and Overdrive Surge');
+console.log('  ✅ PASS: gateScreen.js has watch ticker removed and implements 3D Tilt Cards with Overdrive Surge');
 
-// 2. Check css/components.css for watch ticker and 3D card styling
+// 2. Check css/components.css for 3D card and polaroid styling
 const cssPath = path.join(rootDir, 'css/components.css');
 const cssCode = fs.readFileSync(cssPath, 'utf8');
 
-assert(cssCode.includes('.cyber-watch-ticker-casing'), 'components.css must define .cyber-watch-ticker-casing');
-assert(cssCode.includes('.cyber-watch-led-display'), 'components.css must define .cyber-watch-led-display');
 assert(cssCode.includes('.cyber-tilt-card'), 'components.css must define .cyber-tilt-card');
 assert(cssCode.includes('.cyber-card-foil'), 'components.css must define .cyber-card-foil');
 assert(cssCode.includes('.polaroid-card'), 'components.css must define .polaroid-card');
 assert(cssCode.includes('.polaroid-tape'), 'components.css must define .polaroid-tape');
 assert(cssCode.includes('@media print'), 'components.css must define @media print styles for printable photobook keepsake');
-console.log('  ✅ PASS: css/components.css contains authentic LED watch styles, 3D tilt card styles, and polaroid styles');
+console.log('  ✅ PASS: css/components.css contains authentic 3D tilt card styles, polaroid styles, and print layout');
 
 // 3. Check store.js for Sparks economy and Real Album methods
 const storePath = path.join(rootDir, 'js/state/store.js');
@@ -51,27 +46,29 @@ assert(storeCode.includes('spendSparks'), 'store.js must implement spendSparks()
 assert(storeCode.includes('unlockPerk'), 'store.js must implement unlockPerk()');
 assert(storeCode.includes('recordStoreOrder'), 'store.js must implement recordStoreOrder()');
 assert(storeCode.includes('albumMemories'), 'store.js must track albumMemories');
-assert(storeCode.includes('addAlbumMemory'), 'store.js must implement addAlbumMemory()');
+assert(storeCode.includes('createAlbumFromUploads'), 'store.js must implement createAlbumFromUploads()');
+assert(storeCode.includes('updateAlbumMemory'), 'store.js must implement updateAlbumMemory()');
+assert(storeCode.includes('clearAlbum'), 'store.js must implement clearAlbum()');
 assert(storeCode.includes('deleteAlbumMemory'), 'store.js must implement deleteAlbumMemory()');
 assert(storeCode.includes('addAlbumMemorySticker'), 'store.js must implement addAlbumMemorySticker()');
 assert(storeCode.includes('likeAlbumMemory'), 'store.js must implement likeAlbumMemory()');
-console.log('  ✅ PASS: store.js implements Sparks wallet economy, perk unlocks, order tracking, and album persistence');
+console.log('  ✅ PASS: store.js implements Sparks wallet economy, perk unlocks, order tracking, and dynamic album generation');
 
-// 4. Check yearbookScreen.js for 100% Real Interactive Photo Album Studio
+// 4. Check yearbookScreen.js for 100% Real Interactive Photo Album Studio (Upload First & Story Writer)
 const yearbookPath = path.join(rootDir, 'js/components/yearbookScreen.js');
 const yearbookCode = fs.readFileSync(yearbookPath, 'utf8');
 
 assert(yearbookCode.includes('renderYearbookScreen'), 'yearbookScreen.js must export renderYearbookScreen');
 assert(yearbookCode.includes('bindYearbookEvents'), 'yearbookScreen.js must export bindYearbookEvents');
+assert(yearbookCode.includes('onboarding-dropzone'), 'yearbookScreen.js must first ask user to upload photos');
+assert(yearbookCode.includes('onboarding-file-input'), 'yearbookScreen.js must have multi-photo file picker input');
+assert(yearbookCode.includes('btn-generate-album'), 'yearbookScreen.js must have button to automatically generate album');
+assert(yearbookCode.includes('btn-trigger-edit-story'), 'yearbookScreen.js must provide option to write/edit story for each memory');
+assert(yearbookCode.includes('modal-edit-story'), 'yearbookScreen.js must have story editor modal');
 assert(yearbookCode.includes('tab-mode-layflat'), 'yearbookScreen.js must have 3D Layflat Book mode tab');
 assert(yearbookCode.includes('tab-mode-pinboard'), 'yearbookScreen.js must have Polaroid Pinboard mode tab');
-assert(yearbookCode.includes('modal-upload-memory'), 'yearbookScreen.js must have photo upload modal');
-assert(yearbookCode.includes('input-photo-file'), 'yearbookScreen.js must have file picker input');
-assert(yearbookCode.includes('POLAROID_WARM'), 'yearbookScreen.js must support customizable Polaroid themes');
-assert(yearbookCode.includes('btn-stamp-picker'), 'yearbookScreen.js must support interactive sticker stamping');
-assert(yearbookCode.includes('btn-like-memory'), 'yearbookScreen.js must support heart likes');
-assert(yearbookCode.includes('btn-print-keepsake'), 'yearbookScreen.js must support printable keepsake export');
-console.log('  ✅ PASS: yearbookScreen.js is 100% real with live uploads, 3D layflat flip, pinboard, stickers, and export');
+assert(!yearbookCode.includes('Midnight Campfire Chai & Accidental Confessions'), 'yearbookScreen.js must NOT have hardcoded mock memories');
+console.log('  ✅ PASS: yearbookScreen.js first asks user to upload, auto-generates album, and lets user write stories with no hardcoding');
 
 // 5. Check emporiumScreen.js for Real Store with Sparks and Tracking Receipts
 const emporiumPath = path.join(rootDir, 'js/components/emporiumScreen.js');

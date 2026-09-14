@@ -127,56 +127,7 @@ class ReactiveStore {
   }
 
   getDefaultAlbumMemories() {
-    return [
-      {
-        id: 'mem_1',
-        title: 'Midnight Campfire Chai & Accidental Confessions',
-        caption: 'Someone spilled half the chai into the embers while arguing about whose turn it was to wash the mess tin.',
-        date: '2026-09-12',
-        author: 'Host (You)',
-        camperTags: ['Host (You)', 'Aarav', 'Pooja'],
-        imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-        theme: 'POLAROID_WARM',
-        stickers: ['🔥', '🏆'],
-        likes: 12,
-      },
-      {
-        id: 'mem_2',
-        title: 'The Legendary 3 AM Antakshari Standoff',
-        caption: 'Round 14: Nobody knew a single song starting with "Gy", so someone invented an entire Bhojpuri remix on the spot.',
-        date: '2026-09-10',
-        author: 'Pooja',
-        camperTags: ['Pooja', 'Rohan', 'Sneha'],
-        imageUrl: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
-        theme: 'POLAROID_CYBER',
-        stickers: ['💀', '💖'],
-        likes: 18,
-      },
-      {
-        id: 'mem_3',
-        title: 'Golden Hour Hilltop Trek Polaroid',
-        caption: 'Reached the summit right as the sunset turned the valley crimson. 10/10 would freeze our toes off again.',
-        date: '2026-09-08',
-        author: 'Aarav',
-        camperTags: ['Aarav', 'Host (You)'],
-        imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
-        theme: 'POLAROID_GOLD',
-        stickers: ['💖'],
-        likes: 24,
-      },
-      {
-        id: 'mem_4',
-        title: 'Spin the Bottle Verdict: The Goa Trip Receipt',
-        caption: 'The moment someone finally admitted they had lost the hotel keycard inside the beach shack sand.',
-        date: '2026-09-05',
-        author: 'Sneha',
-        camperTags: ['Sneha', 'Rohan'],
-        imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
-        theme: 'POLAROID_VINTAGE',
-        stickers: ['🤫', '💀'],
-        likes: 31,
-      }
-    ];
+    return [];
   }
 
   loadInitialState() {
@@ -253,8 +204,11 @@ class ReactiveStore {
           if (!parsed.weeklyMission) parsed.weeklyMission = this.getDefaultWeeklyMission();
           if (typeof parsed.userSparks !== 'number') parsed.userSparks = 750;
           if (!Array.isArray(parsed.unlockedPerks)) parsed.unlockedPerks = ['cyber_flame_plasma'];
-          if (!Array.isArray(parsed.orderHistory)) parsed.orderHistory = [];
-          if (!Array.isArray(parsed.albumMemories)) parsed.albumMemories = this.getDefaultAlbumMemories();
+          if (!Array.isArray(parsed.albumMemories)) {
+            parsed.albumMemories = [];
+          } else {
+            parsed.albumMemories = parsed.albumMemories.filter((m) => !['mem_1', 'mem_2', 'mem_3', 'mem_4'].includes(m.id));
+          }
           return parsed;
         }
       } catch (e) {
@@ -923,6 +877,45 @@ class ReactiveStore {
     });
     this.setState({ albumMemories });
     return albumMemories;
+  }
+
+  createAlbumFromUploads({ albumTitle = 'Our Campfire Album', theme = 'POLAROID_WARM', photos = [], camperTags = [] }) {
+    const author = this.state.currentUser?.displayName || 'Host (You)';
+    const newMemories = photos.map((photo, idx) => ({
+      id: `album_${Date.now()}_${idx}_${Math.floor(Math.random() * 1000)}`,
+      title: photo.title || `${albumTitle} #${idx + 1}`,
+      caption: photo.caption || '',
+      date: photo.date || new Date().toISOString().split('T')[0],
+      author: photo.author || author,
+      camperTags: photo.camperTags || (camperTags.length ? camperTags : [author]),
+      imageUrl: typeof photo === 'string' ? photo : (photo.imageUrl || photo.dataUrl),
+      theme: photo.theme || theme,
+      stickers: ['🔥'],
+      likes: 0
+    }));
+
+    const albumMemories = [...newMemories, ...(this.state.albumMemories || [])];
+    this.setState({
+      albumTitle,
+      albumTheme: theme,
+      albumMemories
+    });
+    return albumMemories;
+  }
+
+  updateAlbumMemory(memoryId, updates) {
+    const albumMemories = (this.state.albumMemories || []).map((m) => {
+      if (m.id === memoryId) {
+        return { ...m, ...updates };
+      }
+      return m;
+    });
+    this.setState({ albumMemories });
+    return albumMemories;
+  }
+
+  clearAlbum() {
+    this.setState({ albumMemories: [], albumTitle: null });
   }
 
   persist() {

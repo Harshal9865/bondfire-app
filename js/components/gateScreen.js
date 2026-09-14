@@ -8,8 +8,6 @@
 import { store } from '../state/store.js';
 import { audio } from '../visuals/audioSynth.js';
 
-let watchInterval = null;
-
 export function renderGateScreen() {
   return `
     <div id="cyber-gate-screen" class="cyber-gate-universe select-none notranslate" translate="no">
@@ -81,35 +79,8 @@ export function renderGateScreen() {
           WELCOME TO <span class="bg-gradient-to-r from-sunset-coral via-[#FF7064] to-amber-gold bg-clip-text text-transparent">BONDFIRE</span>
         </h1>
 
-        <!-- RETRO CYBERPUNK DIGITAL WATCH / NEON LED DOT-MATRIX TICKER -->
-        <div id="cyber-watch-ticker" class="cyber-watch-ticker-casing my-2 sm:my-3">
-          <div class="flex items-center gap-3 w-full justify-between pb-1 mb-1 border-b border-white/10 text-[9px] font-mono text-gray-400">
-            <span class="flex items-center gap-1.5 text-amber-gold font-bold">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-gold animate-pulse"></span>
-              <span>QUANTUM TIME ENGINE // UTC</span>
-            </span>
-            <span class="text-mint-green font-mono">SYS.CHRONO v6.4</span>
-          </div>
-
-          <div class="cyber-watch-led-display">
-            <span id="cyber-watch-digits">00:00:00</span>
-            <span class="cyber-watch-ms" id="cyber-watch-ms">.00</span>
-            <span class="text-[10px] font-mono text-gray-400 ml-1">UTC</span>
-          </div>
-
-          <div class="cyber-watch-telemetry-ribbon" id="cyber-watch-telemetry">
-            <span>● LATENCY: 14MS</span>
-            <span>·</span>
-            <span>FREQ: 432HZ</span>
-            <span>·</span>
-            <span>SYNAPSE: 128 BPM</span>
-            <span>·</span>
-            <span class="text-sunset-coral font-bold">P2P SECURE</span>
-          </div>
-        </div>
-
         <!-- Elegant Cyberpunk Subtitle -->
-        <p class="font-mono text-xs sm:text-sm text-gray-300 max-w-lg mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+        <p class="font-mono text-xs sm:text-sm text-gray-300 max-w-lg mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
           <span class="text-amber-gold font-bold">"STEP INTO THE CYBER CAMPFIRE — UNLOCK REAL MEMORIES"</span>
           <span class="block sm:inline text-gray-400 mt-1 sm:mt-0 sm:ml-2">Neural intimacy protocol active · Jack in to connect.</span>
         </p>
@@ -253,28 +224,6 @@ export function bindGateScreenEvents() {
     jukebox.classList.add('hidden');
   }
 
-  // Real-time ticking Cyberpunk Digital Watch updater
-  const digitsEl = document.getElementById('cyber-watch-digits');
-  const msEl = document.getElementById('cyber-watch-ms');
-  
-  if (watchInterval) clearInterval(watchInterval);
-
-  watchInterval = setInterval(() => {
-    if (!document.getElementById('cyber-watch-digits')) {
-      clearInterval(watchInterval);
-      return;
-    }
-    const now = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const h = pad(now.getUTCHours());
-    const m = pad(now.getUTCMinutes());
-    const s = pad(now.getUTCSeconds());
-    const ms = pad(Math.floor(now.getUTCMilliseconds() / 10));
-
-    if (digitsEl) digitsEl.textContent = `${h}:${m}:${s}`;
-    if (msEl) msEl.textContent = `.${ms}`;
-  }, 40);
-
   // Crazy 3D Tilt Card Interaction
   const tiltCards = container.querySelectorAll('.cyber-tilt-card');
   tiltCards.forEach((card) => {
@@ -343,8 +292,6 @@ export function bindGateScreenEvents() {
   const triggerEnterSequence = (targetHash = '#/HOME', targetView = 'HOME') => {
     if (hasEntered) return;
     hasEntered = true;
-
-    if (watchInterval) clearInterval(watchInterval);
 
     // 1. Play futuristic warp sound effect
     audio.playGateWarp();
