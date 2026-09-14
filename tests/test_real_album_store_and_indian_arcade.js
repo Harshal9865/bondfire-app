@@ -151,4 +151,41 @@ assert(audioCode.includes('playCameraSnap'), 'audioSynth.js must implement playC
 assert(audioCode.includes('playLedTick'), 'audioSynth.js must implement playLedTick()');
 console.log('  ✅ PASS: audioSynth.js implements playRoyalFanfare, playCameraSnap, and playLedTick');
 
-console.log('\n🎉 ALL 10 COMPREHENSIVE SUITE TESTS PASSED PERFECTLY!\n');
+// 11. Check Bollywood Antakshari expanded dataset and recent hits
+const quizData = await import('../js/data/bollywoodQuizData.js');
+assert(Array.isArray(quizData.BOLLYWOOD_QUESTIONS), 'BOLLYWOOD_QUESTIONS must be an array');
+assert(quizData.BOLLYWOOD_QUESTIONS.length >= 40, `BOLLYWOOD_QUESTIONS should have at least 40 questions, got ${quizData.BOLLYWOOD_QUESTIONS.length}`);
+
+// Check presence of recent hits (2020-2025)
+const recentHits = quizData.BOLLYWOOD_QUESTIONS.filter(q => q.era === 'RECENT');
+assert(recentHits.length >= 10, 'Must have at least 10 recent blockbuster questions');
+const hasStree2 = quizData.BOLLYWOOD_QUESTIONS.some(q => JSON.stringify(q).includes('Stree 2'));
+const hasAnimal = quizData.BOLLYWOOD_QUESTIONS.some(q => JSON.stringify(q).includes('Animal'));
+const hasJawan = quizData.BOLLYWOOD_QUESTIONS.some(q => JSON.stringify(q).includes('Jawan'));
+const has12thFail = quizData.BOLLYWOOD_QUESTIONS.some(q => JSON.stringify(q).includes('12th Fail'));
+const hasBrahmastra = quizData.BOLLYWOOD_QUESTIONS.some(q => JSON.stringify(q).includes('Brahmāstra') || JSON.stringify(q).includes('Brahmastra'));
+const hasBadNewz = quizData.BOLLYWOOD_QUESTIONS.some(q => JSON.stringify(q).includes('Bad Newz') || JSON.stringify(q).includes('Tauba Tauba'));
+
+assert(hasStree2, 'Must include Stree 2');
+assert(hasAnimal, 'Must include Animal');
+assert(hasJawan, 'Must include Jawan');
+assert(has12thFail, 'Must include 12th Fail');
+assert(hasBrahmastra, 'Must include Brahmāstra');
+assert(hasBadNewz, 'Must include Bad Newz / Tauba Tauba');
+
+// Check era filter function
+assert(typeof quizData.getQuizDeck === 'function', 'getQuizDeck must be exported');
+const recentDeck = quizData.getQuizDeck('RECENT', 5);
+assert(recentDeck.length === 5, 'getQuizDeck must return requested limit');
+assert(recentDeck.every(q => q.era === 'RECENT'), 'Filtered deck must match requested era');
+
+const antakshariDeck = quizData.getQuizDeck('ANTAKSHARI_ONLY', 8);
+assert(antakshariDeck.every(q => q.type === 'ANTAKSHARI'), 'ANTAKSHARI_ONLY filter must return only ANTAKSHARI type');
+
+// Check bollywoodGame.js backwards compatibility re-export
+const bollywoodGame = await import('../js/components/bollywoodGame.js');
+assert(Array.isArray(bollywoodGame.BOLLYWOOD_QUESTIONS), 'bollywoodGame.js must re-export BOLLYWOOD_QUESTIONS');
+assert(bollywoodGame.BOLLYWOOD_QUESTIONS.length >= 40, 'bollywoodGame.js re-exported questions must have >= 40');
+console.log(`  ✅ PASS: Bollywood Antakshari dataset verified (${quizData.BOLLYWOOD_QUESTIONS.length} curated questions with recent blockbusters & era filtering)`);
+
+console.log('\n🎉 ALL 11 COMPREHENSIVE SUITE TESTS PASSED PERFECTLY!\n');
